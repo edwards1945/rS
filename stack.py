@@ -1,6 +1,6 @@
 # stack.7.5.8.py module
 # MOD 7.5.8  
-# #
+# #  no change, trying Git
 
 from rS import *
 import logging
