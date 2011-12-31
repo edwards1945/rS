@@ -233,7 +233,8 @@ class Hand:
     #----------------------------------------------------------------------
 def main():
     import cProfile,  pstats
-    cProfile.run("test()", "prof.py")
+    cProfile.run("test()")
+
     
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.
