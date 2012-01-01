@@ -1,5 +1,5 @@
-# stack.7.5.8.py module
-# MOD 7.5.8  
+# stack.7.5.9.py module
+# MOD 7.5.9  
 # #  no change, trying Git!!!!!!!!!!!
 
 from rS import *
@@ -44,7 +44,7 @@ class Stack(list):
     def DEPRmoveItem(self,  mov,  updateItem_function,  logger=None):
         """ moves an item [crd for rS]: pops it from old stack, pushes it into new stack and calls updateItem() function.
         DEPR: old Mov style
-#:       >>> from rS import *
+        #>>> from rS import *
         #>>> import stack
         #>>> s = stack.Stack('Test')
         
@@ -72,6 +72,7 @@ class Stack(list):
         #>>> s.DEPRmoveItem(mov, lambda c: c+'.updated' )
         #>>> tbl_3
         #['C8', 'C7.updated', 'C6.updated']
+        
         #"""
         #frm_loc,  to_stk,  item =  mov
         #frm_stk =  mov.frm_loc.stk
@@ -82,11 +83,13 @@ class Stack(list):
             #mov.to_stk.PUSH(new_item)  #PUSH new
     #----------------------------------------------------------------------
     def moveMyItems(self,  item, to_stk, updateItem_function):
-        """ moves one or more items -  in  rS - to new stack. For rS the updateItem_function updates the card dictionary with new state.
+        """ moves one or more items -  in  rS items are cards - to the new stack. For rS the updateItem_function updates the card dictionary with new state.
         
         Self can be empty.        
         """
-        if item not in self:  # MOD 7.5.7 111229.1130 DEL> and  item.ndx is None:  # special case: filling a stk.
+        assert  self.name[0] ==  'T'
+        if item not in self:  # special case: populating an empty stk.
+            # MOD 7.5.7 111229.1130 DEL> and  item.ndx is None:  
             to_stk.PUSH(item) 
             updateItem_function(item,  to_stk)        
         else:           
@@ -95,7 +98,9 @@ class Stack(list):
                 self.remove(_itm)   # won't error if empty
                 to_stk.PUSH(_itm)
                 updateItem_function(_itm,  to_stk)        
-                
+            if not self.isEmpty:  # uncovered a card, make it faceUP
+                crd = self.top_item
+                updateItem_function(crd, self)
         
         
         

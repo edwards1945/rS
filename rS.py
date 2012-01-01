@@ -1,5 +1,7 @@
-#rS.7.5.8.py 
-#MOD 7.5.8 
+#rS.7.5.9.py
+#MOD 7.5.9
+## namedtuple Mov2Nme now Mov
+#MOD 7.5.8  implemented uncovered Card in tableau set to faceUP in State and Stack
 
 #I want to compare win rate of non-recursive play versus recursive play.
 
@@ -19,7 +21,7 @@ Cntr =  Counter(['winCnt', 'fCnt',  'nCnt'])
 Crd = namedtuple('Crd', 'suit, valu') #  Card ('H', 3)  OR Crd_EMPTY
 Stt = namedtuple('Stt', 'loc, fce, crd') #  State (('T3', 7), True,('H', 3),)
 newStt =  namedtuple('newStt', ' stkNme,  fce,  crd')
-Mov2Nme = namedtuple('Mov2Nme', 'crd, stkNme')  # Mov2Nme( Crd, 'T5')
+Mov = namedtuple('Mov', 'crd, stkNme')  # Mov( Crd, 'T5')
 HndStat =  namedtuple('HndStat', 'won, f_cnt' )  #HandCount(0, 3)
 SetStat =  namedtuple('SetStat', 'won, f_cnt, n_Cnt' )  #SetCount(5, 4, 50)
 # ***************string formating

@@ -1,5 +1,5 @@
-""" state_testdocs.7.5.8.py 
-#MOD  7.5.8 
+""" state_testdocs.7.5.9.py 
+#MOD  7.5.9 
 # 111226 1445
 # speciality States
 """
@@ -28,6 +28,27 @@ class test_State:
         """
         pass
     
+    def test_populate(self):
+        """       
+        >>> from rS import *
+        >>> import state, stack
+        >>> st = state.State()  # crd2OD & stkOD
+        >>> # **** first assembled as argument
+        >>> st.populate([ newStt('T5',True, Crd('D', 6))])
+        >>> st.crd2OD[Crd('D', 6)]
+        newStt(stkNme='T5', fce=True, crd=Crd(suit='D', valu=6))
+        >>> # **** now multiple pops 
+        >>> p1 = [newStt('T3', False, Crd('C', 13))]
+        >>> p1.append( newStt('T3', False, Crd('C', 12)))
+        >>> p1.append( newStt('H', True, Crd('C', 11)))
+        >>> st.populate(p1)
+        
+        >>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
+        >>> l1 == [('T3', 2), ('T5', 1), ('H', 1)]
+        True
+        >>> #SUCCESSFUL POPULATING        
+        """
+    
 class test_FullState:   
     """
     # TESTS: include
@@ -54,6 +75,19 @@ class test_FullState:
     >>> t6.top_item  != Crd(suit='C', valu=1)
     True
     >>>
+    >>> import state
+    >>> from rS import *
+    >>> ff = state.FullFoundations()
+    >>> ff.fndCnt == 52
+    True
+    >>> ff.stkOD['S'][0] == Crd(suit='S', valu=1)
+    True
+    >>> ff.stkOD['S'].top_item == Crd(suit='S', valu=13)
+    True
+    >>> ff.stkOD['C'].top_item == Crd(suit='C', valu=13)
+    True
+    >>>    
+    
     """
     pass
 

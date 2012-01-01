@@ -1,5 +1,5 @@
-# stack_testdocs.7.5.8.py module
-# MOD 7.5.8  
+# stack_testdocs.7.5.9.py module
+# MOD 7.5.9  
 
 from rS import *
 import logging
@@ -8,6 +8,14 @@ import logging.config
 class Stack(deque):
     """ named deque of 0 to 52 somethings. For rS it's Stt.
     
+    >>> from rS import *
+     >>> import state, stack
+     >>> st = state.State()
+     >>> len(st.crd2OD) == 52
+     True
+     >>> len(st.stkOD)  == 11
+     True
+        
     >>> from rS import *
     >>> import stack
     >>> s = stack.Stack('Test')

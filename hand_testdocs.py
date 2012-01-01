@@ -1,5 +1,5 @@
-#hand.testdocs.7.5.8.py
-#MOD 7.5.8
+#hand.testdocs.7.5.9.py
+#MOD 7.5.9
 
 class testHand:
     def test_PLAY_1_Set(self):
@@ -116,17 +116,17 @@ class testHand:
         #>>> h.kngMove(st)  # OBJECT UNDER TEST
         #True
         #>>> h.kngMovesL[0]  # the first move will be H-13 in T3 to T2
-        #Mov2Nme(crd=Crd(suit='H', valu=13), stkNme='T2')
+        #Mov(crd=Crd(suit='H', valu=13), stkNme='T2')
         #>>> h.kngMovesL[1]
-        #Mov2Nme(crd=Crd(suit='H', valu=13), stkNme='T6')
+        #Mov(crd=Crd(suit='H', valu=13), stkNme='T6')
         #>>> h.kngMovesL[2]
-        #Mov2Nme(crd=Crd(suit='C', valu=13), stkNme='T2')
+        #Mov(crd=Crd(suit='C', valu=13), stkNme='T2')
         #>>> h.kngMovesL[3]  
-        #Mov2Nme(crd=Crd(suit='C', valu=13), stkNme='T6')
+        #Mov(crd=Crd(suit='C', valu=13), stkNme='T6')
         #>>> len(h.kngMovesL) ==  4
         #True
-        #>>>  # *************  move one to confirm moveCrd2Nme() works
-        #>>> h.state.moveCrd2Nme(h.kngMovesL[0])  #UNDER TEST METHOD
+        #>>>  # *************  move one to confirm move() works
+        #>>> h.state.move(h.kngMovesL[0])  #UNDER TEST METHOD
         #>>> st.stkOD['T3'].top_item  # >>  was buried under king
         #Crd(suit='C', valu=1)
         #>>> st.stkOD['T2'].top_item  # card on top of buried Kng
@@ -157,19 +157,19 @@ class testHand:
         False
         >>> len(h.sibMovesL) ==  0
         True
-        >>> # OBJECT UNDER TEST #don't call moveCrd2Nme with no moves OR handle it better than assert !!   
+        >>> # OBJECT UNDER TEST #don't call move with no moves OR handle it better than assert !!   
         >>>
-        #NOTE: The following really tests State.moveCrd2Nme. Should be in State. Figureout what to do with a call of no moves.
-        #>>> st.moveCrd2Nme(h.sibMovesL)
+        #NOTE: The following really tests State.move. Should be in State. Figureout what to do with a call of no moves.
+        #>>> st.move(h.sibMovesL)
         #Traceback (most recent call last):
         #...
-        #AssertionError: WARNING: Don't call moveCrd2Nme with empty move list.
+        #AssertionError: WARNING: Don't call move with empty move list.
         >>> # ********** try again but with faceUP sib
         >>> new_Stt = st.crd2OD[sib_crd]._replace(fce=True)
         >>> st.crd2OD[sib_crd] = new_Stt
         >>> h.sibMove(st) # OBJECT UNDER TEST
         True
-        >>> st.moveCrd2Nme(h.sibMovesL[0])  # OBJECT UNDER TEST
+        >>> st.move(h.sibMovesL[0])  # OBJECT UNDER TEST
         >>> st.stkOD['T6'].top_item  # >>  empty
         >>> st.stkOD['T3'].top_item  # sib
         Crd(suit='D', valu=2)

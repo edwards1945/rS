@@ -1,5 +1,6 @@
-""" state.7.5.8.py 
+""" state.7.5.9.py 
 """
+# MOD 7.5.8 implemented uncovered Card in tableau set to faceUP in State and Stack
 #MOD 7.5.6 working on play_1 and play_n Hands
 #    111228.1325 finally rid of Stt, using newStt everywhere - Ihope.
 #         and redid populate() using newStt - ie without Loc term
@@ -10,7 +11,7 @@
 #     111225 State has new OD, crd2OD: notice crd<s>, aleady populated with 52 cards
 #     111225  adding TestStates
 #     111225 ADDEd rS,namedtuple Ppu to avoid py name conflict with Pop
-#     111225 DEPR  moveCrd() for NEW moveCrd2Nme() 
+#     111225 DEPR  moveCrd() for NEW move() 
 #     111225 CHANGED nt Mov FROM Mov(crd, to_stk) TO Mov(crd, stkNme)
 #            because (1) seeing a Mov shows stak name and (2) it doesn't show ALL the items in the stk.
 
@@ -27,15 +28,7 @@ class State:
     def __init__(self):
         """ populating it's two dicts: 52 named Crds w/o state and 11 named but empty Stacks.)
         
-        >>> from rS import *
-        >>> import state, stack
-        >>> st = state.State()
-        >>> len(st.crd2OD) == 52
-        True
-        >>> len(st.stkOD)  == 11
-        True
-        
-        """
+         """
         self.crd2OD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) #MOD 7.5.4
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
         pass
@@ -49,56 +42,59 @@ class State:
     @property
     def haveWon(self):
         return  True if self.fndCnt ==  52 else False
-    def moveCrd2Nme(self,  mov2, logger=None):  #MOD 7.5.4
-        """ faceUP Crd || Crds >TO> StackNme:
-        
+    def move(self,  mov2, logger=None):  #MOD 7.5.4
+        """ faceUP Crd[s] >TO> StackNme:
+        CALLED from Hand.
         # tests include:
         >>> # ********** BASIC: tbl TOP  >TO> tbl_top
         
         >>> # ********** BASIC: tbl SLICE >TO> tbl_top
+        >>> import state, stack
+        >>> from rS import *
+        >>> st =state.State()
+        >>> p1 = [newStt('T3', True, Crd('C', 13))]
+        >>> p1.append( newStt('T3', True, Crd('C', 12)))  # TEST CARD. No matter what fce I choose UP or DOWN the population call will make it UP.
+        >>> p1.append( newStt('T3', True, Crd('C', 1)))
+        >>> st.populate(p1)
+        >>> cs =st.crd2OD[Crd('C', 12)]
+        >>> cs = cs._replace(fce=False)
+        >>> st.crd2OD[Crd('C', 12)] = cs
+        >>> st.crd2OD[Crd('C', 12)] .fce
+        False
+        >>> # State IS POPULATED *********
+        >>> mov = Mov(Crd('C', 1), 'H')
+        >>> st.move(mov)
+        >>> st.crd2OD[st.stkOD['T3'].top_item].fce  #C-12 set faceUP
+        True
         """
-       #Mov2Nme handles updating <dict> crd2OD and crd.newStt; 
-       # the call to frm_stk.moveMyItem() handles the <dict> stkOD updates via the updateItem_function().
+       #
+       # the call  frm_stk.moveMyItem() handles the <dict> stkOD pop and push
+       # # snd updates the <dict> crd2OD via the passed function: updateItem_function().
         
         crd = mov2.crd
         to_stk_nme =  mov2.stkNme
         to_stk = self.stkOD[to_stk_nme]
+        to_stk_orig_top_crd = to_stk.top_item
         frm_stk_nme =  self.crd2OD[crd].stkNme
         frm_stk = self.stkOD[frm_stk_nme]
         
         imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, to_stk_nme,  to_stk )
         
         def updateItem_function( crd,  to_stk):
+            """ """
             self.crd2OD[crd] = newStt(to_stk.name,  True,  crd)
-            
+                  
         frm_stk.moveMyItems(crd, to_stk,  updateItem_function)  # >> crd now switched & newStt updated.
         
         imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
         if logger:
-            logger.info("State.moveCrd2Nme .. [{}] >> [{}]   *******************".format(frm_stk_nme, to_stk_nme))            
+            logger.info("State.move ..{}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
             logger.debug(imsg)
-            
+        pass    
     #----------------------------------------------------------------------
     def populate(self,  newSttL):
         """populate State using a <list> one or more newStts: newStt(stk_nme, fce, Crd)
-        
-        >>> from rS import *
-        >>> import state, stack
-        >>> st = state.State()  # crd2OD & stkOD
-        >>> # **** first assembled as argument
-        >>> st.populate([ newStt('T5',True, Crd('D', 6))])
-        >>> st.crd2OD[Crd('D', 6)]
-        newStt(stkNme='T5', fce=True, crd=Crd(suit='D', valu=6))
-        >>> # **** now multiple pops 
-        >>> p1 = [newStt('T3', False, Crd('C', 13))]
-        >>> p1.append( newStt('T3', False, Crd('C', 12)))
-        >>> p1.append( newStt('H', True, Crd('C', 11)))
-        >>> st.populate(p1)
-        
-        >>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
-        >>> l1 == [('T3', 2), ('T5', 1), ('H', 1)]
-        True
-        >>> #SUCCESSFUL POPULATING
+ 
         """
         for nxt in  newSttL:
             crd = nxt.crd  
@@ -150,7 +146,7 @@ class FullState(State):
         build_full(self,  shuffle)
         
 #class TS2(State):
-    #""" for use with new moveCrd2Nme()   #MOD 7.5.4"""
+    #""" for use with new move()   #MOD 7.5.4"""
     #def __init__(self):
         #State.__init__(self)  # so all
         #self.populate(Ppu('T5', True,  Crd('C', 1)))
@@ -158,25 +154,14 @@ class FullState(State):
         #self.populate(Ppu('T5', True,  Crd('S', 5)))
         #self.populate(Ppu('T3', True,  Crd('S', 6 )))  #
         ## BASIC tbl_top TO tbl_top        
-        #self.mov2_1 = Mov2Nme(Crd('S', 5), 'T3')  # T3 will have two crds: S6 & S5
+        #self.mov2_1 = Mov(Crd('S', 5), 'T3')  # T3 will have two crds: S6 & S5
         ## BASIC: tbl_slice >TO> tbl_top
-        #self.mov2_2 = Mov2Nme( Crd('C', 1), 'T0' )  # T0 will have C1 & H10
+        #self.mov2_2 = Mov( Crd('C', 1), 'T0' )  # T0 will have C1 & H10
         #self.ret2_2 = Stt(loc=Loc(stk=[Crd(suit='C', valu=1), Crd(suit='H', valu=10)], ndx=0), fce=True, crd=Crd(suit='C', valu=1))        
         
 class FullFoundations(State):
     """ 
-    >>> import state
-    >>> from rS import *
-    >>> ff = state.FullFoundations()
-    >>> ff.fndCnt == 52
-    True
-    >>> ff.stkOD['S'][0] == Crd(suit='S', valu=1)
-    True
-    >>> ff.stkOD['S'].top_item == Crd(suit='S', valu=13)
-    True
-    >>> ff.stkOD['C'].top_item == Crd(suit='C', valu=13)
-    True
-    >>>
+
     """
     def __init__(self):
         State.__init__(self)
@@ -186,5 +171,5 @@ if __name__ == "__main__":
     import doctest
     logging.config.fileConfig('myConfig.conf') 
     doctest.testmod(verbose=False)
-    doctest.testfile("state_testdocs.py")
+    #doctest.testfile("state_testdocs.py")
     #doctest.testfile("deal.print.txt")
