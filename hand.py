@@ -259,8 +259,8 @@ class Hand:
     #----------------------------------------------------------------------
 def main():
     import cProfile,  pstats
-    cProfile.run("test()")  # any change to see it in git
-    #test()
+    #cProfile.run("test()")  # any change to see it in git
+    test()
 
     
 def test():
