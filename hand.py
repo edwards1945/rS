@@ -1,5 +1,5 @@
-#hand.7.5.8     
-#MOD 7.5.8
+#hand.7.5.9     
+#MOD 7.5.9
 # # stops after one pass thru PLAY_1_Hand: need anonther while suit
 # # Hand.state is now default to basic State()
 # #implementing fnd, kng and sib moves.  111225-
@@ -53,33 +53,21 @@ class Hand:
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         RETURNS HndStat(won, fCnt)
         >>> import  state, hand
-        >>> from rS import *
-        >>> testSetCntr = Counter(['winCnt', 'fCnt', 'nCnt'])
+        >>> import logging
+        >>> import logging.config
+        >>> from rS import *      
+        >>> logger = logging.getLogger('myWARN')
+        
+        >>> testSetCntr = Cntr
         >>>
-        >>> #  ****** TESTS # (1) state WON: fndCnt == 52
-        >>> h = hand.Hand()
-        >>> h.state = state.FullFoundations()  # already at theend
-        >>> testSetCntr.clear()
-        >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr
-        Counter({'fCnt': 52, 'winCnt': 1, 'nCnt': 1})
-        >>> # *******TESTS # (2) state STYMID: no moves available
-        >>> h.state = state.State()
-        >>> s0 = newStt('T1', True, Crd('H', 1 ))
-        >>> s1 = newStt('T1', True, Crd( 'H', 2))  # BLOCKS ACE MOVE
-        >>> h.state.populate([ s0, s1])
-        >>> testSetCntr.clear()
-        >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr['fCnt']
-        0
-        >>> # ********* # (3) testdata sequenced for all fndMove
+        >>> # ********* # (4) testdata shuffled
         >>> h = hand.Hand()        
-        >>> h.state = state.FullState(False)
+        >>> h.state = state.FullState()  # default is shuffle: True
+        >>> logger = logging.getLogger('myINFO')
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr['fCnt']
-        52
-        >>>
+        >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+        >>> #testSetCntr
+        >>>        
         """        
         if not logger:  logger = logging.getLogger('myWARN')
         #  myDEBUG OR myINFO OR myWARN
@@ -95,17 +83,17 @@ class Hand:
         
         hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
         while hasMovs:           
-            while has_fndMov :  #MOD 30.1150>and mCntr['k']  <=  52:  #keep this while, rapidly does whole seq
+            while self.fndMove(state,  logger)   :  #MOD 30.1150>and mCntr['k']  <=  52:  #keep this while, rapidly does whole seq
                 mCntr['f'] += 1
-                self.state.moveCrd2Nme(self.fndMovesL[-1], logger)
-                has_fndMov = self.fndMove(state,  logger)       
-            if has_kng_Mov:  #MOD 30.1150> and mCntr['k']  <=  24:
+                self.state.move(self.fndMovesL[-1], logger)
+                #has_fndMov = self.fndMove(state,  logger)       
+            while self.kngMove(state,  logger):  #MOD 30.1150> and mCntr['k']  <=  24:
                 mCntr['k'] +=  1
-                self.state.moveCrd2Nme(self.kngMovesL[-1], logger)
+                self.state.move(self.kngMovesL[-1], logger)
                 #has_kng_Mov =  self.kngMove(state,  logger)
-            if has_sibMov:  #MOD 30.1150> or mCntr['s']  >  200:
+            while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
                 mCntr['s'] +=  1                   
-                self.state.moveCrd2Nme(self.sibMovesL[-1], logger)
+                self.state.move(self.sibMovesL[-1], logger)
                 #has_sibMov = self.sibMove(state,  logger)
                 
             has_fndMov = self.fndMove(state,  logger)  
@@ -116,10 +104,11 @@ class Hand:
                  
         
         if state.haveWon: hCntr['winCnt'] = 1
+        assert  mCntr['f'] ==  state.fndCnt
         hCntr['fCnt'] = state.fndCnt
         hCntr['nCnt'] += 1
                    
-        if logger: logger.info("  *********************************************** Hand (f,n,w)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
+        if logger: logger.info("  **************** Hand (f,n,w)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
         return hCntr
 
     def kngMove(self, state, logger=None):
@@ -152,7 +141,7 @@ class Hand:
                            and RULE_crd_Is_faceUP(stt)
                            and RULE_crd_not_first_crd(crd,  stt)
                            and RULE_crd_Is_in_tbl(stt)]
-            _movL =  [(Mov2Nme( kng_crd,  mty_nme))
+            _movL =  [(Mov( kng_crd,  mty_nme))
                            for kng_nme, kng_crd in  _faceUP_tbl_kngL
                            for mty_nme in  _empty_tbl_stkL
                            if kng_nme != mty_nme]
@@ -161,6 +150,38 @@ class Hand:
             
         return  len(self.kngMovesL ) >  0
            
+    def test_fndMove(self):
+        """SETS self.fndMovesL  - faceUP, topCrd in tableau moves to  foundation topCrd if f_Crd is younger sib of t_Crd 
+        >>> import  state, hand
+        >>> from rS import *
+        >>> st = state.State()
+        >>> h = hand.Hand(st)
+        
+        # populate a foundation test to
+        # (1) topTbl no match in foundation
+        # (2)topTbl has match in foundation
+        # (3)topTbl Ace has match in empty foundation
+        # (4)buried Tbl has match in foundation: NO MOVE
+        # (5) faceDown Ace: No MOVE
+        >>> newSttL = []
+        >>> newSttL.append(newStt( 'T0', True, Crd('C', 2))) #(1)      
+        >>> newSttL.append(newStt( 'T1', True, Crd('D', 2)))  #(2)       
+        >>> newSttL.append(newStt( 'D', True, Crd('D', 1))) #(2)   MOVE  
+        >>> newSttL.append(newStt( 'T2', True, Crd('H', 1))) #(3)  MOVE
+        >>> newSttL.append(newStt( 'T3', True, Crd('S', 1))) #(4)  
+        >>> newSttL.append(newStt( 'T3', True, Crd('S', 2))) #(4)
+        >>> newSttL.append(newStt( 'T4', False, Crd('C', 1))) #(5)  MOVE - the top will reset to True
+        >>> #newSttL
+        >>> st.populate(newSttL)
+        >>> h.fndMove(st)  #  UNDER TEST ITEM
+        True
+        >>> len( h.fndMovesL)   # expect 
+        3
+        >>> #del st
+        >>>
+        """
+        
+
     def fndMove(self, state, logger=None):
         """SETS self.fndMovesL  RETURNS True if there are moves.
         
@@ -172,8 +193,8 @@ class Hand:
         #self.fndMovesL 
         RULE_topNotEmpty =  lambda nme:  not state.stkOD[nme].isEmpty
         RULE_tbl_IsAce = lambda tbl_crd: tbl_crd.valu ==  1
-        RULE_tbl_fnd_tops_Match =  lambda fnd_crd,  tbl_crd:  tbl_crd == fnd_crd._replace(valu=fnd_crd.valu+1)
-        RULE_fnd_PossibleMoves =  lambda tbl_topL:  tbl_topL  #  empty foundations can exist
+        RULE_tbl_fnd_tops_Match =  lambda tbl_crd , fnd_crd  :  tbl_crd == fnd_crd._replace(valu=fnd_crd.valu+1)
+        #RULE_fnd_PossibleMoves =  lambda tbl_topL:  tbl_topL  #  empty foundations can exist
         
         del self.fndMovesL[:]
         
@@ -184,17 +205,18 @@ class Hand:
         # TO foundation
         not_mty_fnd_topCrdL = [(state.stkOD[nme].top_item)
                       for nme in  FOUNDATIONS
-                      if RULE_topNotEmpty(nme)]  
+                      if RULE_topNotEmpty(nme)]  #excludes empty foundations; but tabl aces will fill them.
         
-        if RULE_fnd_PossibleMoves(not_mty_topCrdL):
+        if not_mty_topCrdL:  # at least one topCrd
             for tbl_crd in  not_mty_topCrdL:
                 if RULE_tbl_IsAce(tbl_crd):  #special case: avoid fnd_crd.ndx==None
-                    self.fndMovesL.append(Mov2Nme( tbl_crd,  tbl_crd.suit))
+                    self.fndMovesL.append(Mov( tbl_crd,  tbl_crd.suit))
                 else: 
                     for fnd_crd  in  not_mty_fnd_topCrdL:
-                        if RULE_tbl_fnd_tops_Match(fnd_crd,  tbl_crd):
-                            self.fndMovesL.append(Mov2Nme( tbl_crd,  fnd_crd.suit))
-
+                        if RULE_tbl_fnd_tops_Match( tbl_crd,  fnd_crd):
+                            self.fndMovesL.append(Mov( tbl_crd,  tbl_crd.suit))
+                            
+        # assert from is not in foundation 
         return  len(self.fndMovesL ) >  0
         
     def sibMove(self, state, logger=None):
@@ -202,10 +224,11 @@ class Hand:
         
         - faceUP, buried or not, sib_crd in another tableau moves to a tableau top_crd that can't be an ace.
         """# TESTS in hand_testdocs.py
-        makeStk = lambda nme: state.stkOD[nme]
+        #makeStk = lambda nme: state.stkOD[nme]
         
         RULE_topNotEmpty =  lambda stk:  not stk.isEmpty
         RULE_sibFaceUp =  lambda stt: stt.fce
+        RULE_sib_Not_In_Foundation = lambda stk: stk.name[0] == 'T' 
         RULE_sibDiffTbl =  lambda tbl_stk,  sib_stk : tbl_stk.name !=  sib_stk.name
         
         del self.sibMovesL[:]
@@ -218,14 +241,17 @@ class Hand:
         
         for tbl_stk in  not_mty_stkL :
             top_crd =  tbl_stk.top_item
-            if top_crd.valu !=  1:  # no sib for an Ace
+            if top_crd.valu !=  1:  # no sib for an Ace 
+                # REFACT: maybe do something if it is an ace
                 sib_crd = top_crd._replace(valu=top_crd.valu-1)
                 sib_stt = state.crd2OD[sib_crd]
                 if sib_stt:  # could be empty stack in TESTING.: 
                     sib_stk =  state.stkOD[sib_stt.stkNme]
-                    if RULE_sibFaceUp(sib_stt) and RULE_sibDiffTbl(sib_stk, tbl_stk):
-                        mov =  Mov2Nme(sib_crd, tbl_stk.name)                    
-                        self.sibMovesL.append(mov)  
+                    if (RULE_sibFaceUp(sib_stt)\
+                        and RULE_sibDiffTbl(sib_stk, tbl_stk)\
+                        and RULE_sib_Not_In_Foundation(sib_stk)):                        
+                            mov =  Mov(sib_crd, tbl_stk.name)                    
+                            self.sibMovesL.append(mov)  
         return  len(self.sibMovesL )  >  0  
         
   
@@ -234,6 +260,7 @@ class Hand:
 def main():
     import cProfile,  pstats
     cProfile.run("test()")  # any change to see it in git
+    #test()
 
     
 def test():
@@ -243,8 +270,8 @@ def test():
     s =  state.State()
     h =  hand.Hand(s)
     
-    setCnt = 50
-    gmeCnt = 10
+    setCnt = 20
+    gmeCnt = 50
     
     tstCntr = Cntr; tstCntr.clear()
     for i in range(gmeCnt):
