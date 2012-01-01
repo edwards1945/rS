@@ -1,5 +1,6 @@
 #hand.testdocs.7.5.9.py
-#MOD 7.5.9
+#MOD 7.5.9  look for git
+
 
 class testHand:
     def test_PLAY_1_Set(self):
