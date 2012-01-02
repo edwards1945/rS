@@ -1,12 +1,13 @@
-#hand.7.5.9     
-#MOD 7.5.9
+#hand.7.6     
+#MOD 7.6  Tested Basic play @ 2.5- 3 %
 # # stops after one pass thru PLAY_1_Hand: need anonther while suit
 # # Hand.state is now default to basic State()
 # #implementing fnd, kng and sib moves.  111225-
 
+
 from rS import *
+from  time import  clock  
 import state
-import  hand
 import logging
 import logging.config
 
@@ -31,50 +32,39 @@ class Hand:
     def PLAY_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
-        One Hand FINDS & EXECUTES Moves until stymied or WON.
-        
-        
+        One Hand FINDS & EXECUTES Moves until stymied or WON.    
         """
         if not logger: logger = logging.getLogger('MyINFO')
         #  myDEBUG OR myINFO OR myWARN
-        setCntr =  Cntr; setCntr.clear()
+        setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
             self.state = state.FullState(True)  #new shuffled state.
-            setCntr += self.PLAY_1_Hand(logger=logger)
+            setCntr += self.PLAY_1_Hand(logger=logger)            
+            pass
             
-        n = setCntr['nCnt']
+        n = nCnt =  setCntr['nCnt']
         f = setCntr['fCnt']
+        dt = setCntr['msClk']
         w =  setCntr['winCnt']
-        ret = "  **[{:.1%}]** {:2} WINS in {} HANDS; {} FndCnt @AVG:fnd:{:.1f}.\n".format(w / n  , w,  n, f,  f / n)
+        winMean = w / n  # mean
+        std = calculate_std2(nCnt, winMean)
+        setCntr['std'] =  std  # new
+        ret = "  **** {:2} WINS mean/std [{:.1%}/{:1.2}]  in {} HANDS; {} FndCnt @AVG:fnd:{:.1f} & AVG:ms:{:3.1f}.\n".format( w, std, w / n ,  n, f,  f / n,  dt / n )
         if logger: logger.warn(ret)
         return  setCntr
     
     def PLAY_1_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         RETURNS HndStat(won, fCnt)
-        >>> import  state, hand
-        >>> import logging
-        >>> import logging.config
-        >>> from rS import *      
-        >>> logger = logging.getLogger('myWARN')
-        
-        >>> testSetCntr = Cntr
-        >>>
-        >>> # ********* # (4) testdata shuffled
-        >>> h = hand.Hand()        
-        >>> h.state = state.FullState()  # default is shuffle: True
-        >>> logger = logging.getLogger('myINFO')
-        >>> testSetCntr.clear()
-        >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
-        >>> #testSetCntr
-        >>>        
+    
         """        
         if not logger:  logger = logging.getLogger('myWARN')
         #  myDEBUG OR myINFO OR myWARN
         if not state:
             state = self.state    #MOD 7.5.6
-        hCntr = Counter(fCnt=0, nCnt=0, winCnt=0)
+        hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         mCntr = Counter(f=0,  k=0,  s=0)
+        startClk =  clock()
         
         # MOD 7.5.8 111230 0640 just beginning, while has_Movs not implemented
         has_fndMov = self.fndMove(state,  logger)  
@@ -103,12 +93,12 @@ class Hand:
             hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
                  
         
-        if state.haveWon: hCntr['winCnt'] = 1
-        assert  mCntr['f'] ==  state.fndCnt
+        hCntr['msClk'] = (clock() - startClk) *  1000
+        hCntr['winCnt'] = 1 if state.haveWon else 0
+        #assert  mCntr['f'] ==  state.fndCnt
         hCntr['fCnt'] = state.fndCnt
-        hCntr['nCnt'] += 1
-                   
-        if logger: logger.info("  **************** Hand (f,n,w)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
+        hCntr['nCnt'] = 1
+        if logger: logger.info("  **************** Hand (f,n,w,ms)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
         return hCntr
 
     def kngMove(self, state, logger=None):
@@ -150,38 +140,6 @@ class Hand:
             
         return  len(self.kngMovesL ) >  0
            
-    def test_fndMove(self):
-        """SETS self.fndMovesL  - faceUP, topCrd in tableau moves to  foundation topCrd if f_Crd is younger sib of t_Crd 
-        >>> import  state, hand
-        >>> from rS import *
-        >>> st = state.State()
-        >>> h = hand.Hand(st)
-        
-        # populate a foundation test to
-        # (1) topTbl no match in foundation
-        # (2)topTbl has match in foundation
-        # (3)topTbl Ace has match in empty foundation
-        # (4)buried Tbl has match in foundation: NO MOVE
-        # (5) faceDown Ace: No MOVE
-        >>> newSttL = []
-        >>> newSttL.append(newStt( 'T0', True, Crd('C', 2))) #(1)      
-        >>> newSttL.append(newStt( 'T1', True, Crd('D', 2)))  #(2)       
-        >>> newSttL.append(newStt( 'D', True, Crd('D', 1))) #(2)   MOVE  
-        >>> newSttL.append(newStt( 'T2', True, Crd('H', 1))) #(3)  MOVE
-        >>> newSttL.append(newStt( 'T3', True, Crd('S', 1))) #(4)  
-        >>> newSttL.append(newStt( 'T3', True, Crd('S', 2))) #(4)
-        >>> newSttL.append(newStt( 'T4', False, Crd('C', 1))) #(5)  MOVE - the top will reset to True
-        >>> #newSttL
-        >>> st.populate(newSttL)
-        >>> h.fndMove(st)  #  UNDER TEST ITEM
-        True
-        >>> len( h.fndMovesL)   # expect 
-        3
-        >>> #del st
-        >>>
-        """
-        
-
     def fndMove(self, state, logger=None):
         """SETS self.fndMovesL  RETURNS True if there are moves.
         
@@ -257,38 +215,33 @@ class Hand:
   
             
     #----------------------------------------------------------------------
-def main():
-    import cProfile,  pstats
-    #cProfile.run("test()")  # any change to see it in git
-    test()
-
     
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.
     PRINTS summary stats.
     """    
     s =  state.State()
-    h =  hand.Hand(s)
+    h =  Hand(s)
     
-    setCnt = 20
-    gmeCnt = 50
+    setCnt = 50
+    gmeCnt = 20
     
-    tstCntr = Cntr; tstCntr.clear()
+    tstCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+    
     for i in range(gmeCnt):
         tstCntr += h.PLAY_1_Set(setCnt)
-    print(tstCntr)
+    #print(tstCntr)
+    n = tstCntr['nCnt']
+    print( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
     
-    #tst_wins +=  gme_wins
-    #tst_fndCnt +=  gme_fndCnt
-    #print( "**** WIN:{: .1%}  AvgFnd:{:.1f}  in {} Games of {} Hands ***********".format(tst_wins / tstCnt,  tst_fndCnt / tstCnt,  gmeCnt,  setCnt))
+
       
 #----------------------------------------------------------------------
 if __name__ == "__main__":
     logging.config.fileConfig('myConfig.conf')        
     import doctest
-    #doctest.testmod(verbose=False)
-    #doctest.testfile("hand_testdocs.py")
-    main()
+    doctest.testmod(verbose=False)
+    #doctest.testfile("hand_testdocs.py"
     
     
 

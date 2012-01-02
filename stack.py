@@ -1,8 +1,8 @@
-# stack.7.5.9.py module
-# MOD 7.5.9  
-# #  no change, trying Git!!!!!!!!!!!
+# stack.7.6.py module
+# MOD 7.6  Tested Basic play @ 2.5- 3 %
+# #  
 
-from rS import *
+#from rS import *
 import logging
 import logging.config
     
@@ -41,46 +41,7 @@ class Stack(list):
         except IndexError:
             return  None
     #----------------------------------------------------------------------
-    def DEPRmoveItem(self,  mov,  updateItem_function,  logger=None):
-        """ moves an item [crd for rS]: pops it from old stack, pushes it into new stack and calls updateItem() function.
-        DEPR: old Mov style
-        #>>> from rS import *
-        #>>> import stack
-        #>>> s = stack.Stack('Test')
-        
-        ## ************* TEST a top to top Mov  **********
-        #>>> fnd_H =stack.Stack('H')
-        #>>> tbl_1 = stack.Stack('T1')  #new stack
-        #>>> tbl_1.PUSH('H0') 
-        #>>> frm_Loc =Loc(tbl_1, tbl_1.top_ndx)
-        #>>> frm_Loc
-        #Loc(stk=['H0'], ndx=0)
-        #>>> # ********  setup complete
-        #>>> mov = Mov(frm_Loc, fnd_H, 'H0')
-        #>>> s.DEPRmoveItem(mov, lambda c: c+'.updated')
-        #>>> tbl_1.top_item
-        #>>> fnd_H.top_item
-        #'H0.updated'
-        
-        ## ************** TEST a NOT top  to top  Mov *****
-        #>>> tbl_2 = stack.Stack('T2')
-        #>>> tbl_2.extend(['S13','C7', 'C6'])
-        #>>> tbl_3 = stack.Stack('T3')
-        #>>> tbl_3.PUSH('C8')
-        #>>> # ********  setup complete
-        #>>> mov = Mov(Loc(tbl_2, 1), tbl_3, 'C7')
-        #>>> s.DEPRmoveItem(mov, lambda c: c+'.updated' )
-        #>>> tbl_3
-        #['C8', 'C7.updated', 'C6.updated']
-        
-        #"""
-        #frm_loc,  to_stk,  item =  mov
-        #frm_stk =  mov.frm_loc.stk
-        #_slice = frm_stk[mov.frm_loc.ndx:]
-        #for _itm in  _slice:
-            #new_item = updateItem_function(_itm)
-            #frm_stk.remove(_itm) 
-            #mov.to_stk.PUSH(new_item)  #PUSH new
+
     #----------------------------------------------------------------------
     def moveMyItems(self,  item, to_stk, updateItem_function):
         """ moves one or more items -  in  rS items are cards - to the new stack. For rS the updateItem_function updates the card dictionary with new state.
@@ -107,25 +68,12 @@ class Stack(list):
 #----------------------------------------------------------------------
 def _top_ndx(lst):
     """
-    >>> _top_ndx([1,2,3])==2
-    True
-    >>> _top_ndx([1])== 0
-    True
-    >>> _top_ndx([]) is None
-    True
     """
     lng =  len(lst)
     return lng -1 if  lng > 0 else None
 
 def _top_item (lst):
     """ RETURN: top_item item or None.
-    >>> _top_item(['a', 'b', 'c'])=='c'
-    True
-    >>> _top_item(['d'])== 'd'
-    True
-    >>> _top_item([]) is None
-    True
-   
     """
     ndx = _top_ndx(lst)
     return lst[ndx] if ndx is not None else None    

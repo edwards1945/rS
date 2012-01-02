@@ -1,5 +1,5 @@
-""" state_testdocs.7.5.9.py 
-#MOD  7.5.9 
+""" state_testdocs.7.6.py 
+#MOD  7.6 Tested Basic play @ 2.5- 3 %
 # 111226 1445
 # speciality States
 """
@@ -48,7 +48,31 @@ class test_State:
         True
         >>> #SUCCESSFUL POPULATING        
         """
-    
+    def test_move(self,  mov2, logger=None):  #MOD 7.5.4
+        """ faceUP Crd[s] >TO> StackNme:
+        CALLED from Hand.
+        # tests include:
+        >>> # ********** BASIC: tbl TOP  >TO> tbl_top
+        
+        >>> # ********** BASIC: tbl SLICE >TO> tbl_top
+        >>> import state, stack
+        >>> from rS import *
+        >>> st =state.State()
+        >>> p1 = [newStt('T3', True, Crd('C', 13))]
+        >>> p1.append( newStt('T3', True, Crd('C', 12)))  # TEST CARD. No matter what fce I choose UP or DOWN the population call will make it UP.
+        >>> p1.append( newStt('T3', True, Crd('C', 1)))
+        >>> st.populate(p1)
+        >>> cs =st.crd2OD[Crd('C', 12)]
+        >>> cs = cs._replace(fce=False)
+        >>> st.crd2OD[Crd('C', 12)] = cs
+        >>> st.crd2OD[Crd('C', 12)] .fce
+        False
+        >>> # State IS POPULATED *********
+        >>> mov = Mov(Crd('C', 1), 'H')
+        >>> st.move(mov)
+        >>> st.crd2OD[st.stkOD['T3'].top_item].fce  #C-12 set faceUP
+        True
+        """
 class test_FullState:   
     """
     # TESTS: include

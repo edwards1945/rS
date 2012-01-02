@@ -1,5 +1,5 @@
-#hand.testdocs.7.5.9.py
-#MOD 7.5.9  look for git
+#hand.testdocs.7.6.py
+#MOD 7.6  Tested Basic play @ 2.5- 3 %
 
 
 class testHand:
@@ -11,14 +11,16 @@ class testHand:
         >>> import logging.config
         >>> #import cProfile
         
-        >>> testSetCntr = Counter(['winCnt', 'fCnt', 'nCnt'])
+        >>> testSetCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>> h = hand.Hand()
         >>>
-        >>> #  ****** TESTS # (1) state WON: fndCnt == 52
+        >>> #  ****** TESTS # (1) state already WON: fndCnt == 52
         >>> h.state = state.FullState(True)  #shuffled
         >>> logger = logging.getLogger('myWARN')
         >>> testSetCntr.clear()
         >>> testSetCntr = h.PLAY_1_Set(5, logger=logger)  #TEST OBJECT
+        >>> testSetCntr['nCnt'] == 5
+        True
         >>>
         """
         
@@ -28,13 +30,13 @@ class testHand:
         >>> from rS import *
         >>> testSetCntr = Counter(['winCnt', 'fCnt', 'nCnt'])
         >>>
-        >>> #  ****** TESTS # (1) state WON: fndCnt == 52
+        >>> #  ****** TESTS # (1) state is aleady WON: fndCnt == 52
         >>> h = hand.Hand()
-        >>> h.state = state.FullFoundations()  # already at theend
+        >>> h.state = state.FullFoundations()  # already at the end
         >>> testSetCntr.clear()
         >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr
-        Counter({'fCnt': 52, 'winCnt': 1, 'nCnt': 1})
+        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 52
+        True
         >>> # *******TESTS # (2) state STYMID: no moves available
         >>> h.state = state.State()
         >>> s0 = newStt('T1', True, Crd('H', 1 ))
@@ -42,16 +44,31 @@ class testHand:
         >>> h.state.populate([ s0, s1])
         >>> testSetCntr.clear()
         >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr['fCnt']
-        0
+        >>> testSetCntr['winCnt'] == 0 and testSetCntr['nCnt'] == 1
+        True
         >>> # ********* # (3) testdata sequenced for all fndMove
         >>> h = hand.Hand()        
         >>> h.state = state.FullState(False)
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr['fCnt']
-        52
+        >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT 
+        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 52  # 1 pass thre play_1_Hand using 'while fndMove()
+        True
         >>>
+        >>> import  state, hand
+        >>> import logging
+        >>> import logging.config
+        >>> from rS import *      
+        >>> logger = logging.getLogger('myWARN')        
+        >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>>
+        >>> # ********* # (4) testdata shuffled
+        >>> h = hand.Hand()        
+        >>> h.state = state.FullState()  # default is shuffle: True
+        >>> logger = logging.getLogger('myINFO')
+        >>> testSetCntr.clear()
+        >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+        >>> #testSetCntr
+        >>>                
         """
         #TESTS: should include
         # (1) state WON: fndCnt == 52
@@ -82,7 +99,7 @@ class testHand:
         >>> newSttL.append(newStt( 'T2', True, Crd('H', 1))) #(3)  MOVE
         >>> newSttL.append(newStt( 'T3', True, Crd('S', 1))) #(4)  
         >>> newSttL.append(newStt( 'T3', True, Crd('S', 2))) #(4)
-        >>> newSttL.append(newStt( 'T4', False, Crd('C', 1))) #(5)  MOVE - the top will reset to True
+        >>> newSttL.append(newStt( 'T4', False, Crd('C', 1))) #(5)  MOVE 
         >>> #newSttL
         >>> st.populate(newSttL)
         >>> h.fndMove(st)  #  UNDER TEST ITEM
