@@ -1,5 +1,6 @@
 #rS.7.6.py
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
+## added two standard deviation functions: compute_std1 & 2
 ## namedtuple Mov2Nme now Mov
 #MOD 7.5.8  implemented uncovered Card in tableau set to faceUP in State and Stack
 
@@ -53,6 +54,7 @@ def calculate_std1(nL, mean):
     return math.sqrt(var1)
 def calculate_std2(nCnt, winMean):
     """ sqrt(var>> N*mean(1-mean)/(N-1))
+    
     >>> nL = [1,0,1,0,1,0,1,0,1,0]
     >>> n = len(nL)
     >>> m = .5
