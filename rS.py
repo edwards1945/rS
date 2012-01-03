@@ -1,5 +1,6 @@
 #rS.7.6.py
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
+# 120103.0900
 ## namedtuple Mov2Nme now Mov
 #MOD 7.5.8  implemented uncovered Card in tableau set to faceUP in State and Stack
 
