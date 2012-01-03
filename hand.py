@@ -232,7 +232,10 @@ def test():
         tstCntr += h.PLAY_1_Set(setCnt)
     #print(tstCntr)
     n = tstCntr['nCnt']
-    print( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
+    msg = ( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
+    
+    print(msg)
+    
     
 
       
