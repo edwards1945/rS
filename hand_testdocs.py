@@ -18,7 +18,7 @@ class testHand:
         >>>
         >>> #  ****** TESTS # (1) state already WON: fndCnt == 52
         >>> h.state = state.FullState(True)  #shuffled
-        >>> logger = logging.getLogger('myDEBUG')
+        >>> logger = logging.getLogger('myW')
         >>> testSetCntr.clear()
         >>> testSetCntr = h.PLAY_1_Set(5, logger=logger)  #TEST OBJECT
         >>> testSetCntr['nCnt'] == 5
@@ -60,13 +60,13 @@ class testHand:
         >>> import logging
         >>> import logging.config
         >>> from h import *      
-        >>> logger = logging.getLogger('myWARN')        
+        >>> logger = logging.getLogger('myW')        
         >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>>
         >>> # ********* # (4) testdata shuffled
         >>> h = hand.Hand()        
         >>> h.state = state.FullState()  # default is shuffle: True
-        >>> logger = logging.getLogger('myINFO')
+        >>> logger = logging.getLogger('myW')
         >>> testSetCntr.clear()
         >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
         >>> #testSetCntr

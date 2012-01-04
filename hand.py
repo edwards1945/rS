@@ -24,7 +24,7 @@ class Hand:
         """
     def __init__(self, mystate=state.State()):
         """ """
-        logger = logging.getLogger('myWARN') #  myDEBUG, myINFO OR myWARN 
+        logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate  #MOD 7.5.7
         self.fndMovesL =  []
         self.sibMovesL = []  
@@ -36,8 +36,8 @@ class Hand:
         
         One Hand FINDS & EXECUTES Moves until stymied or WON.    
         """
-        if not logger: logger = logging.getLogger('myWARN')
-        #  myDEBUG OR myINFO OR myWARN
+        if not logger: logger = logging.getLogger('myW')
+        #  myD OR myI OR myW
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
             self.state = state.FullState(True)  #new shuffled state.
@@ -52,7 +52,7 @@ class Hand:
         std = calculate_std2(nCnt, winMean)
         setCntr['std'] =  std  # new
         ret = "  **** {:2} WINS mean/std [{:.1%}/{:1.2}]  in {} HANDS; {} FndCnt @AVG:fnd:{:.1f} & AVG:ms:{:3.1f}.\n".format( w, std, w / n ,  n, f,  f / n,  dt / n )
-        if logger: logger.warn(ret)
+        if logger: logger.info(ret)
         return  setCntr
     
     def PLAY_1_Hand(self,  state=None,  logger=None):
@@ -60,8 +60,8 @@ class Hand:
         RETURNS HndStat(won, fCnt)
     
         """        
-        if not logger:  logger = logging.getLogger('myWARN')
-        #  myDEBUG OR myINFO OR myWARN
+        if not logger:  logger = logging.getLogger('myW')
+        #  myD OR myI OR myW
         if not state:
             state = self.state    #MOD 7.5.6
         hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
@@ -235,7 +235,7 @@ def test():
         tstCntr += h.PLAY_1_Set(setCnt)
         
     n = tstCntr['nCnt']
-    msg = ( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
+    msg = ( "Test - {: .1%}/{:.1%} - {} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games/{} Hands.\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['winCnt'], tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
     
     print(msg)
     f.write(msg)
