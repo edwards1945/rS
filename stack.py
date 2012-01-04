@@ -2,7 +2,7 @@
 # MOD 7.6  Tested Basic play @ 2.5- 3 %
 # #  
 
-#from rS import *
+#from h import *
 import logging
 import logging.config
     

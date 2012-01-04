@@ -17,7 +17,7 @@
 
 
 import random
-from rS import *
+from h import *
 import  stack
 import logging
 import logging.config

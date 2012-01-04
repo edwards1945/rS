@@ -5,7 +5,7 @@
 """
 
 import random
-from rS import *
+from h import *
 import  stack,  state
 
 import logging
@@ -17,7 +17,7 @@ class test_State:
     def test_fndCnt(self):
         """
         >>> import state
-        >>> from rS import *
+        >>> from h import *
         >>> s = state.State()
         >>> s.fndCnt == 0
         True
@@ -30,7 +30,7 @@ class test_State:
     
     def test_populate(self):
         """       
-        >>> from rS import *
+        >>> from h import *
         >>> import state, stack
         >>> st = state.State()  # crd2OD & stkOD
         >>> # **** first assembled as argument
@@ -56,7 +56,7 @@ class test_State:
         
         >>> # ********** BASIC: tbl SLICE >TO> tbl_top
         >>> import state, stack
-        >>> from rS import *
+        >>> from h import *
         >>> st =state.State()
         >>> p1 = [newStt('T3', True, Crd('C', 13))]
         >>> p1.append( newStt('T3', True, Crd('C', 12)))  # TEST CARD. No matter what fce I choose UP or DOWN the population call will make it UP.
@@ -78,7 +78,7 @@ class test_FullState:
     # TESTS: include
     
     >>> import state, stack
-    >>> from rS import *
+    >>> from h import *
     
     # (1) ****************** unshuffled with expected sequence.
     >>> unsfl = state.FullState(False)
@@ -100,7 +100,7 @@ class test_FullState:
     True
     >>>
     >>> import state
-    >>> from rS import *
+    >>> from h import *
     >>> ff = state.FullFoundations()
     >>> ff.fndCnt == 52
     True
