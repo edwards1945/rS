@@ -36,7 +36,7 @@ class Hand:
         
         One Hand FINDS & EXECUTES Moves until stymied or WON.    
         """
-        if not logger: logger = logging.getLogger('MyINFO')
+        if not logger: logger = logging.getLogger('myWARN')
         #  myDEBUG OR myINFO OR myWARN
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):

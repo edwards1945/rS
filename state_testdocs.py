@@ -117,5 +117,5 @@ class test_FullState:
 
 if __name__ == "__main__":
     import doctest
-    #logging.config.fileConfig('myConfig.conf') 
+    logging.config.fileConfig('myConfig.conf') 
     doctest.testmod(verbose=False)

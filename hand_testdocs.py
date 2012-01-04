@@ -1,6 +1,8 @@
 #hand.testdocs.7.6.py
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
 
+import logging
+import logging.config
 
 class testHand:
     def test_PLAY_1_Set(self):
@@ -16,7 +18,7 @@ class testHand:
         >>>
         >>> #  ****** TESTS # (1) state already WON: fndCnt == 52
         >>> h.state = state.FullState(True)  #shuffled
-        >>> logger = logging.getLogger('myWARN')
+        >>> logger = logging.getLogger('myDEBUG')
         >>> testSetCntr.clear()
         >>> testSetCntr = h.PLAY_1_Set(5, logger=logger)  #TEST OBJECT
         >>> testSetCntr['nCnt'] == 5
@@ -198,6 +200,7 @@ class testHand:
     
 
 if __name__ == "__main__":
+    logging.config.fileConfig('myConfig.conf')            
     import doctest
     doctest.testmod(verbose=False)
         
