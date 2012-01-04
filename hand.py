@@ -9,7 +9,7 @@
 
 from h import *
 from  time import  clock  
-import state
+import state,  copy
 import logging
 import logging.config
 
@@ -85,8 +85,11 @@ class Hand:
                 #has_fndMov = self.fndMove(state,  logger)       
             while self.kngMove(state,  logger):  #MOD 30.1150> and mCntr['k']  <=  24:
                 mCntr['k'] +=  1
-                self.state.move(self.kngMovesL[-1], logger)
-                #has_kng_Mov =  self.kngMove(state,  logger)
+                if len(self.kngMovesL) >  1:  # create len -1 new Hands to play.
+                    deepState =  copy.deepcopy(self.state)                    
+                    self.state.move(self.kngMovesL[-1], logger)
+                    
+                pass #has_kng_Mov =  self.kngMove(state,  logger)
             while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
