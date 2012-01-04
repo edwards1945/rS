@@ -44,7 +44,7 @@ class Hand:
         #  myD OR myI OR myW
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
-            self.state = state.FullState(True)  #new shuffled state.
+            self.state = state.FullState(True, name="0")  #new shuffled state.
             setCntr += self.PLAY_1_Hand(logger=logger)            
             pass
             
@@ -86,9 +86,14 @@ class Hand:
             while self.kngMove(state,  logger):  #MOD 30.1150> and mCntr['k']  <=  24:
                 mCntr['k'] +=  1
                 if len(self.kngMovesL) >  1:  # create len -1 new Hands to play.
-                    deepState =  copy.deepcopy(self.state)                    
-                    self.state.move(self.kngMovesL[-1], logger)
-                    
+                    lst = self.kngMovesL[1:]
+                    deepState =  copy.deepcopy(self.state)
+                    for i, _mov in enumerate(lst):
+                        nme = "{}.{}".format(self.name, str(i+1))
+                        h =  Hand(deepState, nme)
+                        if logger: logger.info("made hand named {}".format(h.name))
+                    pass                   
+                self.state.move(self.kngMovesL[0], logger)  # continues this Hand.
                 pass #has_kng_Mov =  self.kngMove(state,  logger)
             while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
                 mCntr['s'] +=  1                   
@@ -121,8 +126,8 @@ class Hand:
          >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
          >>>
          >>> # ********* # (1) testdata shuffled
-         >>> h = hand.Hand(name='New Name')
-         >>> h.name == 'New Name'
+         >>> h = hand.Hand(name='0')
+         >>> h.name == '0'
          True
          >>> h.state = state.FullState()  # default is shuffle: True
          >>> logger = logging.getLogger('myI')

@@ -68,7 +68,7 @@ class State:
         
         imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
         if logger:
-            logger.info("State.move ..{}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
+            logger.info("**** moved {}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
             logger.debug(imsg)
         pass    
     #----------------------------------------------------------------------
