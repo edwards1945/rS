@@ -91,6 +91,7 @@ class Hand:
                     for i, _mov in enumerate(lst):
                         nme = "{}.{}".format(self.name, str(i+1))
                         h =  Hand(deepState, nme)
+                        #h.PLAY_1_Hand(logger=logger)
                         if logger: logger.info("made hand named {}".format(h.name))
                     pass                   
                 self.state.move(self.kngMovesL[0], logger)  # continues this Hand.
@@ -113,7 +114,7 @@ class Hand:
         hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
         hCntr['nCnt'] = 1
         
-        if logger: logger.info("  *********** Hand (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values())))
+        if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.name))
         return hCntr
 
     def test_kngForking():
