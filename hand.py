@@ -105,9 +105,10 @@ class Hand:
         hCntr['msClk'] = (clock() - startClk) *  1000
         hCntr['winCnt'] = 1 if state.haveWon else 0
         #assert  mCntr['f'] ==  state.fndCnt
-        hCntr['fCnt'] = state.fndCnt
+        hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
         hCntr['nCnt'] = 1
-        if logger: logger.info("  **************** Hand (f,n,w,ms)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
+        
+        if logger: logger.info("  *********** Hand (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values())))
         return hCntr
 
     def test_kngForking():
