@@ -5,6 +5,7 @@ import logging
 import logging.config
 
 class testHand:
+        
     def test_PLAY_1_Set(self):
         """      
         >>> from h import *

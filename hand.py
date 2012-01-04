@@ -22,15 +22,19 @@ class Hand:
        format (moves list) > ([crd, FROM_StkStt, TO_Stk], [],,):
        where [as of "rS.60.0.py module. #VER 111109.0620]
         """
-    def __init__(self, mystate=state.State()):
+    def __init__(self, mystate=state.State(),  name=None):
         """ """
         logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate  #MOD 7.5.7
+        self._name =  name
         self.fndMovesL =  []
         self.sibMovesL = []  
         self.kngMovesL =  []
         
     #----------------------------------------------------------------------
+    @property
+    def name(self):
+        return self._name
     def PLAY_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
@@ -57,7 +61,7 @@ class Hand:
     
     def PLAY_1_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
-        RETURNS HndStat(won, fCnt)
+        RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
     
         """        
         if not logger:  logger = logging.getLogger('myW')
@@ -102,6 +106,27 @@ class Hand:
         hCntr['nCnt'] = 1
         if logger: logger.info("  **************** Hand (f,n,w,ms)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
         return hCntr
+
+    def test_kngForking():
+        """ the begining of maxHands: picking the highest return.
+        >>> import  state, hand
+         >>> import logging
+         >>> import logging.config
+         >>> from h import *      
+         >>> logger = logging.getLogger('myW')        
+         >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+         >>>
+         >>> # ********* # (1) testdata shuffled
+         >>> h = hand.Hand(name='New Name')
+         >>> h.name == 'New Name'
+         True
+         >>> h.state = state.FullState()  # default is shuffle: True
+         >>> logger = logging.getLogger('myI')
+         >>> testSetCntr.clear()
+         >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+         >>> #testSetCntr
+         >>>                        
+        """
 
     def kngMove(self, state, logger=None):
         """SETS self.kngMovesL  RETURNS True if there are moves.
