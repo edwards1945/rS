@@ -5,7 +5,7 @@
 class testHand:
     def test_PLAY_1_Set(self):
         """      
-        >>> from rS import *
+        >>> from h import *
         >>> import  state, hand
         >>> import logging
         >>> import logging.config
@@ -27,7 +27,7 @@ class testHand:
     def test_PLAY_1_Hand(self):
         """      
         >>> import  state, hand
-        >>> from rS import *
+        >>> from h import *
         >>> testSetCntr = Counter(['winCnt', 'fCnt', 'nCnt'])
         >>>
         >>> #  ****** TESTS # (1) state is aleady WON: fndCnt == 52
@@ -57,7 +57,7 @@ class testHand:
         >>> import  state, hand
         >>> import logging
         >>> import logging.config
-        >>> from rS import *      
+        >>> from h import *      
         >>> logger = logging.getLogger('myWARN')        
         >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>>
@@ -82,7 +82,7 @@ class testHand:
     def test_fndMove(self):
         """SETS self.fndMovesL  - faceUP, topCrd in tableau moves to  foundation topCrd if f_Crd is younger sib of t_Crd 
         >>> import  state, hand
-        >>> from rS import *
+        >>> from h import *
         >>> st = state.State()
         >>> h = hand.Hand(st)
         
@@ -114,7 +114,7 @@ class testHand:
         """ SETS self.kngMovesL  - king IsFaceUp_NotFirstRULE in tableau moves to a tableau topCrd.
 
         >>> import  state, hand
-        >>> from rS import *
+        >>> from h import *
         >>> st = state.State()
         
         >>> # **** populate a king test state.: three UP kings but one is ndx 0, two empty tbl: T2, T6
@@ -158,7 +158,7 @@ class testHand:
         """ SETS self.sibMovesL - faceUP, sib_crd in another tableau moves to a tableau topCrd.
         
         >>> import  state, hand
-        >>> from rS import *
+        >>> from h import *
         >>> st = state.State()
         >>> # violations: top is Ace, sib faceDOWN
         >>> # **** populate a test state.
