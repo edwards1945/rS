@@ -1,11 +1,13 @@
-#hand.7.6     
+#hand.7.6
+
+
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
 # # stops after one pass thru PLAY_1_Hand: need anonther while suit
 # # Hand.state is now default to basic State()
 # #implementing fnd, kng and sib moves.  111225-
 
 
-from rS import *
+from h import *
 from  time import  clock  
 import state
 import logging
@@ -227,14 +229,17 @@ def test():
     gmeCnt = 20
     
     tstCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+    f =  open('testPrintout.txt', mode='a')
     
     for i in range(gmeCnt):
         tstCntr += h.PLAY_1_Set(setCnt)
-    #print(tstCntr)
+        
     n = tstCntr['nCnt']
-    msg = ( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
+    msg = ( "Test - {: .1%}/{:.1%} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games of {} Hands ***********\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
     
     print(msg)
+    f.write(msg)
+    f.close()
     
     
 

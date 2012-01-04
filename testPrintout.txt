@@ -1,0 +1,9 @@
+
+Test -  3.3%/0.3% WINS:AVG: 4.3 FndMovs in 3.8 ms  for 20 Games of 50 Hands ***********
+Test -  2.8%/0.3% WINS:AVG: 3.8 FndMovs in 3.6 ms  for 20 Games of 50 Hands ***********
+Test -  2.0%/0.2% WINS:AVG: 3.4 FndMovs in 3.5 ms  for 20 Games of 50 Hands ***********
+Test -  2.2%/0.3% WINS:AVG: 3.6 FndMovs in 3.6 ms  for 20 Games of 50 Hands ***********
+Test -  2.7%/0.2% WINS:AVG: 3.9 FndMovs in 3.6 ms  for 20 Games of 50 Hands ***********
+Test -  2.8%/0.3% WINS:AVG: 4.1 FndMovs in 3.7 ms  for 20 Games of 50 Hands ***********
+Test -  4.1%/0.4% WINS:AVG: 4.7 FndMovs in 4.0 ms  for 20 Games of 50 Hands ***********
+Test -  2.1%/0.2% WINS:AVG: 3.6 FndMovs in 3.5 ms  for 20 Games of 50 Hands ***********

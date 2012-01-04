@@ -1,7 +1,7 @@
 # stack_testdocs.7.6.py module
 # MOD 7.6  Tested Basic play @ 2.5- 3 %
 
-from rS import *
+from h import *
 import  stack
 import logging
 import logging.config
@@ -9,7 +9,7 @@ import logging.config
 class test_Stack(deque):
     """ named deque of 0 to 52 somethings. For rS it's Stt.
     
-    >>> from rS import *
+    >>> from h import *
     >>> import state, stack
     >>> st = state.State()
     >>> len(st.crd2OD) == 52
@@ -17,7 +17,7 @@ class test_Stack(deque):
     >>> len(st.stkOD)  == 11
     True
        
-   >>> from rS import *
+   >>> from h import *
    >>> import stack
    >>> s = stack.Stack('Test')
     
