@@ -48,7 +48,7 @@ class Stack(list):
         
         Self can be empty.        
         """
-        assert  self.name[0] ==  'T'
+        # assert  self.name[0] ==  'T' #this test does NOT belong in Stack; it's a Hand assert.
         if item not in self:  # special case: populating an empty stk.
             # MOD 7.5.7 111229.1130 DEL> and  item.ndx is None:  
             to_stk.PUSH(item) 

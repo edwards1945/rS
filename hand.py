@@ -22,19 +22,22 @@ class Hand:
        format (moves list) > ([crd, FROM_StkStt, TO_Stk], [],,):
        where [as of "rS.60.0.py module. #VER 111109.0620]
         """
-    def __init__(self, mystate=state.State(),  name=None):
+    def __init__(self, mystate=state.State(),  tag=None):
         """ """
         logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate  #MOD 7.5.7
-        self._name =  name
+        self._tag =  tag
         self.fndMovesL =  []
         self.sibMovesL = []  
         self.kngMovesL =  []
         
     #----------------------------------------------------------------------
     @property
-    def name(self):
-        return self._name
+    def tag(self):
+        return self._tag
+    @ tag.setter
+    def tag(self, tag):
+        self._tag =  tag
     def PLAY_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
@@ -79,21 +82,29 @@ class Hand:
         
         hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
         while hasMovs:           
-            while self.fndMove(state,  logger)   :  #MOD 30.1150>and mCntr['k']  <=  52:  #keep this while, rapidly does whole seq
+            while self.fndMove(state,  logger):  #the while, rapidly does whole seq
                 mCntr['f'] += 1
                 self.state.move(self.fndMovesL[-1], logger)
-                #has_fndMov = self.fndMove(state,  logger)       
-            while self.kngMove(state,  logger):  #MOD 30.1150> and mCntr['k']  <=  24:
-                mCntr['k'] +=  1
-                if len(self.kngMovesL) >  1:  # create len -1 new Hands to play.
-                    deepState =  copy.deepcopy(self.state)                    
-                    self.state.move(self.kngMovesL[-1], logger)
-                    
-                pass #has_kng_Mov =  self.kngMove(state,  logger)
-            while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
+                #
+            if self.kngMove(state,  logger):  #do one then look for fndMove
+                mCntr['k'] +=  1                                
+                movsL =  self.kngMovesL
+                self.state.move(self.kngMovesL[-1], logger)
+                continue
+                #i = 0
+                #for mov in movsL:
+                    #deepState =  copy.deepcopy(self.state)  #state after a mov               
+                    #nme = "{}.{}".format(self.tag, str(i))  # first, in the .0 hand.
+                    #self.tag = nme
+                    #self.state.move(mov, logger)  # after 
+                    #h =  Hand(deepState, nme)  #new Hand/same State
+                    #if logger: logger.info("made a Hand tagd {}".format(h.tag))
+                    ##h.PLAY_1_Hand(logger=logger)
+                    #i += 1
+            if self.sibMove(state,  logger):  # do one then look for fndMove
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
-                #has_sibMov = self.sibMove(state,  logger)
+                continue
                 
             has_fndMov = self.fndMove(state,  logger)  
             has_kng_Mov =  self.kngMove(state,  logger)
@@ -105,30 +116,29 @@ class Hand:
         hCntr['msClk'] = (clock() - startClk) *  1000
         hCntr['winCnt'] = 1 if state.haveWon else 0
         #assert  mCntr['f'] ==  state.fndCnt
-        hCntr['fCnt'] = state.fndCnt
+        hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
         hCntr['nCnt'] = 1
-        if logger: logger.info("  **************** Hand (f,n,w,ms)-({0[fCnt]:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(f,k,s)-({1[f]:2}, {1[k]:2}, {1[s]:3})\n\n".format(  dict( hCntr) ,  dict(mCntr)))
+        
+        if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
         return hCntr
 
-    def test_kngForking():
+    def test_kngBranching():
         """ the begining of maxHands: picking the highest return.
         >>> import  state, hand
-         >>> import logging
-         >>> import logging.config
-         >>> from h import *      
-         >>> logger = logging.getLogger('myW')        
-         >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-         >>>
-         >>> # ********* # (1) testdata shuffled
-         >>> h = hand.Hand(name='New Name')
-         >>> h.name == 'New Name'
-         True
-         >>> h.state = state.FullState()  # default is shuffle: True
-         >>> logger = logging.getLogger('myI')
-         >>> testSetCntr.clear()
-         >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
-         >>> #testSetCntr
-         >>>                        
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> logger = logging.getLogger('myW')        
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> h = hand.Hand(tag='0')
+        >>> h.state = state.FullFoundations()
+        >>> h.state.move(Mov(Crd('C', 12),  'T0'))
+        >>> h.state.move(Mov(Crd('D', 12),  'T1'))
+        >>> logger = logging.getLogger('myI')
+        >>> tCntr.clear()
+        >>> tCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+        >>> #tCntr
+        >>>                        
         """
 
     def kngMove(self, state, logger=None):
@@ -142,9 +152,9 @@ class Hand:
         # FROM RULES: tops
         RULE_stk_IsEmpty =  lambda nme:  state.stkOD[nme].isEmpty
         # TO RULES: Kings
-        RULE_crd_Is_in_tbl = lambda new_stt: new_stt.stkNme[0] ==  'T'
-        RULE_crd_Is_faceUP =  lambda new_stt: new_stt.fce
-        RULE_crd_not_first_crd =  lambda crd,  stt: state.stkOD[stt.stkNme].index(crd) >  0
+        RULE_crd_Is_in_tbl = lambda stt: stt.stkNme[0] ==  'T'
+        RULE_crd_Is_faceUP =  lambda stt: stt.fce
+        RULE_crd_not_first_crd =  lambda stt: state.stkOD[stt.stkNme].index(stt.crd) >  0
                 
         # TO Stack
         _empty_tbl_stkL = [ (nme)  for nme in  TABLEAUS
@@ -159,7 +169,7 @@ class Hand:
                         for crd, stt in  _kng_crdL
                            if stt
                            and RULE_crd_Is_faceUP(stt)
-                           and RULE_crd_not_first_crd(crd,  stt)
+                           and RULE_crd_not_first_crd(stt)
                            and RULE_crd_Is_in_tbl(stt)]
             _movL =  [(Mov( kng_crd,  mty_nme))
                            for kng_nme, kng_crd in  _faceUP_tbl_kngL
