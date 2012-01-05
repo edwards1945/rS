@@ -89,22 +89,22 @@ class Hand:
             while self.kngMove(state,  logger):  #until empty tabls: filled or no kings.
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
-                i = 0
-                for mov in movsL:
-                    deepState =  copy.deepcopy(self.state)  #state after a mov               
-                    nme = "{}.{}".format(self.name, str(i))  # first, in the .0 hand.
-                    self.name = nme
-                    self.state.move(mov, logger)  # after 
-                    h =  Hand(deepState, nme)  #new Hand/same State
-                    if logger: logger.info("made a Hand named {}".format(h.name))
-                    #h.PLAY_1_Hand(logger=logger)
-                    i += 1
-                
+                self.state.move(self.kngMovesL[-1], logger)
+                #i = 0
+                #for mov in movsL:
+                    #deepState =  copy.deepcopy(self.state)  #state after a mov               
+                    #nme = "{}.{}".format(self.name, str(i))  # first, in the .0 hand.
+                    #self.name = nme
+                    #self.state.move(mov, logger)  # after 
+                    #h =  Hand(deepState, nme)  #new Hand/same State
+                    #if logger: logger.info("made a Hand named {}".format(h.name))
+                    ##h.PLAY_1_Hand(logger=logger)
+                    #i += 1
                 pass    
             while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
-                #has_sibMov = self.sibMove(state,  logger)
+                #
                 
             has_fndMov = self.fndMove(state,  logger)  
             has_kng_Mov =  self.kngMove(state,  logger)
