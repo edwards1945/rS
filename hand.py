@@ -35,6 +35,9 @@ class Hand:
     @property
     def name(self):
         return self._name
+    @ name.setter
+    def name(self, nme):
+        self.name =  nme
     def PLAY_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
@@ -79,23 +82,25 @@ class Hand:
         
         hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
         while hasMovs:           
-            while self.fndMove(state,  logger)   :  #MOD 30.1150>and mCntr['k']  <=  52:  #keep this while, rapidly does whole seq
+            while self.fndMove(state,  logger):  #keep this while, rapidly does whole seq
                 mCntr['f'] += 1
                 self.state.move(self.fndMovesL[-1], logger)
-                #has_fndMov = self.fndMove(state,  logger)       
-            while self.kngMove(state,  logger):  #MOD 30.1150> and mCntr['k']  <=  24:
-                mCntr['k'] +=  1
-                if len(self.kngMovesL) >  1:  # create len -1 new Hands to play.
-                    lst = self.kngMovesL[1:]
-                    deepState =  copy.deepcopy(self.state)
-                    for i, _mov in enumerate(lst):
-                        nme = "{}.{}".format(self.name, str(i+1))
-                        h =  Hand(deepState, nme)
-                        #h.PLAY_1_Hand(logger=logger)
-                        if logger: logger.info("made hand named {}".format(h.name))
-                    pass                   
-                self.state.move(self.kngMovesL[0], logger)  # continues this Hand.
-                pass #has_kng_Mov =  self.kngMove(state,  logger)
+                #
+            while self.kngMove(state,  logger):  #until empty tabls: filled or no kings.
+                mCntr['k'] +=  1                                
+                movsL =  self.kngMovesL
+                i = 0
+                for mov in movsL:
+                    deepState =  copy.deepcopy(self.state)  #state after a mov               
+                    nme = "{}.{}".format(self.name, str(i))  # first, in the .0 hand.
+                    self.name = nme
+                    self.state.move(mov, logger)  # after 
+                    h =  Hand(deepState, nme)  #new Hand/same State
+                    if logger: logger.info("made a Hand named {}".format(h.name))
+                    #h.PLAY_1_Hand(logger=logger)
+                    i += 1
+                
+                pass    
             while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
@@ -117,7 +122,7 @@ class Hand:
         if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.name))
         return hCntr
 
-    def test_kngForking():
+    def test_kngBranching():
         """ the begining of maxHands: picking the highest return.
         >>> import  state, hand
          >>> import logging
