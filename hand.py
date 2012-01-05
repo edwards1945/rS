@@ -75,18 +75,16 @@ class Hand:
         mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
         
-        # MOD 7.5.8 111230 0640 just beginning, while has_Movs not implemented
-        has_fndMov = self.fndMove(state,  logger)  
-        has_kng_Mov =  self.kngMove(state,  logger)
-        has_sibMov = self.sibMove(state,  logger)
+        hasMovs = self.fndMove(state,  logger)\
+            or  self.kngMove(state,  logger)\
+            or self.sibMove(state,  logger)
         
-        hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
         while hasMovs:           
-            while self.fndMove(state,  logger):  #the while, rapidly does whole seq
+            while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
                 self.state.move(self.fndMovesL[-1], logger)
                 #
-            if self.kngMove(state,  logger):  #do one then look for fndMove
+            if self.kngMove(state,  logger):  #do one, then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
                 self.state.move(self.kngMovesL[-1], logger)
@@ -101,16 +99,15 @@ class Hand:
                     #if logger: logger.info("made a Hand tagd {}".format(h.tag))
                     ##h.PLAY_1_Hand(logger=logger)
                     #i += 1
-            if self.sibMove(state,  logger):  # do one then look for fndMove
+            if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
                 continue
-                
-            has_fndMov = self.fndMove(state,  logger)  
-            has_kng_Mov =  self.kngMove(state,  logger)
-            has_sibMov = self.sibMove(state,  logger)
             
-            hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
+            #refresh and try again:
+            hasMovs = self.fndMove(state,  logger)\
+                or  self.kngMove(state,  logger)\
+                or self.sibMove(state,  logger)
                  
         
         hCntr['msClk'] = (clock() - startClk) *  1000
