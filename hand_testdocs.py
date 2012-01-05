@@ -38,7 +38,8 @@ class testHand:
         >>> h.state = state.FullFoundations()  # already at the end
         >>> testSetCntr.clear()
         >>> testSetCntr += h.PLAY_1_Hand()  #TEST OBJECT
-        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 52
+        >>> #testSetCntr
+        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 0
         True
         >>> # *******TESTS # (2) state STYMID: no moves available
         >>> h.state = state.State()

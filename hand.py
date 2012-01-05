@@ -22,22 +22,22 @@ class Hand:
        format (moves list) > ([crd, FROM_StkStt, TO_Stk], [],,):
        where [as of "rS.60.0.py module. #VER 111109.0620]
         """
-    def __init__(self, mystate=state.State(),  name=None):
+    def __init__(self, mystate=state.State(),  tag=None):
         """ """
         logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate  #MOD 7.5.7
-        self._name =  name
+        self._tag =  tag
         self.fndMovesL =  []
         self.sibMovesL = []  
         self.kngMovesL =  []
         
     #----------------------------------------------------------------------
     @property
-    def name(self):
-        return self._name
-    @ name.setter
-    def name(self, nme):
-        self.name =  nme
+    def tag(self):
+        return self._tag
+    @ tag.setter
+    def tag(self, tag):
+        self._tag =  tag
     def PLAY_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
@@ -47,7 +47,7 @@ class Hand:
         #  myD OR myI OR myW
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
-            self.state = state.FullState(True, name="0")  #new shuffled state.
+            self.state = state.FullState(True)  #new shuffled state.
             setCntr += self.PLAY_1_Hand(logger=logger)            
             pass
             
@@ -93,11 +93,11 @@ class Hand:
                 #i = 0
                 #for mov in movsL:
                     #deepState =  copy.deepcopy(self.state)  #state after a mov               
-                    #nme = "{}.{}".format(self.name, str(i))  # first, in the .0 hand.
-                    #self.name = nme
+                    #nme = "{}.{}".format(self.tag, str(i))  # first, in the .0 hand.
+                    #self.tag = nme
                     #self.state.move(mov, logger)  # after 
                     #h =  Hand(deepState, nme)  #new Hand/same State
-                    #if logger: logger.info("made a Hand named {}".format(h.name))
+                    #if logger: logger.info("made a Hand tagd {}".format(h.tag))
                     ##h.PLAY_1_Hand(logger=logger)
                     #i += 1
                 pass    
@@ -119,7 +119,7 @@ class Hand:
         hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
         hCntr['nCnt'] = 1
         
-        if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.name))
+        if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
         return hCntr
 
     def test_kngBranching():
@@ -132,9 +132,12 @@ class Hand:
          >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
          >>>
          >>> # ********* # (1) testdata shuffled
-         >>> h = hand.Hand(name='0')
-         >>> h.name == '0'
+         >>> h = hand.Hand(tag='0')
+         >>> h.tag == '0'
          True
+         >>> h.tag = 'h.5.6'
+         >>> h.tag
+         'h.5.6'
          >>> h.state = state.FullState()  # default is shuffle: True
          >>> logger = logging.getLogger('myI')
          >>> testSetCntr.clear()
