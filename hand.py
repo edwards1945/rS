@@ -82,14 +82,15 @@ class Hand:
         
         hasMovs = has_fndMov or  has_kng_Mov or has_sibMov
         while hasMovs:           
-            while self.fndMove(state,  logger):  #keep this while, rapidly does whole seq
+            while self.fndMove(state,  logger):  #the while, rapidly does whole seq
                 mCntr['f'] += 1
                 self.state.move(self.fndMovesL[-1], logger)
                 #
-            while self.kngMove(state,  logger):  #until empty tabls: filled or no kings.
+            if self.kngMove(state,  logger):  #do one then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
                 self.state.move(self.kngMovesL[-1], logger)
+                continue
                 #i = 0
                 #for mov in movsL:
                     #deepState =  copy.deepcopy(self.state)  #state after a mov               
@@ -100,11 +101,10 @@ class Hand:
                     #if logger: logger.info("made a Hand tagd {}".format(h.tag))
                     ##h.PLAY_1_Hand(logger=logger)
                     #i += 1
-                pass    
-            while self.sibMove(state,  logger):  #MOD 30.1150> or mCntr['s']  >  200:
+            if self.sibMove(state,  logger):  # do one then look for fndMove
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[-1], logger)
-                #
+                continue
                 
             has_fndMov = self.fndMove(state,  logger)  
             has_kng_Mov =  self.kngMove(state,  logger)
@@ -125,18 +125,20 @@ class Hand:
     def test_kngBranching():
         """ the begining of maxHands: picking the highest return.
         >>> import  state, hand
-         >>> import logging
-         >>> import logging.config
-         >>> from h import *      
-         >>> logger = logging.getLogger('myW')        
-         >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-         >>> h = hand.Hand(tag='0')         
-         >>> h.state = state.FullState()  # default is shuffle: True
-         >>> logger = logging.getLogger('myI')
-         >>> testSetCntr.clear()
-         >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
-         >>> #testSetCntr
-         >>>                        
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> logger = logging.getLogger('myW')        
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> h = hand.Hand(tag='0')
+        >>> h.state = state.FullFoundations()
+        >>> h.state.move(Mov(Crd('C', 12),  'T0'))
+        >>> h.state.move(Mov(Crd('D', 12),  'T1'))
+        >>> logger = logging.getLogger('myI')
+        >>> tCntr.clear()
+        >>> tCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+        >>> #tCntr
+        >>>                        
         """
 
     def kngMove(self, state, logger=None):
@@ -150,9 +152,9 @@ class Hand:
         # FROM RULES: tops
         RULE_stk_IsEmpty =  lambda nme:  state.stkOD[nme].isEmpty
         # TO RULES: Kings
-        RULE_crd_Is_in_tbl = lambda new_stt: new_stt.stkNme[0] ==  'T'
-        RULE_crd_Is_faceUP =  lambda new_stt: new_stt.fce
-        RULE_crd_not_first_crd =  lambda crd,  stt: state.stkOD[stt.stkNme].index(crd) >  0
+        RULE_crd_Is_in_tbl = lambda stt: stt.stkNme[0] ==  'T'
+        RULE_crd_Is_faceUP =  lambda stt: stt.fce
+        RULE_crd_not_first_crd =  lambda stt: state.stkOD[stt.stkNme].index(stt.crd) >  0
                 
         # TO Stack
         _empty_tbl_stkL = [ (nme)  for nme in  TABLEAUS
@@ -167,7 +169,7 @@ class Hand:
                         for crd, stt in  _kng_crdL
                            if stt
                            and RULE_crd_Is_faceUP(stt)
-                           and RULE_crd_not_first_crd(crd,  stt)
+                           and RULE_crd_not_first_crd(stt)
                            and RULE_crd_Is_in_tbl(stt)]
             _movL =  [(Mov( kng_crd,  mty_nme))
                            for kng_nme, kng_crd in  _faceUP_tbl_kngL

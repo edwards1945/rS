@@ -1,3 +1,4 @@
 Test -  2.3%/0.3% - 23 WINS:AVG: 3.8 FndMovs in 3.9 ms  for 20 Games/ 50 Hands.
 Test -  3.2%/0.3% - 32 WINS:AVG: 4.3 FndMovs in 4.1 ms  for 20 Games/ 50 Hands.
 Test -  2.8%/0.3% - 28 WINS:AVG: 3.8 FndMovs in 3.6 ms  for 20 Games/50 Hands.
+Test -  2.4%/0.3% - 24 WINS:AVG: 3.9 FndMovs in 3.7 ms  for 20 Games/50 Hands.

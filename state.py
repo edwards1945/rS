@@ -74,7 +74,6 @@ class State:
     #----------------------------------------------------------------------
     def populate(self,  newSttL):
         """populate State using a <list> one or more newStts: newStt(stk_nme, fce, Crd)
- 
         """
         for nxt in  newSttL:
             crd = nxt.crd  
