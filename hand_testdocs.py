@@ -73,13 +73,15 @@ class testHand:
         >>> testSetCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
         >>> #testSetCntr
         >>>                
-        """
-        #TESTS: should include
-        # (1) state WON: fndCnt == 52
-        # (2) state STYMID: no moves available
-        # (3) testdata sequenced for all fndMove
-        # (4) shuffled
-        
+
+        >>> # ********* # (1) test new tag
+        >>> h = hand.Hand(tag='0')
+        >>> h.tag == '0'
+        True
+        >>> h.tag = 'h.5.6'
+        >>> h.tag
+        'h.5.6'
+        """        
         pass
     
     

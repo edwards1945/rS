@@ -130,14 +130,7 @@ class Hand:
          >>> from h import *      
          >>> logger = logging.getLogger('myW')        
          >>> testSetCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-         >>>
-         >>> # ********* # (1) testdata shuffled
-         >>> h = hand.Hand(tag='0')
-         >>> h.tag == '0'
-         True
-         >>> h.tag = 'h.5.6'
-         >>> h.tag
-         'h.5.6'
+         >>> h = hand.Hand(tag='0')         
          >>> h.state = state.FullState()  # default is shuffle: True
          >>> logger = logging.getLogger('myI')
          >>> testSetCntr.clear()
