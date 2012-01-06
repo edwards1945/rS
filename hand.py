@@ -90,7 +90,7 @@ class Hand:
                 i =  1
                 while len(movsL) >  1:  # a new hand/state for each mov.
                     #i  = len(movsL) -1                 
-                    deepState =  copy.deepcopy(self.state)  # orig state
+                    deepState =  copy.deepcopy(self.state)  # orig state   #REFACT  indiv states 
                     tag = "{}.{}".format(self.tag, str(i))  # sub tags
                     h =  Hand(deepState, tag)  #new Hand w/orig State
                     mov =  movsL.pop(0) 
@@ -101,6 +101,7 @@ class Hand:
                     pass  #
                 else:
                     self.state.move(movsL[0], logger)
+                    continue
 
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1
