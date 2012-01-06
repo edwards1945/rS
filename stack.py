@@ -44,11 +44,11 @@ class Stack(list):
 
     #----------------------------------------------------------------------
     def moveMyItems(self,  item, to_stk, updateItem_function):
-        """ moves one or more items -  in  rS items are cards - to the new stack. For rS the updateItem_function updates the card dictionary with new state.
+        """ moves one or more items -  in  rS items are cards - to the new stack.
+        The updateItem_function() updates the card dictionary with new state in rS.
         
         Self can be empty.        
         """
-        # assert  self.name[0] ==  'T' #this test does NOT belong in Stack; it's a Hand assert.
         if item not in self:  # special case: populating an empty stk.
             # MOD 7.5.7 111229.1130 DEL> and  item.ndx is None:  
             to_stk.PUSH(item) 

@@ -79,27 +79,34 @@ class Hand:
         while hasMovs:           
             while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
+                movsL =  self.fndMovesL
+                if logger: logger.info("----Hand.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))                  
                 self.state.move(self.fndMovesL[0], logger)
-                #
-
+                
             if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
+                if logger: logger.info("----Hand.{} now has {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                i =  1
                 while len(movsL) >  1:  # a new hand/state for each mov.
-                    i  = len(movsL) -1                 
+                    #i  = len(movsL) -1                 
                     deepState =  copy.deepcopy(self.state)  # orig state
-                    tag = "{}.{}".format(self.tag, str(i))  # first, in the .0 hand.
-                    mov =  movsL.pop()  # changes order of new hands & therefore state
-                    h =  Hand(deepState, tag)  #new Hand/orig State
-                    h.state.move(mov, logger)  # changes new state
-                    if logger: logger.info("Hand.{} made a Hand w/tag:{}".format(self.tag, h.tag))
-                    h.play_1_Hand(logger=logger)
+                    tag = "{}.{}".format(self.tag, str(i))  # sub tags
+                    h =  Hand(deepState, tag)  #new Hand w/orig State
+                    mov =  movsL.pop(0) 
+                    if logger: logger.info("---Hand.{0} made sub Hand.{1} and {1} moved:{2}.".format(self.tag, h.tag,  mov))
+                    h.state.move(mov, logger)  # move first mov
+                    hCntr += h.play_1_Hand(logger=logger)
+                    i += 1
                     pass  #
                 else:
                     self.state.move(movsL[0], logger)
 
             if self.sibMove(state,  logger):  # do one, then look for fndMove
-                mCntr['s'] +=  1                   
+                mCntr['s'] +=  1
+                movsL =  self.sibMovesL
+                if logger: logger.info("----Hand.{} now has {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))                  
+                
                 self.state.move(self.sibMovesL[0], logger)
                 continue
             
@@ -109,13 +116,13 @@ class Hand:
                 or self.sibMove(state,  logger)
                  
         
-        hCntr['msClk'] = (clock() - startClk) *  1000
-        hCntr['winCnt'] = 1 if state.haveWon else 0
+        hCntr['msClk'] += (clock() - startClk) *  1000
+        hCntr['winCnt'] += 1 if state.haveWon else 0
         #assert  mCntr['f'] ==  state.fndCnt
-        hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
-        hCntr['nCnt'] = 1
+        hCntr['fCnt'] += mCntr['f']  #   MOD:   state.fndCnt
+        hCntr['nCnt'] += 1
         
-        if logger: logger.info("  *********** Hand.{4} (f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *****\n\n".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
+        if logger: logger.warn("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
         return hCntr
 
     def test_kngBranching():
@@ -128,13 +135,13 @@ class Hand:
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>> h = hand.Hand(tag='1')
         >>> h.state = state.FullFoundations()
-        >>> h.state.move(Mov(Crd('C', 12),  'T0'))
-        >>> h.state.move(Mov(Crd('D', 12),  'T1'))
-        >>> h.state.move(Mov(Crd('D', 11),  'T2'))
-        >>> h.state.move(Mov(Crd('D', 10),  'T3'))
-        >>> #h.state.move(Mov(Crd('D', 9),  'T4'))
-        >>> h.state.move(Mov(Crd('D', 7),  'T5'))  # D7 buried by D8; T6 is still empty.
-        >>> # 2 kngMovs: 2Kngs x 1 empty tbls.
+        >>> # MAKE 4 kngMovs: 2Kngs x 2 empty tbls.
+        >>> h.state.move(Mov(Crd('C', 12),  'T0'))  # is 13, 12
+        >>> h.state.move(Mov(Crd('D', 12),  'T1'))  # is 13, 12
+        >>> h.state.move(Mov(Crd('D', 11),  'T2'))  # is11
+        >>> h.state.move(Mov(Crd('D', 10),  'T3'))  # is 10
+        >>> h.state.move(Mov(Crd('D', 7),  'T4'))  # is7,8,9
+        >>> #                                                T5 & T6 are empty.
         >>> logger = logging.getLogger('myI')
         >>> tCntr.clear()
         >>> tCntr += h.play_1_Hand(logger=logger)  #TEST OBJECT
