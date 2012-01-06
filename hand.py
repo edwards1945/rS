@@ -75,19 +75,13 @@ class Hand:
         startClk =  clock()
         
         hasMovs = True  # at least one pass thru >> self.fndMove(state,  logger) or  self.kngMove(state,  logger)  or self.sibMove(state,  logger)
-<<<<<<< HEAD
-=======
-        
->>>>>>> play
+
         while hasMovs:           
             while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
                 self.state.move(self.fndMovesL[0], logger)
                 #
-<<<<<<< HEAD
 
-=======
->>>>>>> play
             if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
@@ -103,12 +97,7 @@ class Hand:
                     pass  #
                 else:
                     self.state.move(movsL[0], logger)
-<<<<<<< HEAD
-                    
-=======
-                    # ??????? continue  # look for more moves of all kinds.
 
->>>>>>> play
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1                   
                 self.state.move(self.sibMovesL[0], logger)
