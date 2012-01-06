@@ -2,7 +2,7 @@
 
 
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
-# # stops after one pass thru PLAY_1_Hand: need anonther while suit
+# # stops after one pass thru play_1_Hand: need anonther while suit
 # # Hand.state is now default to basic State()
 # #implementing fnd, kng and sib moves.  111225-
 
@@ -38,7 +38,7 @@ class Hand:
     @ tag.setter
     def tag(self, tag):
         self._tag =  tag
-    def PLAY_1_Set(self,  N_hands=50,   logger=None):
+    def play_1_Set(self,  N_hands=50,   logger=None):
         """PLAYS  1 Set: N Hands, and REPORTS and RETURNS setStats: won, foundationCnt, handCnt
         
         One Hand FINDS & EXECUTES Moves until stymied or WON.    
@@ -48,7 +48,7 @@ class Hand:
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
             self.state = state.FullState(True)  #new shuffled state.
-            setCntr += self.PLAY_1_Hand(logger=logger)            
+            setCntr += self.play_1_Hand(logger=logger)            
             pass
             
         n = nCnt =  setCntr['nCnt']
@@ -62,46 +62,44 @@ class Hand:
         if logger: logger.info(ret)
         return  setCntr
     
-    def PLAY_1_Hand(self,  state=None,  logger=None):
+    def play_1_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
     
         """        
         if not logger:  logger = logging.getLogger('myW')
-        #  myD OR myI OR myW
-        if not state:
-            state = self.state    #MOD 7.5.6
+        if not state: state = self.state
+        
         hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
         
-        hasMovs = self.fndMove(state,  logger)\
-            or  self.kngMove(state,  logger)\
-            or self.sibMove(state,  logger)
-        
+        hasMovs = True  # at least one pass thru >> self.fndMove(state,  logger) or  self.kngMove(state,  logger)  or self.sibMove(state,  logger)
         while hasMovs:           
             while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
-                self.state.move(self.fndMovesL[-1], logger)
+                self.state.move(self.fndMovesL[0], logger)
                 #
-            if self.kngMove(state,  logger):  #do one, then look for fndMove
+
+            if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL =  self.kngMovesL
-                self.state.move(self.kngMovesL[-1], logger)
-                continue
-                #i = 0
-                #for mov in movsL:
-                    #deepState =  copy.deepcopy(self.state)  #state after a mov               
-                    #nme = "{}.{}".format(self.tag, str(i))  # first, in the .0 hand.
-                    #self.tag = nme
-                    #self.state.move(mov, logger)  # after 
-                    #h =  Hand(deepState, nme)  #new Hand/same State
-                    #if logger: logger.info("made a Hand tagd {}".format(h.tag))
-                    ##h.PLAY_1_Hand(logger=logger)
-                    #i += 1
+                while len(movsL) >  1:  # a new hand/state for each mov.
+                    i  = len(movsL) -1                 
+                    deepState =  copy.deepcopy(self.state)  # orig state
+                    tag = "{}.{}".format(self.tag, str(i))  # first, in the .0 hand.
+                    mov =  movsL.pop()  # changes order of new hands & therefore state
+                    h =  Hand(deepState, tag)  #new Hand/orig State
+                    h.state.move(mov, logger)  # changes new state
+                    if logger: logger.info("Hand.{} made a Hand w/tag:{}".format(self.tag, h.tag))
+                    h.play_1_Hand(logger=logger)
+                    pass  #
+                else:
+                    self.state.move(movsL[0], logger)
+                    
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1                   
-                self.state.move(self.sibMovesL[-1], logger)
+                self.state.move(self.sibMovesL[0], logger)
                 continue
             
             #refresh and try again:
@@ -127,13 +125,18 @@ class Hand:
         >>> from h import *      
         >>> logger = logging.getLogger('myW')        
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        >>> h = hand.Hand(tag='0')
+        >>> h = hand.Hand(tag='1')
         >>> h.state = state.FullFoundations()
         >>> h.state.move(Mov(Crd('C', 12),  'T0'))
         >>> h.state.move(Mov(Crd('D', 12),  'T1'))
+        >>> h.state.move(Mov(Crd('D', 11),  'T2'))
+        >>> h.state.move(Mov(Crd('D', 10),  'T3'))
+        >>> #h.state.move(Mov(Crd('D', 9),  'T4'))
+        >>> h.state.move(Mov(Crd('D', 7),  'T5'))  # D7 buried by D8; T6 is still empty.
+        >>> # 2 kngMovs: 2Kngs x 1 empty tbls.
         >>> logger = logging.getLogger('myI')
         >>> tCntr.clear()
-        >>> tCntr += h.PLAY_1_Hand(logger=logger)  #TEST OBJECT
+        >>> tCntr += h.play_1_Hand(logger=logger)  #TEST OBJECT
         >>> #tCntr
         >>>                        
         """
@@ -267,7 +270,7 @@ def test():
     f =  open('testPrintout.txt', mode='a')
     
     for i in range(gmeCnt):
-        tstCntr += h.PLAY_1_Set(setCnt)
+        tstCntr += h.play_1_Set(setCnt)
         
     n = tstCntr['nCnt']
     msg = ( "Test - {: .1%}/{:.1%} - {} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games/{} Hands.\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['winCnt'], tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
