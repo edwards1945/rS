@@ -1,11 +1,10 @@
 #! /usr/bin/env python3.2
 #rS.7.6.py
-#MOD 7.6  Tested Basic play @ 2.5- 3 %
-# 120103.0900
-## added #! above to make it immediately executable but it didn't work.
-## added two standard deviation functions: compute_std1 & 2
-## namedtuple Mov2Nme now Mov
-## Dad rules!
+#120107.10.00  in git seeTops what do I want to see??
+#  something like>> tops now: T1:C05, T2:--, T3,H13
+
+
+
 
 #I want to compare win rate of non-recursive play versus recursive play.
 
