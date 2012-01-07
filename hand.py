@@ -1,10 +1,7 @@
-#hand.7.6.0
+#hand.7.6.1
 
 
-#MOD 7.6  Tested Basic play @ 2.5- 3 %
-# # stops after one pass thru play_1_Hand: need anonther while suit
-# # Hand.state is now default to basic State()
-# #implementing fnd, kng and sib moves.  111225-
+#MOD 7.6.1  2nd recursive play_Hand
 
 
 from h import *
@@ -25,7 +22,7 @@ class Hand:
     def __init__(self, mystate=state.State(),  tag=None):
         """ """
         logger = logging.getLogger('myW') #  myD, myI OR myW 
-        self.state = mystate  #MOD 7.5.7
+        self.state = mystate
         self._tag =  tag
         self.fndMovesL =  []
         self.sibMovesL = []  
@@ -48,7 +45,7 @@ class Hand:
         setCntr =  Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         for n in  range(N_hands):
             self.state = state.FullState(True)  #new shuffled state.
-            setCntr += self.play_1_Hand(logger=logger)            
+            setCntr += self.play_Hand(logger=logger)            
             pass
             
         n = nCnt =  setCntr['nCnt']
@@ -62,7 +59,31 @@ class Hand:
         if logger: logger.info(ret)
         return  setCntr
     
-    def play_1_Hand(self,  state=None,  logger=None):
+    def _do_best_kngMove(self,  movsL, logger):
+        """ create new Hands; play till it stops; return hBEST.state
+        """
+        #make it look like self.state.move(.......) call"""
+        i =  1
+        retD =dict()
+        for mov in  movsL:
+            tag = "{}.{}".format(self.tag, str(i))  # sub tags
+            h =  Hand(copy.deepcopy(self.state), tag)  #new Hand w/orig State
+            pass #confirm self.state AS NOT CHANGED during for mov ...
+            #mov =  movsL.pop(0) 
+            if logger: logger.info("---Hand.{0} made sub Hand.{1} and {1} will move:{2}.".format(self.tag, h.tag,  mov))
+            h.state.move(mov, logger)  # move first mov
+            retD[h.tag] = (h.play_Hand(logger=logger),  h ) #tuple
+            i += 1
+            pass
+        # choose hBEST and set self.state = hBEST.state
+        l = list(retD.items())
+        _tag =  l[0][0]
+        self.state = retD[_tag][1].state
+        #THE FOLLOWING IS BENIGN TEST RETURN
+        #self.state.move(self.kngMovesL[0], logger)
+        
+    
+    def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
     
@@ -74,8 +95,7 @@ class Hand:
         mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
         
-        hasMovs = True  # at least one pass thru >> self.fndMove(state,  logger) or  self.kngMove(state,  logger)  or self.sibMove(state,  logger)
-
+        hasMovs = True  
         while hasMovs:           
             while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
@@ -85,29 +105,15 @@ class Hand:
                 
             if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 mCntr['k'] +=  1                                
-                movsL =  self.kngMovesL
+                movsL =  copy.copy(self.kngMovesL)
                 if logger: logger.info("----Hand.{} now has {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                i =  1
-                while len(movsL) >  1:  # a new hand/state for each mov.
-                    #i  = len(movsL) -1                 
-                    deepState =  copy.deepcopy(self.state)  # orig state   #REFACT  indiv states 
-                    tag = "{}.{}".format(self.tag, str(i))  # sub tags
-                    h =  Hand(deepState, tag)  #new Hand w/orig State
-                    mov =  movsL.pop(0) 
-                    if logger: logger.info("---Hand.{0} made sub Hand.{1} and {1} moved:{2}.".format(self.tag, h.tag,  mov))
-                    h.state.move(mov, logger)  # move first mov
-                    hCntr += h.play_1_Hand(logger=logger)
-                    i += 1
-                    pass  #
-                else:
-                    self.state.move(movsL[0], logger)
-                    continue
+                self._do_best_kngMove(movsL,  logger)
+                continue
 
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1
                 movsL =  self.sibMovesL
                 if logger: logger.info("----Hand.{} now has {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))                  
-                
                 self.state.move(self.sibMovesL[0], logger)
                 continue
             
@@ -143,9 +149,9 @@ class Hand:
         >>> h.state.move(Mov(Crd('D', 10),  'T3'))  # is 10
         >>> h.state.move(Mov(Crd('D', 7),  'T4'))  # is7,8,9
         >>> #                                                T5 & T6 are empty.
-        >>> logger = logging.getLogger('myI')
+        >>> logger = logging.getLogger('myW')
         >>> tCntr.clear()
-        >>> tCntr += h.play_1_Hand(logger=logger)  #TEST OBJECT
+        >>> tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
         >>> #tCntr
         >>>                        
         """

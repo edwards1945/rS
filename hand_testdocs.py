@@ -27,7 +27,7 @@ class testHand:
         >>>
         """
         
-    def test_play_1_Hand(self):
+    def test_play_Hand(self):
         """      
         >>> import  state, hand
         >>> from h import *
@@ -37,7 +37,7 @@ class testHand:
         >>> h = hand.Hand()
         >>> h.state = state.FullFoundations()  # already at the end
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.play_1_Hand()  #TEST OBJECT
+        >>> testSetCntr += h.play_Hand()  #TEST OBJECT
         >>> #testSetCntr
         >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 0
         True
@@ -47,15 +47,15 @@ class testHand:
         >>> s1 = newStt('T1', True, Crd( 'H', 2))  # BLOCKS ACE MOVE
         >>> h.state.populate([ s0, s1])
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.play_1_Hand()  #TEST OBJECT
+        >>> testSetCntr += h.play_Hand()  #TEST OBJECT
         >>> testSetCntr['winCnt'] == 0 and testSetCntr['nCnt'] == 1
         True
         >>> # ********* # (3) testdata sequenced for all fndMove
         >>> h = hand.Hand()        
         >>> h.state = state.FullState(False)
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.play_1_Hand()  #TEST OBJECT 
-        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 52  # 1 pass thre play_1_Hand using 'while fndMove()
+        >>> testSetCntr += h.play_Hand()  #TEST OBJECT 
+        >>> testSetCntr['nCnt'] == 1 and testSetCntr['fCnt'] == 52  # 1 pass thre play_Hand using 'while fndMove()
         True
         >>>
         >>> import  state, hand
@@ -70,7 +70,7 @@ class testHand:
         >>> h.state = state.FullState()  # default is shuffle: True
         >>> logger = logging.getLogger('myW')
         >>> testSetCntr.clear()
-        >>> testSetCntr += h.play_1_Hand(logger=logger)  #TEST OBJECT
+        >>> testSetCntr += h.play_Hand(logger=logger)  #TEST OBJECT
         >>> #testSetCntr
         >>>                
 
