@@ -22,3 +22,14 @@ Test -  2.5%/0.2% - 25 WINS:AVG: 3.6 FndMovs in 14.8ms  for 20 Games/50 Hands.
 Test -  3.2%/0.3% - 32 WINS:AVG: 4.2 FndMovs in 18.6ms  for 20 Games/50 Hands.
 Test -  2.9%/0.3% - 29 WINS:AVG: 3.8 FndMovs in 16.1ms  for 20 Games/50 Hands.
 Test -  2.7%/0.3% - 27 WINS:AVG: 3.9 FndMovs in 17.8ms  for 20 Games/50 Hands.
+Not recursive: put kngMove at end.
+Test -  3.1%/0.3% - 31 WINS:AVG: 4.2 FndMovs in 9.9 ms  for 20 Games/50 Hands.
+Test -  2.5%/0.2% - 25 WINS:AVG: 3.9 FndMovs in 4.9 ms  for 20 Games/50 Hands.
+Test -  3.4%/0.3% - 34 WINS:AVG: 4.3 FndMovs in 4.9 ms  for 20 Games/50 Hands.
+Test -  2.6%/0.2% - 26 WINS:AVG: 4.0 FndMovs in 4.9 ms  for 20 Games/50 Hands.
+Test -  3.5%/0.3% - 35 WINS:AVG: 4.2 FndMovs in 4.8 ms  for 20 Games/50 Hands.
+Test -  3.3%/0.3% - 33 WINS:AVG: 4.2 FndMovs in 4.9 ms  for 20 Games/50 Hands.
+Test -  3.5%/0.3% - 35 WINS:AVG: 4.4 FndMovs in 5.0 ms  for 20 Games/50 Hands.
+Test -  3.3%/0.3% - 33 WINS:AVG: 4.1 FndMovs in 4.9 ms  for 20 Games/50 Hands.
+Test -  2.2%/0.2% - 22 WINS:AVG: 3.7 FndMovs in 5.2 ms  for 20 Games/50 Hands.
+Test -  2.5%/0.3% - 25 WINS:AVG: 3.8 FndMovs in 4.7 ms  for 20 Games/50 Hands.

@@ -72,28 +72,34 @@ class Hand:
         startClk =  clock()
         
         still_has_Movs = True  
-        while still_has_Movs:           
+        while still_has_Movs:
+            if logger:
+                logger.info(self.state.seeTops())
             while self.fndMove(state,  logger):  #do a whole seq if possible.
                 mCntr['f'] += 1
                 movsL =  self.fndMovesL
-                if logger: logger.info("----Hand.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))                  
+                if logger:
+                    logger.info("--play_Hnd.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 self.state.move(self.fndMovesL[0], logger)
                 
-            if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
-                mCntr['k'] +=  1                                
-                movsL =  copy.copy(self.kngMovesL)
-                if logger: logger.info("----Hand.{} now has {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                self._do_best_kngMove(movsL,  logger)
-                #self.state.move(self.kngMovesL[0], logger)
-                # problem: this bypasses calc sstill_has_moves  continue
-
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1
                 movsL =  self.sibMovesL
-                if logger: logger.info("----Hand.{} now has {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))                  
+                if logger:
+                    logger.info("--play_Hnd.{} now has {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 self.state.move(self.sibMovesL[0], logger)
-                #continue
-            
+                continue  #bypasses kngMove
+                
+            if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
+                mCntr['k'] +=  1                                
+                movsL = self.kngMovesL
+                #movsL =  copy.copy(self.kngMovesL)
+                if logger:
+                    logger.info("--play_Hnd.{} now has {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
+                    
+                #self._do_best_kngMove(movsL,  logger)
+                self.state.move(self.kngMovesL[0], logger)
+
             #refresh and try again:
             still_has_Movs = self.fndMove(state,  logger)\
                 or  self.kngMove(state,  logger)\
@@ -107,7 +113,7 @@ class Hand:
         hCntr['nCnt'] += 1
         
 
-        if logger: logger.warn("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
+        if logger: logger.info("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
 
         return hCntr
 
@@ -128,7 +134,7 @@ class Hand:
         >>> h.state.move(Mov(Crd('D', 10),  'T3'))  # is 10
         >>> h.state.move(Mov(Crd('D', 7),  'T4'))  # is7,8,9
         >>> #                                                T5 & T6 are empty.
-        >>> logger = logging.getLogger('myI')
+        >>> logger = logging.getLogger('myW')
         >>> tCntr.clear()
         >>> tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
         >>> #tCntr
