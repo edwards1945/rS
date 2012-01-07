@@ -1,10 +1,7 @@
 #! /usr/bin/env python3.2
 #rS.7.6.py
-#MOD 7.6  Tested Basic play @ 2.5- 3 %
-#MOD 120107.0950
-#  tried _do_best_kngMove() spawning new Hands in 1st cut. Worked but really slowed things down.
-#  trying _do_best_kngMove just spawning new State but can't figure it out.
-## branch: maybe if I could see the top || head cards in a loggger output I could understand better. Should I git branch from here:wip or from master??? Let's try from master to seeTops.
+
+#120107.10.00  in git created seeTops and produced state.sttTops() to return a string of formated tops ( or I'm beginning to think of them as heads): T1:C05, T2:--, T3,H13
 
 # PURPOSE
 #I want to compare win rate of non-recursive play versus recursive play.

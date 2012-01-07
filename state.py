@@ -42,6 +42,18 @@ class State:
     @property
     def haveWon(self):
         return  True if self.fndCnt ==  52 else False
+    def seeTops(self):
+        """ returns formated str of top 11 stacks."""
+        x =  lambda stk: stk[-1] if stk else None
+        t = [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
+        ret = 'Top-'
+        for top in  t:
+            if top[1]:
+                ret += "{0}:{1.suit}{1.valu}, ".format(top[0], top[1])
+            else:
+                ret +=  "{0}:--,".format(top[0], top[1])
+        return ret
+        
     def move(self,  mov2, logger=None):  #MOD 7.5.4
         """ faceUP Crd[s] >TO> StackNme:
         CALLED from Hand.
@@ -70,6 +82,7 @@ class State:
         if logger:
             logger.info("**** moved {}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
             logger.debug(imsg)
+            logger.info(self.seeTops())
         pass    
     #----------------------------------------------------------------------
     def populate(self,  newSttL):

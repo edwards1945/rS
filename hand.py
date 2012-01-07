@@ -106,7 +106,9 @@ class Hand:
         hCntr['fCnt'] += mCntr['f']  #   MOD:   state.fndCnt
         hCntr['nCnt'] += 1
         
+
         if logger: logger.warn("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
+
         return hCntr
 
     def test_kngBranching():
