@@ -43,7 +43,7 @@ class State:
     def haveWon(self):
         return  True if self.fndCnt ==  52 else False
     def seeTops(self):
-        """ """
+        """ returns formated str of top 11 stacks."""
         x =  lambda stk: stk[-1] if stk else None
         t = [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
         ret = 'Top-'
