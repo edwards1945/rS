@@ -1,4 +1,4 @@
-#hand.7.6
+#hand.7.6.0
 
 
 #MOD 7.6  Tested Basic play @ 2.5- 3 %
