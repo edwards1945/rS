@@ -19,7 +19,7 @@ class testHand:
         >>>
         >>> #  ****** TESTS # (1) state already WON: fndCnt == 52
         >>> h.state = state.FullState(True)  #shuffled
-        >>> logger = logging.getLogger('root')
+        >>> logger = logging.getLogger('myI')
         >>> testSetCntr.clear()
         >>> testSetCntr = h.play_1_Set(5, logger=logger)  #TEST OBJECT
         >>> testSetCntr['nCnt'] == 5

@@ -69,7 +69,7 @@ class State:
         to_stk_orig_top_crd = to_stk.top_item
         frm_stk_nme =  self.crd2OD[crd].stkNme
         frm_stk = self.stkOD[frm_stk_nme]
-        
+        assert True
         imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, to_stk_nme,  to_stk )
         
         def updateItem_function( crd,  to_stk):
@@ -80,9 +80,9 @@ class State:
         
         imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
         if logger:
-            logger.debug("**** moved {}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
+            logger.info("**** moved {}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
             logger.debug(imsg)
-            #logger.info(self.seeTops())
+            logger.info(self.seeTops())
         pass    
     #----------------------------------------------------------------------
     def populate(self,  newSttL):

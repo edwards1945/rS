@@ -79,14 +79,14 @@ class Hand:
                 mCntr['f'] += 1
                 movsL =  self.fndMovesL
                 if logger:
-                    logger.info("--play_Hnd.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 self.state.move(self.fndMovesL[0], logger)
                 
             if self.sibMove(state,  logger):  # do one, then look for fndMove
                 mCntr['s'] +=  1
                 movsL =  self.sibMovesL
                 if logger:
-                    logger.info("--play_Hnd.{} now has {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                    logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 self.state.move(self.sibMovesL[0], logger)
                 continue  #bypasses kngMove
                 
@@ -95,25 +95,25 @@ class Hand:
                 movsL = self.kngMovesL
                 #movsL =  copy.copy(self.kngMovesL)
                 if logger:
-                    logger.info("--play_Hnd.{} now has {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
-                    
-                #self._do_best_kngMove(movsL,  logger)
-                self.state.move(self.kngMovesL[0], logger)
+                    logger.info("--kngMove.{} now sees {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))                    
+                self.state = self._do_best_kngMove(movsL,  logger)
+                #self.state.move(self.kngMovesL[0], logger)
 
             #refresh and try again:
-            still_has_Movs = self.fndMove(state,  logger)\
+            if self.state.fndCnt ==  52:
+                break
+            still_has_Movs = (self.fndMove(state,  logger)\
                 or  self.kngMove(state,  logger)\
-                or self.sibMove(state,  logger)
-                 
-        
-        hCntr['msClk'] += (clock() - startClk) *  1000
-        hCntr['winCnt'] += 1 if state.haveWon else 0
+                or self.sibMove(state,  logger))
+                        
+        hCntr['msClk'] = (clock() - startClk) *  1000
+        hCntr['winCnt'] = 1 if state.haveWon else 0
         #assert  mCntr['f'] ==  state.fndCnt
-        hCntr['fCnt'] += mCntr['f']  #   MOD:   state.fndCnt
-        hCntr['nCnt'] += 1
+        hCntr['fCnt'] = mCntr['f']  #   MOD:   state.fndCnt
+        hCntr['nCnt'] = 1
         
 
-        if logger: logger.info("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
+        if logger: logger.warn("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
 
         return hCntr
 
@@ -123,7 +123,7 @@ class Hand:
         >>> import logging
         >>> import logging.config
         >>> from h import *      
-        >>> logger = logging.getLogger('myW')        
+        >>> #logger = logging.getLogger('myW')        
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>> h = hand.Hand(tag='1')
         >>> h.state = state.FullFoundations()
@@ -134,11 +134,16 @@ class Hand:
         >>> h.state.move(Mov(Crd('D', 10),  'T3'))  # is 10
         >>> h.state.move(Mov(Crd('D', 7),  'T4'))  # is7,8,9
         >>> #                                                T5 & T6 are empty.
-        >>> logger = logging.getLogger('myW')
+        >>> logger = logging.getLogger('myI')
         >>> tCntr.clear()
         >>> tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
-        >>> #tCntr
-        >>>                        
+        
+        #>>> #tCntr
+        #>>> # shuffled
+        #>>> h.state = state.FullState()
+        #>>> tCntr.clear()
+        #>>> tCntr = h.play_Hand(logger=logger)  #TEST OBJECT
+                      
         """
 
     def kngMove(self, state, logger=None):
@@ -176,8 +181,7 @@ class Hand:
                            for mty_nme in  _empty_tbl_stkL
                            if kng_nme != mty_nme]
             for _mov in  _movL:
-                self.kngMovesL.append( _mov) 
-            
+                self.kngMovesL.append( _mov)             
         return  len(self.kngMovesL ) >  0
            
     def fndMove(self, state, logger=None):
@@ -256,30 +260,22 @@ class Hand:
             
     #----------------------------------------------------------------------
     def _do_best_kngMove(self,  movsL, logger):
-        """ create new Hands; play till it stops; return hBEST.state
+        """ create new Hands; play till it stops; RETURN state
         """
         #make it look like self.state.move(.......) call"""
         i =  1
+        retCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         retD =dict()
         for mov in  movsL:
             old_tag = self.tag
             tag = "{}.{}".format(old_tag, str(i))  # sub tags
-            self.state = copy.deepcopy(self.state) #new state            
-            self.tag =  tag
-            if logger: logger.info("---State.{0} has new State.{1} and {1} will move:{2}.".format(old_tag, tag,  mov))
-            self.state.move(mov, logger)  # move first mov
-            return   # this should replicate base fndMove
+            h = Hand(copy.deepcopy(self.state),  tag)  #new state starts with cur state.
+            if logger: logger.info("---do_best...Hand.{0} sub.{1} will move:{2}.".format(old_tag, tag,  mov))
             
-            #retD[tag] = (h.play_Hand(logger=logger),  h ) #tuple
-            #i += 1
-        # choose hBEST and set self.state = hBEST.state
-        #l = list(retD.items())
-        #_tag =  l[0][0]
-        #self.state = retD[_tag][1].state
-        #THE FOLLOWING IS BENIGN TEST RETURN
-        #self.state.move(self.kngMovesL[0], logger)
-        
-    
+            h.state.move(mov, logger)  # this move changes state.
+            retCntr += h.play_Hand(logger=logger)
+            return h.state
+               
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.
     PRINTS summary stats.
