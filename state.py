@@ -72,11 +72,13 @@ class State:
         assert True
         imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, to_stk_nme,  to_stk )
         
-        def updateItem_function( crd,  to_stk):
+        def updateItem_function( crd,  to_stk,  logger):
             """ """
             self.crd2OD[crd] = newStt(to_stk.name,  True,  crd)
+            if logger:
+                logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))                        
                   
-        frm_stk.moveMyItems(crd, to_stk,  updateItem_function)  # >> crd now switched & newStt updated.
+        frm_stk.moveMyItems(crd, to_stk,  updateItem_function,  logger)  # >> crd now switched & newStt updated.
         
         imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
         if logger:
