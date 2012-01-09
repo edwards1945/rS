@@ -1,5 +1,5 @@
-#h.7.6.py  - git  branch(improveWins )
-#MOD 7.6  
+#h.7.7.py 
+#MOD 7.7 enhanced State  enhanced State.
 # Tested Basic play @ 2.5- 3 %
 
 import sys,  math
@@ -25,7 +25,7 @@ UP= TEST_TRUE = True
 DOWN = TEST = TEST_FALSE = False
 FACES = {'UP': True, 'DOWN':  False}
 KING_CARDS =  [('S', 12),  ('H', 12),  ('D', 12),  ('C', 12)]
-SUITS =[  'S', 'H', 'D',  'C'] #MOD 60.1 alpha order: THUS S,H,D,C ; NOT S,H,C,D
+SUITS =[  'S', 'H', 'D',  'C'] 
 VALUES =[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,  13]
 TABLEAUS = [  'T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6']
 FOUNDATIONS = SUITS  

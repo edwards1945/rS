@@ -1,5 +1,5 @@
-#hand.testdocs.7.6.py
-#MOD 7.6  Tested Basic play @ 2.5- 3 %
+#hand.testdocs.7.7.py
+#MOD 7.7 enhanced State
 
 import logging
 import logging.config

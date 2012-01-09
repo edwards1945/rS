@@ -1,5 +1,5 @@
-""" state_testdocs.7.6.py 
-#MOD  7.6 Tested Basic play @ 2.5- 3 %
+""" state_testdocs.7.7.py 
+#MOD  7.6 
 # 111226 1445
 # speciality States
 """

@@ -1,7 +1,5 @@
-#hand.7.6.1
-
-
-#MOD 7.6.1  2nd recursive play_Hand
+#hand.7.7
+#MOD 7.7 enhanced State
 
 
 from h import *
@@ -93,11 +91,9 @@ class Hand:
             if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 mCntr['k'] +=  1                                
                 movsL = self.kngMovesL
-                #movsL =  copy.copy(self.kngMovesL)
                 if logger:
                     logger.info("--kngMove.{} now sees {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))                    
                 self.state = self._do_best_kngMove(movsL,  logger)
-                #self.state.move(self.kngMovesL[0], logger)
 
             #refresh and try again:
             if self.state.fndCnt ==  52:

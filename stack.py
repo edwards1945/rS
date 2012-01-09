@@ -1,5 +1,5 @@
-# stack.7.6.py module
-# MOD 7.6  Tested Basic play @ 2.5- 3 %
+# stack.7.7.py module
+# MOD 7.7 enhanced State
 # #  
 
 #from h import *

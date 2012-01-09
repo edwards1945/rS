@@ -1,20 +1,6 @@
-""" state.7.6.py 
+""" state.7.7.py 
 """
-# MOD 7.5.8 implemented uncovered Card in tableau set to faceUP in State and Stack
-#MOD 7.5.6 working on play_1 and play_n Hands
-#    111228.1325 finally rid of Stt, using newStt everywhere - Ihope.
-#         and redid populate() using newStt - ie without Loc term
-# #    111227  adding collections.Counters
-#MOD 7.5.5 switching to Stk2(name of stack ) from Stk(actural stack ref): and all it's ramifications
-##  all three moves work
-#MOD 7.5.4 
-#     111225 State has new OD, crd2OD: notice crd<s>, aleady populated with 52 cards
-#     111225  adding TestStates
-#     111225 ADDEd rS,namedtuple Ppu to avoid py name conflict with Pop
-#     111225 DEPR  moveCrd() for NEW move() 
-#     111225 CHANGED nt Mov FROM Mov(crd, to_stk) TO Mov(crd, stkNme)
-#            because (1) seeing a Mov shows stak name and (2) it doesn't show ALL the items in the stk.
-
+# MOD 7.7 enhanced State
 
 import random
 from h import *
@@ -93,7 +79,6 @@ class State:
         for nxt in  newSttL:
             crd = nxt.crd  
             stk_nme = nxt.stkNme  
-            # DEPR Mod 7.5.6 WAS: stt =  Stt(Loc(stk,  len(stk)),  newStt.fce,  crd)
             self.crd2OD[crd]  =   newStt( stk_nme, True, crd )  # all top cards are true.
             self.stkOD[stk_nme].append(crd)  # append makes every new card the top MIGHT TRY Stack.moveMyItems()
             pass
