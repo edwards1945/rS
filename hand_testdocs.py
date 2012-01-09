@@ -5,6 +5,29 @@ import logging
 import logging.config
 
 class testHand:
+    def test_0_kngBranching():
+        """ the begining of maxHands: picking the highest return.
+        >>> import  state, hand
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> #logger = logging.getLogger('myW')        
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> h = hand.Hand(tag='1')
+        >>> h.state = state.FullFoundations()
+        >>> # MAKE 4 kngMovs: 2Kngs x 2 empty tbls.
+        >>> h.state.move(Mov(Crd('C', 12),  'T0'))  # is 13, 12
+        >>> h.state.move(Mov(Crd('D', 12),  'T1'))  # is 13, 12
+        >>> h.state.move(Mov(Crd('D', 11),  'T2'))  # is11
+        >>> h.state.move(Mov(Crd('D', 10),  'T3'))  # is 10
+        >>> h.state.move(Mov(Crd('D', 7),  'T4'))  # is7,8,9
+        >>> #                                                T5 & T6 are empty.
+        >>> logger = logging.getLogger('myW')
+        >>> tCntr.clear()
+        >>> tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
+        
+         """
+    
         
     def test_play_1_Set(self):
         """      
