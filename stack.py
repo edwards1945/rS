@@ -43,7 +43,7 @@ class Stack(list):
     #----------------------------------------------------------------------
 
     #----------------------------------------------------------------------
-    def moveMyItems(self,  item, to_stk, updateItem_function):
+    def moveMyItems(self,  item, to_stk, updateItem_function,  logger):
         """ moves one or more items -  in  rS items are cards - to the new stack.
         The updateItem_function() updates the card dictionary with new state in rS.
         
@@ -52,16 +52,16 @@ class Stack(list):
         if item not in self:  # special case: populating an empty stk.
             # MOD 7.5.7 111229.1130 DEL> and  item.ndx is None:  
             to_stk.PUSH(item) 
-            updateItem_function(item,  to_stk)        
+            updateItem_function(item,  to_stk,  logger)        
         else:           
             _slice = self[self.index(item):] 
             for _itm in  _slice:
                 self.remove(_itm)   # won't error if empty
                 to_stk.PUSH(_itm)
-                updateItem_function(_itm,  to_stk)        
+                updateItem_function(_itm,  to_stk,  logger)        
             if not self.isEmpty:  # uncovered a card, make it faceUP
                 crd = self.top_item
-                updateItem_function(crd, self)
+                updateItem_function(crd, self, logger)
         
         
         
