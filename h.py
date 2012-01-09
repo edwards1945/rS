@@ -13,7 +13,9 @@ import logging.config
 Crd = namedtuple('Crd', 'suit, valu') #  Card ('H', 3)  OR Crd_EMPTY
 Stt = namedtuple('Stt', 'loc, fce, crd') #  State (('T3', 7), True,('H', 3),)
 newStt =  namedtuple('newStt', ' stkNme,  fce,  crd')
+Status =  namedtuple('Status', 'crd, fce, stkNme')  #began in v7.7 REVERSED ORDER.
 Mov = namedtuple('Mov', 'crd, stkNme')  # Mov( Crd, 'T5')
+Move = namedtuple('Move', 'crd, stkNme')  # Mov( Crd, 'T5')  #began in v7.7
 HndStat =  namedtuple('HndStat', 'won, f_cnt' )  #HandCount(0, 3)
 SetStat =  namedtuple('SetStat', 'won, f_cnt, n_Cnt' )  #SetCount(5, 4, 50)
 # ***************string formating

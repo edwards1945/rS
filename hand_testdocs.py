@@ -5,6 +5,20 @@ import logging
 import logging.config
 
 class testHand:
+    def test_1_kngBranching():
+        """ the begining of maxHands: picking the highest return.
+        >>> import  state, hand
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> h = hand.Hand(tag='1')
+        >>> h.state = state.FullState()  # shuffled
+        >>> logger = logging.getLogger('myI')
+        >>> tCntr.clear()
+        >>> #REFACT hold off till newState >>tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
+        >>>          
+        """ 
     def test_0_kngBranching():
         """ the begining of maxHands: picking the highest return.
         >>> import  state, hand
@@ -44,7 +58,7 @@ class testHand:
         >>> h.state = state.FullState(True)  #shuffled
         >>> logger = logging.getLogger('myI')
         >>> testSetCntr.clear()
-        >>> testSetCntr = h.play_1_Set(5, logger=logger)  #TEST OBJECT
+        >>> #REFACT testSetCntr = h.play_1_Set(5, logger=logger)  #TEST OBJECT
         >>> testSetCntr['nCnt'] == 5
         True
         >>>

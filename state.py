@@ -1,6 +1,11 @@
 """ state.7.7.py 
 """
 # MOD 7.7 enhanced State
+# introduce namedtuple Status to replace newStt
+# introduce namedtuple crdOD to replace Hand's crd2OD.
+# populate() to not force face = True.
+# added another dicitionary: movesD
+#  add findMoves(): move this functionality from hand to here where it belongs.
 
 import random
 from h import *
@@ -86,13 +91,60 @@ class State:
         
     
     #----------------------------------------------------------------------
+class newState(State):
+    """ move finding and executing to State.
+    """
+    def __init__(self, shuffle=True):
+        State.__init__(self)
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}
+        self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) #MOD 7.7
+        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
         
+    def populate(self,  StatusL):
+        """sequencially populates State from a <list> of Status:
+        this mod preserves fce
+        Status(stk_nme, fce, Crd)
+        """
+        for sts in  StatusL:
+            crd = sts.crd  
+            stk_nme = sts.stkNme  
+            self.crdOD[crd]  =   sts 
+            self.stkOD[stk_nme].append(crd)  
+    def findMoves(self):
+        """ rebuilds fnd.., kng..., sibMoves"""
+        for nme, mL in  self.movesD.items():
+            del self.movesD[nme] [:]  # clear xxxMoves
+        # for top in tbl_topsl
+        ##if ace make fndMove
+        
+        pass
+    def test_newState(self):
+        """
+        >>> #(1) confirm simple Ace fndMovs in findMoves().
+        >>> from h import *
+        >>> import state, stack
+        >>> st = state.newState()
+        >>> ace = Crd( 'C', 1)
+        >>> sts = Status(ace, True, 'T0')
+        >>> stsL = []
+        >>> stsL.append(sts)
+        >>> st.populate(stsL)
+        >>> st.crdOD[ace] == sts  #just confirm populate() works.
+        True
+        >>> # PRELOAD something in moves dict to assure it is cleared on findMoves() call.
+        >>> st.movesD['fnd'].append(Move(Crd('TEST', None), 'TEST'))
+        >>> st.findMoves()
+        >>> st.movesD['fnd']
+        []
+        >>> # findMoves() tests
+        """
 class FullState(State):
     """ shuffled or sequenced rS state.  
     """    
     def __init__(self, shuffle=True):
         State.__init__(self)
-        #BUILD RUSSIAN ROULETTE INIT STATE
+        #BUILD RUSSIAN SOLITAIRE STATE 
+        # 
         def build_full(self, shuffle ):
             """ """
             STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
@@ -123,25 +175,9 @@ class FullState(State):
     
         #----------------------------------------------------------------------    
         build_full(self,  shuffle)
-        
-#class TS2(State):
-    #""" for use with new move()   #MOD 7.5.4"""
-    #def __init__(self):
-        #State.__init__(self)  # so all
-        #self.populate(Ppu('T5', True,  Crd('C', 1)))
-        #self.populate(Ppu('T5', True,  Crd('H', 10)))
-        #self.populate(Ppu('T5', True,  Crd('S', 5)))
-        #self.populate(Ppu('T3', True,  Crd('S', 6 )))  #
-        ## BASIC tbl_top TO tbl_top        
-        #self.mov2_1 = Mov(Crd('S', 5), 'T3')  # T3 will have two crds: S6 & S5
-        ## BASIC: tbl_slice >TO> tbl_top
-        #self.mov2_2 = Mov( Crd('C', 1), 'T0' )  # T0 will have C1 & H10
-        #self.ret2_2 = Stt(loc=Loc(stk=[Crd(suit='C', valu=1), Crd(suit='H', valu=10)], ndx=0), fce=True, crd=Crd(suit='C', valu=1))        
-        
+  
 class FullFoundations(State):
-    """ 
-
-    """
+    """ a WON state.     """
     def __init__(self):
         State.__init__(self)
         self.populate([( newStt(nme, True, Crd(nme, i))) for i in range(1,14) for nme in SUITS])
@@ -150,5 +186,5 @@ if __name__ == "__main__":
     import doctest
     logging.config.fileConfig('myConfig.conf') 
     doctest.testmod(verbose=False)
-    #doctest.testfile("state_testdocs.py")
+    doctest.testfile("state_testdocs.py")
     #doctest.testfile("deal.print.txt")

@@ -11,6 +11,29 @@ import  stack,  state
 import logging
 import logging.config
 ####################################################
+def test_new_populate_newState(self):
+    """
+    >>> # confirm populate works using new namedtuple Status.
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.newState()  # crd2OD & stkOD
+    >>> # **** first assembled as argument
+    >>> st.populate([ Status(Crd('D', 6), False, 'T5')])
+    >>> st.crdOD[Crd('D', 6)] == Status(crd=Crd(suit='D', valu=6), fce=False, stkNme='T5')
+    True
+    >>> # **** now multiple status. 
+    >>> p1 = [Status(Crd('C', 13), False, 'T3')]
+    >>> p1.append( Status(Crd('C', 12), False, 'T3'))
+    >>> p1.append( Status(Crd('C', 11), True, 'T3'))
+    >>> st.populate(p1)
+    >>> st.crdOD[Crd('C', 13)].fce == False
+    True
+    >>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
+    >>> l1 == [('T3', 3), ('T5', 1)]
+    True
+    >>> #SUCCESSFUL POPULATING                
+    """
+
 class test_State:
     """ combines 52 Cards and 11 Stacks to produce 52 States.    
     """
@@ -42,12 +65,14 @@ class test_State:
         >>> p1.append( newStt('T3', False, Crd('C', 12)))
         >>> p1.append( newStt('H', True, Crd('C', 11)))
         >>> st.populate(p1)
-        
         >>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
         >>> l1 == [('T3', 2), ('T5', 1), ('H', 1)]
         True
-        >>> #SUCCESSFUL POPULATING        
+        >>>
+        #SUCCESSFUL POPULATING        
         """
+        pass
+    
     def test_move(self,  mov2, logger=None):  #MOD 7.5.4
         """ faceUP Crd[s] >TO> StackNme:
         CALLED from Hand.
@@ -72,7 +97,10 @@ class test_State:
         >>> st.move(mov)
         >>> st.crd2OD[st.stkOD['T3'].top_item].fce  #C-12 set faceUP
         True
+        >>> # test_move
         """
+        pass
+    
 class test_FullState:   
     """
     # TESTS: include

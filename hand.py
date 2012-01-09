@@ -10,18 +10,14 @@ import logging.config
 
 #########################################################
 class Hand:
-    """ a Hand is a series of Hand.State.Moves until there are no more Moves: either stymied or WON.
-    
-    aggregates all 3 kinds of Moves for a State and SHIFTS one of them creating a new State.
-    three kinds: fndMove, sibMove, kngMove.
-       format (moves list) > ([crd, FROM_StkStt, TO_Stk], [],,):
-       where [as of "rS.60.0.py module. #VER 111109.0620]
-        """
+    """ a Hand selects and initiates State.Moves until there are no more Moves: either state.stymied or state.WON.
+    """
     def __init__(self, mystate=state.State(),  tag=None):
         """ """
         logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate
         self._tag =  tag
+        # REFACT remove these three aftr state enhances
         self.fndMovesL =  []
         self.sibMovesL = []  
         self.kngMovesL =  []
@@ -112,21 +108,6 @@ class Hand:
         if logger: logger.warn("  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCnt,  sum(mCntr.values()),  self.tag))
 
         return hCntr
-
-    def test_1_kngBranching():
-        """ the begining of maxHands: picking the highest return.
-        >>> import  state, hand
-        >>> import logging
-        >>> import logging.config
-        >>> from h import *      
-        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        >>> h = hand.Hand(tag='1')
-        >>> h.state = state.FullState()  # shuffled
-        >>> logger = logging.getLogger('myI')
-        >>> tCntr.clear()
-        >>> tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
-        >>>          
-        """
 
     def kngMove(self, state, logger=None):
         """SETS self.kngMovesL  RETURNS True if there are moves.
