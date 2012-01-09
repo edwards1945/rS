@@ -1,18 +1,11 @@
 """ state.7.7.py 
 """
-# MOD 7.7 enhanced State
-# introduce namedtuple Status to replace newStt
-# introduce namedtuple crdOD to replace Hand's crd2OD.
-# populate() to not force face = True.
-# added another dicitionary: movesD
-#  add findMoves(): move this functionality from hand to here where it belongs.
-
 import random
 from h import *
 import  stack
 import logging
 import logging.config
-################################################
+###############################################
 class State:
     """ the meld on 11 Stacks and 52 Crds populated - read dealt - is a specific pattern.
     """
@@ -33,12 +26,27 @@ class State:
     @property
     def haveWon(self):
         return  True if self.fndCnt ==  52 else False
+    def getTopsL(self, stk_typeStr=None):
+        """ RET: <list> of [ ALL | FND | TBL]  ( stkNme, crd)
+        stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
+        """
+
+        x =  lambda stk: stk[-1] if stk else None
+        typ =    stk_typeStr and stk_typeStr[0].lower()
+        if typ ==  't':
+            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items()) if nme[0].lower()  ==  't']
+        elif  typ ==  'f':
+            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items()) if nme[0].lower()  ==  'f']
+        else:
+            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
+        return tl
+            
     def seeTops(self):
         """ returns formated str of top 11 stacks."""
-        x =  lambda stk: stk[-1] if stk else None
-        t = [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
+        #x =  lambda stk: stk[-1] if stk else None
+        #t = [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
         ret = 'Top-'
-        for top in  t:
+        for top in  self.getTops():
             if top[1]:
                 ret += "{0}:{1.suit}{1.valu}, ".format(top[0], top[1])
             else:
@@ -96,10 +104,9 @@ class newState(State):
     """
     def __init__(self, shuffle=True):
         State.__init__(self)
-        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW
         self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) #MOD 7.7
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
-        
     def populate(self,  StatusL):
         """sequencially populates State from a <list> of Status:
         this mod preserves fce
@@ -111,10 +118,16 @@ class newState(State):
             self.crdOD[crd]  =   sts 
             self.stkOD[stk_nme].append(crd)  
     def findMoves(self):
-        """ rebuilds fnd.., kng..., sibMoves"""
+        """ rebuilds fnd.., kng..., sibMoves from tbl_heads."""
         for nme, mL in  self.movesD.items():
             del self.movesD[nme] [:]  # clear xxxMoves
-        # for top in tbl_topsl
+        _tL = [ (hd)  for nme, hd in self.getTopsL('TBL')]
+        for hd in _tL:
+            if hd and hd.valu ==  1:  #Ace
+                mov = Move(hd, hd.suit)
+                self.movesD['fnd'].append(mov)
+                pass  #
+            
         ##if ace make fndMove
         
         pass
@@ -124,19 +137,24 @@ class newState(State):
         >>> from h import *
         >>> import state, stack
         >>> st = state.newState()
-        >>> ace = Crd( 'C', 1)
-        >>> sts = Status(ace, True, 'T0')
-        >>> stsL = []
-        >>> stsL.append(sts)
-        >>> st.populate(stsL)
-        >>> st.crdOD[ace] == sts  #just confirm populate() works.
-        True
-        >>> # PRELOAD something in moves dict to assure it is cleared on findMoves() call.
-        >>> st.movesD['fnd'].append(Move(Crd('TEST', None), 'TEST'))
-        >>> st.findMoves()
-        >>> st.movesD['fnd']
+        >>> #   MOVE DATA
+        >>> t_ace = Crd( 'C', 1)
+        >>> t_sts = Status(t_ace, True, 'T0')  # expect this Ace.
+        >>> t_stsL = []
+        >>> t_stsL.append(t_sts)
+        >>> #     NO MOVE DATA
+        >>> junk = Move(Crd('TEST', 4), 'TEST')
+        >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
+        >>> # TEST LOGIC ERROR: top or head are always fceUP>>t_stsL.append(Status(Crd('D', 1), False, 'T1'))  # no move: fceDOWN
+        >>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
+        >>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
+        >>> st.populate(t_stsL)
+        >>> #      SETUP COMPLETE
+        >>> st.findMoves()  #UNDER TEST
+        >>> st.movesD['sib']
         []
-        >>> # findMoves() tests
+        >>> st.movesD['fnd'] == [Move(crd=Crd(suit='C', valu=1), stkNme='C')]
+        True
         """
 class FullState(State):
     """ shuffled or sequenced rS state.  
