@@ -125,8 +125,8 @@ class Hand:
         RULE_crd_not_first_crd =  lambda stt: state.stkOD[stt.stkNme].index(stt.crd) >  0
                 
         # TO Stack
-        _empty_tbl_stkL = [ (nme)  for nme in  TABLEAUS
-                        if RULE_stk_IsEmpty(nme)]
+        _empty_tbl_stkL = [ (stkNme)  for stkNme in  TABLEAUS
+                        if RULE_stk_IsEmpty(stkNme)]
         
         if _empty_tbl_stkL:
             
