@@ -118,7 +118,7 @@ class newState(State):
             stk_nme = sts.stkNme  
             self.crdOD[crd]  =   sts 
             self.stkOD[stk_nme].append(crd)
-    def getTopsL(self, stk_typeStr=None):
+    def getHeadsL(self, stk_typeStr=None):
         """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
         """
         #NOTE: the list return ORDER is reverse that of State.
@@ -137,7 +137,7 @@ class newState(State):
     def findMoves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
-        _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getTopsL('TBL') if head]
+        _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
         hasMoves = self.fndMoves(_notEmpty_tblHeadsL) 
         hasMoves = self.kngMoves(_notEmpty_tblHeadsL)  or hasMoves
         hasMoves = self.sibMoves(_notEmpty_tblHeadsL)  or hasMoves
@@ -172,7 +172,7 @@ class newState(State):
         
         - king Crd IsFaceUp, in a tableau, and not its first card.
        MOVES TO empty tableau."""
-        _empty_tblsNmesL = [(tblNme) for xheadCrd, tblNme in  self.getTopsL('TBL') if not  xheadCrd]  # just want stack name, so I can use tops. For kngs, tops don't signify.
+        _empty_tblsNmesL = [(tblNme) for xheadCrd, tblNme in  self.getHeadsL('TBL') if not  xheadCrd]  # just want stack name, so I can use tops. For kngs, tops don't signify.
         _movsL = []
         del self.movesD['kng'] [:]  
         for mt_tblNme in _empty_tblsNmesL:  #NOTE: the first if _kngCrd only None in testing State.
@@ -195,7 +195,7 @@ class newState(State):
             MOVES TO   notEmpty_foundation head_crd
             IF tbl_Crd is older sib of fnd_Crd.
             """
-        _notEmpty_fndHeadsL =  [ (head, nme)  for head, nme in self.getTopsL('FND') if head]
+        _notEmpty_fndHeadsL =  [ (head, nme)  for head, nme in self.getHeadsL('FND') if head]
         _movsL = []
         del self.movesD['fnd'] [:]  
         for  tblHead, tblNme in _notEmpty_tblHeadsL:
