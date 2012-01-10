@@ -148,8 +148,7 @@ class Hand:
         return  len(self.kngMovesL ) >  0
            
     def fndMove(self, state, logger=None):
-        """SETS self.fndMovesL  RETURNS True if there are moves.
-        
+        """SETS self.fndMovesL  && RETURNS True if there are moves.
         - faceUP, top_crd in tableau moves to  foundation top_crd if tbl_Crd is older sib of fnd_Crd. 
         """# tests in hand_testdocs.py
         
