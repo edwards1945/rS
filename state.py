@@ -27,9 +27,9 @@ class State:
     def haveWon(self):
         return  True if self.fndCnt ==  52 else False
     def getTopsL(self, stk_typeStr=None):
-        """ RET: <list> of [ ALL | FND | TBL]  ( stkNme, crd)
-        stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
+        """ RET: <list>  ( stkNme, topCrd) for stk types: FND | TBL or all stacks.
         """
+        # NOTE: stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
 
         x =  lambda stk: stk[-1] if stk else None
         typ =    stk_typeStr and stk_typeStr[0].lower()
@@ -118,20 +118,55 @@ class newState(State):
             self.crdOD[crd]  =   sts 
             self.stkOD[stk_nme].append(crd)  
     def findMoves(self):
-        """ rebuilds fnd.., kng..., sibMoves.
-       sib & fndMoves from tbl_heads; kngMoves from empty tableaus."""
+        """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
+        """
         for nme, mL in  self.movesD.items():
-            del self.movesD[nme] [:]  
+            del self.movesD[nme] [:]  # needed in case 
+            
         # REFACT THINK JUST movesD[xxx] = dict(list) 
         # clear prior xxxMoves
-     
-        
+    
         _notEmpty_tblHeadsL = [ (nme, head)  for nme, head in self.getTopsL('TBL') if head]
-      
-        aceMoves(_notEmpty_tblHeadsL)        
-        fndMoves(_notEmpty_tblHeadsL)
-        kngMoves()  #SMELLS: WASTED LOOP
+        hasMoves = False
+        hasMoves or aceMoves(_notEmpty_tblHeadsL)        
+        hasMoves or fndMoves(_notEmpty_tblHeadsL)
+        hasMoves or kngMoves() 
+        hasMoves or sibMoves(_notEmpty_tblHeadsL)
         
+        return hasMoves
+    
+    def sibMoves(self, _notEmpty_tblHeadsL):
+        """SETS self.sibMovesL &&  RETURNS True if there are moves.
+        
+        - faceUP, buried or not, sib_crd in another tableau moves to a notEmpty tableau top_crd that can't be an ace.."""
+        # sib moves TO _notEmpty_tblHeadsL greater than an Ace in:
+        _not_Ace_notEmpty_tblHeads = \
+            [(stkNme,  headCrd)  \
+                        for stkNme,  headCrd in _notEmpty_tblHeadsL
+                        if headCrd.valu > 1]
+        
+        # SIB Crd in another stk moves TO _not_Ace_notEmpty_tblHead:
+        _sib_tbl_CrdsL =  [ (Crd(headCrd.suit,  headCrd.valu - 1)) \
+                for tblNme, headCrd in  _not_Ace_notEmpty_tblHeads ]  
+          
+        _faceUP_sibL = [(sibCrd, self.crdOD[sibCrd]) \
+                        for crd, sts in  _sib_tbl_CrdsL \
+                        if sts.fce]
+                                
+        # MOVES 
+        _movsL = [Move(sibCrd,  headStkNme) \
+                  for sibCrd in  _sib_tbl_CrdsL \
+                  for  headStkNme, headCrd in  _not_Ace_notEmpty_tblHeads \
+                  if self.crdOD[sibCrd].fce \
+                  and  self.crdOD[sibCrd].stkNme != headStkNme]
+        hasMove = len(_movsL) > 0
+        if hasMove:
+           self.movesD['sib'] = dict(_movsL)
+        else:
+            self.movesD['sib'] [:]  
+        return len(_movsL) >  0
+    
+
     def kngMoves(self):
         """SETS self.kngMovesL &&  RETURNS True if there are moves
         - king IsFaceUp, in a tableau, and not its first card.
@@ -155,29 +190,32 @@ class newState(State):
         self.movesD['kng'] = dict(_movsL)
         return len(_movsL) >  0
     
-    def aceMoves(self, _notEmpty_tblHeadsL):
-        """ SETS movesD['fnd']  and RET True if there were moves.
+    #def aceMoves(self, _notEmpty_tblHeadsL):
+        #""" SETS movesD['fnd']  and RET True if there were moves.
         
-        tbl head with valu == 1   IS a foundation move."""
-        _movsL = [Move(ace, ace.suit)  \
-                              for tblNme, ace in  _notEmpty_tblHeadsL
-                              if ace.valu ==  1]
-        self.movesD['fnd'] =  dict(_movsL)
-        return len(_movsL) >  0
+        #tbl head with valu == 1   IS a foundation move."""
+        #_movsL = [Move(ace, ace.suit)  \
+                              #for tblNme, ace in  _notEmpty_tblHeadsL
+                              #if ace.valu ==  1]
+        #self.movesD['fnd'] = dict(_movsL)
+        #return len(_movsL) >  0
     
-    def fndMoves(self, _notEmpty_tblHeads):
+    def fndMoves(self, _notEmpty_tblHeadsL):
         """SETS movesD['fnd']  and RET True if there were moves.
                
             -MOVES  faceUP, head_crd in notEmpty tableau TO   notEmpty_foundation head_crd if tbl_Crd is older sib of fnd_Crd and not in the same tableau.
             """
-        #NOTE: Ace Rule handles empty_foundation heads
-
-        _movsL =  [( tblHead,  fndNme) \
-                 for tblNme,  tblHead in _notEmpty_tblHeads \
-                 for fndNme,  fndHead in  _notEmpty_fndHeadsL\
-                 if tblHead.valu == fndHead.valu + 1 \
-                 and tblNme != fndNme ]
-        self.movesD['fnd'] = dict(_movsL)
+        _notEmpty_fndHeadsL =  [ (nme, head)  for nme, head in self.getTopsL('FND') if head]
+        _movsL = []
+        for tblNme,  tblHead in _notEmpty_tblHeads:
+            if tblHead.valu ==  1:
+                _movsL.append( Move(tblHead, tblHead.suit) )      
+            else:
+                for nme,  head in _notEmpty_fndHeadsL:
+                    if tblHead.valu == fndHead.valu + 1 \
+                    and tblNme != fndNme: 
+                        _movsL.append(Move(head,  tblNme))
+        self.movesD['fnd'].append(_movsL)
         return len(_movsL) >  0
         
     def test_newState(self):
