@@ -128,12 +128,9 @@ class newState(State):
         
         _notEmpty_tblHeadsL = [ (nme, head)  for nme, head in self.getTopsL('TBL') if head]
       
-        for nme, head in _notEmpty_tblHeadsL:
-            if head and head.valu ==  1:  #Ace
-                aceMoves(nme,  head)
-                
+        aceMoves(_notEmpty_tblHeadsL)        
         fndMoves(_notEmpty_tblHeadsL)
-        findKngMoves()  #SMELLS: WASTED LOOP
+        kngMoves()  #SMELLS: WASTED LOOP
         
     def kngMoves(self):
         """SETS self.kngMovesL &&  RETURNS True if there are moves
@@ -152,29 +149,37 @@ class newState(State):
                      and sts.stkNme in _full_tbl_NmesL\
                      and self.stkOD[kngSts.stkNme].index(kngCrd) >  0]        
         # MOVES 
-        _movsL = [Move(kngCrd,  mtTbl) for kngCrd in  _faceUP_not1st_tbl_kngL for  mtTbl in  _empty_tblsNmesL]
-        self.movesd['kng'] = dict(_movsL)
-        _
+        _movsL = [Move(kngCrd,  mtTbl) \
+                  for kngCrd in  _faceUP_not1st_tbl_kngL \
+                  for  mtTbl in  _empty_tblsNmesL]
+        self.movesD['kng'] = dict(_movsL)
+        return len(_movsL) >  0
+    
+    def aceMoves(self, _notEmpty_tblHeadsL):
+        """ SETS movesD['fnd']  and RET True if there were moves.
         
-    def aceMoves(self,  stkNme, hdCrd):
-        """ tbl head with valu == 1 IS a foundation move."""
-        mov = Move(hd, hd.suit)
-        self.movesD['fnd'].append(mov)
+        tbl head with valu == 1   IS a foundation move."""
+        _movsL = [Move(ace, ace.suit)  \
+                              for tblNme, ace in  _notEmpty_tblHeadsL
+                              if ace.valu ==  1]
+        self.movesD['fnd'] =  dict(_movsL)
+        return len(_movsL) >  0
+    
     def fndMoves(self, _notEmpty_tblHeads):
         """SETS movesD['fnd']  and RET True if there were moves.
                
             -MOVES  faceUP, head_crd in notEmpty tableau TO   notEmpty_foundation head_crd if tbl_Crd is older sib of fnd_Crd and not in the same tableau.
             """
         #NOTE: Ace Rule handles empty_foundation heads
-        _notEmpty_fndHeadsL = [(nme,  head) for nme,  head in self.getTopsL('FND') ]
-        movs =  [( tblHead,  fndNme) \
+
+        _movsL =  [( tblHead,  fndNme) \
                  for tblNme,  tblHead in _notEmpty_tblHeads \
                  for fndNme,  fndHead in  _notEmpty_fndHeadsL\
-                 if tblHead.valu == fndHead.valu + 1
+                 if tblHead.valu == fndHead.valu + 1 \
                  and tblNme != fndNme ]
-         
+        self.movesD['fnd'] = dict(_movsL)
+        return len(_movsL) >  0
         
-        pass
     def test_newState(self):
         """
         >>> #(1) confirm simple Ace fndMovs in findMoves().
