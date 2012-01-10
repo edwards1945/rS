@@ -1,7 +1,11 @@
-""" state.7.7.py 
+""" state.7.7.1.py 
 """
-# 100109
+# MOD 7.7.1
+# 120110 # next is State.move(). assure logging is effective.
+##  crippled hand_testdocs.py till ready for it. All test now OK.
+#
 # MOD 7.7 enhanced State
+# 120109
 # introduce namedtuple h.Status to replace newStt
 # introduced new namedtuple h.Move(Crd, fce, StkNme) :NEW ORDER.
 # introduce namedtuple newState.crdOD to replace Hand's crd2OD.
