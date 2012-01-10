@@ -11,6 +11,111 @@ import  stack,  state
 import logging
 import logging.config
 ####################################################
+def test_kngMoves_newState(self):
+    """
+    >>> #(1) confirm kngMovs in findMoves().
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.newState()
+    >>> #   EXPECTED MOVE DATA: kng ->- 1 empty; buried to head
+    >>> t_ace = Crd( 'C', 1)
+    >>> t_sts = Status(t_ace, True, 'T0')  # head to head
+    >>> t_stsL = []
+    >>> # #T0 empty
+    >>> t_stsL.append(Status(Crd('S', 1), True, 'T1'))  # 
+    >>> t_stsL.append(Status(Crd('S', 13), True, 'T1'))  # S13 head ->- empty T0 & T5
+    >>> t_stsL.append(Status(Crd('H', 7), True, 'T2')) #h
+    >>> t_stsL.append(Status(Crd('C', 4), False, 'T3'))  # 
+    >>> t_stsL.append(Status(Crd('C', 13), True, 'T3'))  # C13 buried ->- empty T0 & T5
+    >>> #   EXPECTED NO MOVE DATA: kng.fceDOWN; kng index 0;
+    >>> t_stsL.append(Status(Crd('D', 12), False, 'T4'))  # 
+    >>> t_stsL.append(Status(Crd('D', 13), False, 'T4'))  # D13 no move ->- emptyT0: faceDOWN
+    >>> t_stsL.append(Status(Crd('H', 2), True, 'T4'))  # head
+    >>> t_stsL.append(Status(Crd('H', 13), True, 'T6'))  # H13 no move ->-empty T0: index 0
+    >>> t_stsL.append(Status(Crd('H', 4), True, 'T6'))  # h
+    >>> st.populate(t_stsL)
+    >>> #      SETUP COMPLETE
+    >>> st.findMoves()  #UNDER TEST
+    True
+    >>> len( st.movesD['kng'] ) == 4 # 
+    True
+    >>> st.movesD['kng'][1]  == Move(crd=Crd(suit='C', valu=13), stkNme='T0')
+    True
+    >>> st.movesD['fnd'] == []
+    True
+    >>> st.movesD['sib'] == []
+    True
+    >>> # DONE
+    """
+    pass
+
+def test_sibMoves_newState(self):
+    """
+    >>> #(1) confirm sibMovs in findMoves().
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.newState()
+    >>> #   EXPECTED MOVE DATA: head TO head; buried to head
+    >>> t_ace = Crd( 'C', 1)
+    >>> t_sts = Status(t_ace, True, 'T0')  # head to head
+    >>> t_stsL = []
+    >>> t_stsL.append(Status(Crd('H', 6), True, 'T1'))  #head ->- head T2
+    >>> t_stsL.append(Status(Crd('H', 7), True, 'T2')) #h
+    >>> t_stsL.append(Status(Crd('C', 5), True, 'T3'))  # buried ->- head T4
+    >>> t_stsL.append(Status(Crd('S', 5), True, 'T3'))
+    >>> t_stsL.append(Status(Crd('C', 6), True, 'T4'))  #h
+    >>> #   EXPECTED NO MOVE DATA: fceDOWN: fceDOWN, same tabl, fnd ->- tbl
+    >>> t_stsL.append(Status(Crd('D', 6), False, 'T5'))  # no move ->- head T6: faceDOWN
+    >>> t_stsL.append(Status(Crd('D', 7), True, 'T6'))  # h
+    >>> t_stsL.append(Status(Crd('S', 2), True, 'S'))  # no move ->- head T5: fnd ->- tbl
+    >>> t_stsL.append(Status(Crd('S', 2), True, 'T0'))  # no move ->- head T0: same tableau
+    >>> t_stsL.append(Status(Crd('S', 3), True, 'T0'))  # h
+    >>> st.populate(t_stsL)
+    >>> #      SETUP COMPLETE
+    >>> st.findMoves()  #UNDER TEST
+    True
+    >>> len( st.movesD['sib'] ) == 2 # 
+    True
+    >>> st.movesD['sib'][1]  == Move(crd=Crd(suit='C', valu=5), stkNme='T4')
+    True
+    >>> st.movesD['fnd'] == []
+    True
+    >>> st.movesD['kng'] == []
+    True
+    
+    """
+    pass
+
+def test_fndMoves_newState(self):
+    """
+    >>> #(1) confirm fndMoves in findMoves().
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.newState()
+    >>> #   EXPECTED MOVE DATA
+    >>> t_ace = Crd( 'C', 1)
+    >>> t_sts = Status(t_ace, True, 'T0')  # expect this Ace.
+    >>> t_stsL = []
+    >>> t_stsL.append(t_sts)
+    >>> #   EXPECTED NO MOVE DATA
+    >>> junk = Move(Crd('TEST', 4), 'TEST')
+    >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
+    >>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
+    >>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
+    >>> st.populate(t_stsL)
+    >>> #      SETUP COMPLETE
+    >>> st.findMoves()  #UNDER TEST
+    True
+    >>> st.movesD['kng']  
+    []
+    >>> st.movesD['sib']  # junk movesD cleared
+    []
+    >>> st.movesD['fnd'] == [Move(crd=Crd(suit='C', valu=1), stkNme='C')]
+    True
+    
+    """
+    pass
+
 def test_new_populate_newState(self):
     """
     >>> # confirm populate works using new namedtuple Status.
@@ -33,6 +138,7 @@ def test_new_populate_newState(self):
     True
     >>> #SUCCESSFUL POPULATING                
     """
+    pass
 
 class test_State:
     """ combines 52 Cards and 11 Stacks to produce 52 States.    

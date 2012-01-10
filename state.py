@@ -137,10 +137,10 @@ class newState(State):
     def findMoves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
-        _notEmpty_tblHeadsL = [ (head, nme)  for nme, head in self.getTopsL('TBL') if head]
-        hasMoves = fndMoves(_notEmpty_tblHeadsL)
-        hasMoves or kngMoves(_notEmpty_tblHeadsL) 
-        hasMoves or sibMoves(_notEmpty_tblHeadsL)
+        _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getTopsL('TBL') if head]
+        hasMoves = self.fndMoves(_notEmpty_tblHeadsL) 
+        hasMoves = self.kngMoves(_notEmpty_tblHeadsL)  or hasMoves
+        hasMoves = self.sibMoves(_notEmpty_tblHeadsL)  or hasMoves
         return hasMoves
     
     def sibMoves(self, _notEmpty_tblHeadsL):
@@ -151,21 +151,21 @@ class newState(State):
         IF sib,  not in head tableau or foundation and faceUP
         """
         _movsL = []
+        del self.movesD['sib'] [:]  
         for   tbl_headCrd, tbl_stkNme in  _notEmpty_tblHeadsL:
             if tbl_headCrd.valu > 1:    #not Ace head card         
                 _sibCrd =  Crd(tbl_headCrd.suit,  tbl_headCrd.valu - 1)  
                 _sibSts =  self.crdOD[_sibCrd]
                 # sib not in foundation, sib not in same tbl, sib faceUP
-                if _sibSts.stkNme != tbl_stkNme \
+                if _sibSts\
+                and _sibSts.stkNme != tbl_stkNme \
                 and _sibSts.stkNme[0] == 'T' \
-                and _sibCrd.fce:
+                and _sibSts.fce:
                     _mov = Move(_sibCrd,  tbl_stkNme)
                     _movsL.append(_mov)                    
         if _movsL:
-           self.movesD['sib'] = dict(_movsL)
-        else:
-            self.movesD['sib'] [:]  
-        return len(_movs) > 0
+           self.movesD['sib'] = _movsL
+        return len(_movsL) > 0
     
     def kngMoves(self,  _notEmpty_tblHeadsL):
         """SETS self.kngMovesL &&  RETURNS True if there are moves
@@ -173,20 +173,20 @@ class newState(State):
         - king Crd IsFaceUp, in a tableau, and not its first card.
        MOVES TO empty tableau."""
         _empty_tblsNmesL = [(tblNme) for xheadCrd, tblNme in  self.getTopsL('TBL') if not  xheadCrd]  # just want stack name, so I can use tops. For kngs, tops don't signify.
-        _movsL = [] 
-        for mt_tblNme in _empty_tblsNmesL:
+        _movsL = []
+        del self.movesD['kng'] [:]  
+        for mt_tblNme in _empty_tblsNmesL:  #NOTE: the first if _kngCrd only None in testing State.
             for _kngCrd in  [Crd('S',  13), Crd('H', 13), Crd('D',  13),  Crd('C', 13)]:
                 _kngSts = self.crdOD[_kngCrd]
-                if _kngSts.fce \
-                and _kngSts.stkNme in _notEmpty_tblHeadsL\
+                if _kngSts \
+                and _kngSts.fce \
+                and _kngSts.stkNme in [(stkNme) for crd, stkNme in _notEmpty_tblHeadsL]\
                 and self.stkOD[_kngSts.stkNme].index(_kngCrd) > 0:
                     _mov = Move(_kngCrd,  mt_tblNme)
                     _movsL.append(_mov)                    
         if _movsL:
-           self.movesD['kng'] = dict(_movsL)
-        else:
-            self.movesD['kng'] [:]  
-        return len(_movs) > 0
+           self.movesD['kng'] = _movsL
+        return len(_movsL) > 0
     
     def fndMoves(self, _notEmpty_tblHeadsL):
         """SETS movesD['fnd']  and RET True if there were moves.
@@ -197,6 +197,7 @@ class newState(State):
             """
         _notEmpty_fndHeadsL =  [ (head, nme)  for head, nme in self.getTopsL('FND') if head]
         _movsL = []
+        del self.movesD['fnd'] [:]  
         for  tblHead, tblNme in _notEmpty_tblHeadsL:
             if tblHead.valu ==  1:  # Ace
                 _movsL.append( Move(tblHead, tblHead.suit) )      
@@ -206,36 +207,9 @@ class newState(State):
                     and tblHead.suit == fndNme: 
                         _movsL.append(Move(fndHead,  tblNme))
         if _movsL:
-           self.movesD['fnd'] = dict(_movsL)
-        else:
-            self.movesD['fnd'] [:]  
-        return len(_movs) > 0
+           self.movesD['fnd'] = _movsL
+        return len(_movsL) > 0
         
-    def test_newState(self):
-        """
-        >>> #(1) confirm simple Ace fndMovs in findMoves().
-        >>> from h import *
-        >>> import state, stack
-        >>> st = state.newState()
-        >>> #   MOVE DATA
-        >>> t_ace = Crd( 'C', 1)
-        >>> t_sts = Status(t_ace, True, 'T0')  # expect this Ace.
-        >>> t_stsL = []
-        >>> t_stsL.append(t_sts)
-        >>> #     NO MOVE DATA
-        >>> junk = Move(Crd('TEST', 4), 'TEST')
-        >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
-        >>> # TEST LOGIC ERROR: top or head are always fceUP>>t_stsL.append(Status(Crd('D', 1), False, 'T1'))  # no move: fceDOWN
-        >>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
-        >>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
-        >>> st.populate(t_stsL)
-        >>> #      SETUP COMPLETE
-        >>> st.findMoves()  #UNDER TEST
-        >>> st.movesD['sib']
-        []
-        >>> st.movesD['fnd'] == [Move(crd=Crd(suit='C', valu=1), stkNme='C')]
-        True
-        """
 class FullState(State):
     """ shuffled or sequenced rS state.  
     """    
