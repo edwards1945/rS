@@ -29,7 +29,7 @@ class State:
     def getTopsL(self, stk_typeStr=None):
         """ RET: <list>  ( stkNme, topCrd) for stk types: FND | TBL or all stacks.
         """
-        # NOTE: stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
+        # NOTE: stk_typeStr ONLY uses stk_typeStr[0] against 'f' or 't'
 
         x =  lambda stk: stk[-1] if stk else None
         typ =    stk_typeStr and stk_typeStr[0].lower()
@@ -118,6 +118,7 @@ class newState(State):
             stk_nme = sts.stkNme  
             self.crdOD[crd]  =   sts 
             self.stkOD[stk_nme].append(crd)
+            
     def move(self,  a_Move, logger=None): 
         """ Move(Crd, stkNme).
         has a lot of logging for my debugging and monitoring. """
@@ -125,57 +126,83 @@ class newState(State):
        #
 
 
-        if logger:
-            logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))
+        #if logger:
+            #logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))
                 
         frmCrd = a_Move.crd
         frmSts =  self.crdOD[frmCrd]
+        assert  frmSts.fce , " Move ERROR: face is DOWN in Status{}".format(frmSts)
         frmStk = self.stkOD[frmSts.stkNme]
         frmSlice = frmStk[frmStk.index(frmCrd):]
 
         toStk_nme =  a_Move.stkNme
         toStk = self.stkOD[toStk_nme]
-
-              
-        #imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, toStk_nme,  toStk )
         
         # MAJOR CALL
+        log_before_seeHeadsStr = self.seeHeads()
+        log_movStr = ""
         while frmSlice:
-            newCrd = frmSlice.pop(0)
-            newSts = self.crdOD[newCrd]
-            newStkNme =  newSts.stkNme
-            newSts= Status(newCrd, newSts.fce, toStk_nme)
-            toStk_curHead = toStk.top_item
+            toStk_curHead = toStk.top_item  # for log
+            curCrd = frmSlice.pop(0)
+            curSts = self.crdOD[curCrd]
+            curStkNme =  curSts.stkNme
+            self.crdOD[curCrd] = Status(curCrd, curSts.fce, toStk_nme)
             # let the stackMoveMyItems handle stk pops and pushes.
-            frmStk.moveItem(newCrd, toStk, logger)  #NOTE requires Stack not name.
+            frmStk.moveItem(curCrd, toStk, logger)  #NOTE requires Stack not name.
             
-            movStr = "**** moved {newCrd}-[{newStkNme}] onto [{toStk_nme}] {toStk_curHead}  ****************".format()
+            log_movStr += ("\n" +  "*" *  10 + "**** moved {curCrd}-[{curStkNme}] onto [{toStk_nme}]-{toStk_curHead}" +  "*"  * 10).format( ** locals())
+            
         if not  frmStk.isEmpty:
-            newHead =  frmStk.top_item  ##REFACT??? method?
-            frmStk.crdOD[crd] = Status(newHead,  True,  toStk_nme)
+            curHead =  frmStk.top_item  ##REFACT??? method name ?
+            self.crdOD[curHead] = Status(curHead,  True,  toStk_nme)
             
-        #imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
+        log_after_seeHeadsStr = self.seeHeads() 
         
         if logger:
-            logger.info(movStr )           
-            #logger.debug(imsg)
-            logger.info(self.seeTops())
+            logger.info(log_before_seeHeadsStr)
+            logger.info(log_movStr )           
+            logger.info(log_after_seeHeadsStr + "\n")
         pass
     
     def test_move_newState(self):
         """ improve monitoring of moves.
-        # UNDER TEST: move()
+        # UNDER TEST: move()  #NOT findMoves()
+        >>> # EXPECTED GOOD 
         >>> from h import *
         >>> import state, stack
+        >>> ##
+        >>> ## sibMove: buried, & new Head is faceUP
+        >>> logger = logging.getLogger('myI')      
         >>> ns = state.newState()
         >>> stsL = []  #Status to populate state
         >>> movsL = []
-        >>> # EXPECTED GOOD MOVES
+        >>> stsL.append(Status(Crd('S', 5), False, 'T1'))  #  will be Head and fceUP  
+        >>> stsL.append(Status(Crd('S', 3), True, 'T1'))  # will be in T2
+        >>> stsL.append(Status(Crd('S', 2), True, 'T1'))  #  will be in T2 head
+        >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  #
+        >>> movsL.append(Move(Crd('S', 3), 'T2'))
+        >>> ns.populate(stsL)
+        >>> ns.move(movsL[0], logger)  #UNDER TEST
+        >>> ns.stkOD['T1'].head == Crd('S', 5)  # new T1 Head
+        True
+        >>> ns.crdOD[Crd('S', 5)].fce 
+        True
+        >>> ns.crdOD[Crd('S', 2)].crd == ns.stkOD['T2'].head  # new T2 head
+        True
+        >>> ##
+        >>> ## fndMove: head => fnd
+        >>> ns = state.newState()
+        >>> stsL = []  #Status to populate state
+        >>> movsL = []        
         >>> stsL.append(Status(Crd('S', 1), True, 'T0'))  #
         >>> movsL.append(Move(Crd('S', 1), 'S'))
-        >>> 
         >>> ns.populate(stsL)
-        >>> ns.move(movsL[0])
+        >>> ns.move(movsL[0], logger)  #UNDER TEST
+        >>> ns.stkOD['T0'].isEmpty
+        True
+        >>> ns.crdOD[Crd('S', 1)].stkNme == 'S'
+        True
+        
         
         """
     #----------------------------------------------------------------------
@@ -270,6 +297,17 @@ class newState(State):
         if _movsL:
            self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
+    
+    def seeHeads(self):
+        """ returns formated str of  11 stack heads."""
+        ret = 'Top-'
+        for top in  self.getTopsL():
+            if top[1]:
+                ret += "{0}:{1.suit}{1.valu}, ".format(top[0], top[1])
+            else:
+                ret +=  "{0}:---,".format(top[0], top[1])
+        return ret
+            
         
 class FullState(State):
     """ shuffled or sequenced rS state.  

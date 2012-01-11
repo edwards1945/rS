@@ -1,6 +1,8 @@
 """ state.7.7.1.py 
 """
 # MOD 7.7.1
+# 120111 # working on move logging and testing
+# Stack new property: head
 # 120110 # next is State.move(). assure logging is effective.
 ##  crippled hand_testdocs.py till ready for it. All test now OK.
 ## overlaid State.move in newState

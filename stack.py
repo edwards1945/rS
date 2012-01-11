@@ -27,6 +27,9 @@ class Stack(list):
     @property
     def top_item (self):
         return _top_item(self)
+    @ property
+    def head(self):
+        return self[-1] if len(self) else None
     #----------------------------------------------------------------------
     def PUSH(self, item):
         """ right push.
