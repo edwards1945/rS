@@ -1,8 +1,11 @@
 """ state.7.7.1.py 
 """
 # MOD 7.7.1
-# 120111 # working on move logging and testing
-# Stack new property: head
+# 120111 # newState.move() full implement; simple tests run and in state_testdocs.py. Really improved logging: all in one place in move().
+## added use of 'hand' instead of 'top' as it is in State: mostly in Stack too.
+## NO checking in Move(); except assert ''can't move faceDOWN'.
+## improved move() logging and testing
+##Stack new property: head
 # 120110 # next is State.move(). assure logging is effective.
 ##  crippled hand_testdocs.py till ready for it. All test now OK.
 ## overlaid State.move in newState

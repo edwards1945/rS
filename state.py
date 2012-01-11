@@ -122,12 +122,8 @@ class newState(State):
     def move(self,  a_Move, logger=None): 
         """ Move(Crd, stkNme).
         has a lot of logging for my debugging and monitoring. """
-       # NOTE: NO checking the Move.
+       # NOTE: LITTLE checking in Move(); just assert can't move faceDOWN
        #
-
-
-        #if logger:
-            #logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))
                 
         frmCrd = a_Move.crd
         frmSts =  self.crdOD[frmCrd]
@@ -161,50 +157,38 @@ class newState(State):
         if logger:
             logger.info(log_before_seeHeadsStr)
             logger.info(log_movStr )           
-            logger.info(log_after_seeHeadsStr + "\n")
+            logger.info(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
         pass
     
-    def test_move_newState(self):
+    def test_kng_move_newState(self):
         """ improve monitoring of moves.
-        # UNDER TEST: move()  #NOT findMoves()
+        # UNDER TEST: move()  #NOT TESTING findMoves()
         >>> # EXPECTED GOOD 
         >>> from h import *
         >>> import state, stack
-        >>> ##
-        >>> ## sibMove: buried, & new Head is faceUP
         >>> logger = logging.getLogger('myI')      
+        >>> ##
+        >>> ## kngMove: buried, & new Head is faceUP
         >>> ns = state.newState()
         >>> stsL = []  #Status to populate state
         >>> movsL = []
-        >>> stsL.append(Status(Crd('S', 5), False, 'T1'))  #  will be Head and fceUP  
-        >>> stsL.append(Status(Crd('S', 3), True, 'T1'))  # will be in T2
-        >>> stsL.append(Status(Crd('S', 2), True, 'T1'))  #  will be in T2 head
-        >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  #
-        >>> movsL.append(Move(Crd('S', 3), 'T2'))
+        >>> stsL.append(Status(Crd('S',2), False, 'T1'))  #  filler 
+        >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  # filler
+        >>> stsL.append(Status(Crd('S', 6), True, 'T3'))  #  
+        >>> stsL.append(Status(Crd('S', 8), True, 'T4'))  #
+        >>> stsL.append(Status(Crd('S', 10), True, 'T5'))  #
+        >>> stsL.append(Status(Crd('S', 13), True, 'T6'))  #  S13=> T0
+        >>> stsL.append(Status(Crd('S', 12), True, 'T6'))  #
+        >>> movsL.append(Move(Crd('S', 13), 'T0'))
         >>> ns.populate(stsL)
         >>> ns.move(movsL[0], logger)  #UNDER TEST
-        >>> ns.stkOD['T1'].head == Crd('S', 5)  # new T1 Head
+        >>> ns.stkOD['T6'].head == None
         True
-        >>> ns.crdOD[Crd('S', 5)].fce 
+        >>> ns.crdOD[Crd('S', 12)].crd == ns.stkOD['T0'].head  # new T2 head
         True
-        >>> ns.crdOD[Crd('S', 2)].crd == ns.stkOD['T2'].head  # new T2 head
-        True
-        >>> ##
-        >>> ## fndMove: head => fnd
-        >>> ns = state.newState()
-        >>> stsL = []  #Status to populate state
-        >>> movsL = []        
-        >>> stsL.append(Status(Crd('S', 1), True, 'T0'))  #
-        >>> movsL.append(Move(Crd('S', 1), 'S'))
-        >>> ns.populate(stsL)
-        >>> ns.move(movsL[0], logger)  #UNDER TEST
-        >>> ns.stkOD['T0'].isEmpty
-        True
-        >>> ns.crdOD[Crd('S', 1)].stkNme == 'S'
-        True
-        
-        
+        >>>
         """
+        pass
     #----------------------------------------------------------------------
     def getHeadsL(self, stk_typeStr=None):
         """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
@@ -357,5 +341,5 @@ if __name__ == "__main__":
     import doctest
     logging.config.fileConfig('myConfig.conf') 
     doctest.testmod(verbose=False)
-    doctest.testfile("state_testdocs.py")
+    #doctest.testfile("state_testdocs.py")
     #doctest.testfile("deal.print.txt")

@@ -10,7 +10,89 @@ import  stack,  state
 
 import logging
 import logging.config
-####################################################
+############################################
+def test_kng_move_newState(self):
+    """ improve monitoring of moves.
+    # UNDER TEST: move()  #NOT TESTING findMoves()
+    >>> # EXPECTED GOOD 
+    >>> from h import *
+    >>> import state, stack
+    >>> logger = logging.getLogger('myI')      
+    >>> ##
+    >>> ## kngMove: buried, & new Head is faceUP
+    >>> ns = state.newState()
+    >>> stsL = []  #Status to populate state
+    >>> movsL = []
+    >>> stsL.append(Status(Crd('S',2), False, 'T1'))  #  filler 
+    >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  # filler
+    >>> stsL.append(Status(Crd('S', 6), True, 'T3'))  #  
+    >>> stsL.append(Status(Crd('S', 8), True, 'T4'))  #
+    >>> stsL.append(Status(Crd('S', 10), True, 'T5'))  #
+    >>> stsL.append(Status(Crd('S', 13), True, 'T6'))  #  S13=> T0
+    >>> stsL.append(Status(Crd('S', 12), True, 'T6'))  #
+    >>> movsL.append(Move(Crd('S', 13), 'T0'))
+    >>> ns.populate(stsL)
+    >>> ns.move(movsL[0], logger)  #UNDER TEST
+    >>> ns.stkOD['T6'].head == None
+    True
+    >>> ns.crdOD[Crd('S', 12)].crd == ns.stkOD['T0'].head  # new T2 head
+    True
+    >>>
+    """
+    pass
+
+def test_fnd_move_newState(self):
+    """ improve monitoring of moves.
+    # UNDER TEST: move()  #NOT TESTING findMoves()
+    >>> # EXPECTED GOOD 
+    >>> from h import *
+    >>> import state, stack
+    >>> logger = logging.getLogger('myI')    
+    >>> ##
+    >>> ## fndMove: head => fnd
+    >>> ns = state.newState()
+    >>> stsL = []  #Status to populate state
+    >>> movsL = []        
+    >>> stsL.append(Status(Crd('S', 1), True, 'T0'))  #
+    >>> movsL.append(Move(Crd('S', 1), 'S'))
+    >>> ns.populate(stsL)
+    >>> ns.move(movsL[0], logger)  #UNDER TEST
+    >>> ns.stkOD['T0'].isEmpty
+    True
+    >>> ns.crdOD[Crd('S', 1)].stkNme == 'S'
+    True
+    >>> #
+    """
+    pass
+def test_sib_move_newState(self):
+    """ improve monitoring of moves.
+    # UNDER TEST: move()  #NOT TESTING findMoves()
+    >>> # EXPECTED GOOD 
+    >>> from h import *
+    >>> import state, stack
+    >>> logger = logging.getLogger('myI')
+    >>> ##
+    >>> ## sibMove: buried, & new Head is faceUP
+    >>> logger = logging.getLogger('myI')      
+    >>> ns = state.newState()
+    >>> stsL = []  #Status to populate state
+    >>> movsL = []
+    >>> stsL.append(Status(Crd('S', 5), False, 'T1'))  #  will be Head and fceUP  
+    >>> stsL.append(Status(Crd('S', 3), True, 'T1'))  # will be in T2
+    >>> stsL.append(Status(Crd('S', 2), True, 'T1'))  #  will be in T2 head
+    >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  #
+    >>> movsL.append(Move(Crd('S', 3), 'T2'))
+    >>> ns.populate(stsL)
+    >>> ns.move(movsL[0], logger)  #UNDER TEST
+    >>> ns.stkOD['T1'].head == Crd('S', 5)  # new T1 Head
+    True
+    >>> ns.crdOD[Crd('S', 5)].fce 
+    True
+    >>> ns.crdOD[Crd('S', 2)].crd == ns.stkOD['T2'].head  # new T2 head
+    True
+    >>> ##
+    """
+
 def test_kngMoves_newState(self):
     """
     >>> #(1) confirm kngMovs in findMoves().
