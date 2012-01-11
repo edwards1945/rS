@@ -104,8 +104,8 @@ class newState(State):
     """
     def __init__(self, shuffle=True):
         State.__init__(self)
-        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW
-        self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) #MOD 7.7
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
+        self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) 
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
 
     def populate(self,  StatusL):
@@ -118,6 +118,67 @@ class newState(State):
             stk_nme = sts.stkNme  
             self.crdOD[crd]  =   sts 
             self.stkOD[stk_nme].append(crd)
+    def move(self,  a_Move, logger=None): 
+        """ Move(Crd, stkNme).
+        has a lot of logging for my debugging and monitoring. """
+       # NOTE: NO checking the Move.
+       #
+
+
+        if logger:
+            logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))
+                
+        frmCrd = a_Move.crd
+        frmSts =  self.crdOD[frmCrd]
+        frmStk = self.stkOD[frmSts.stkNme]
+        frmSlice = frmStk[frmStk.index(frmCrd):]
+
+        toStk_nme =  a_Move.stkNme
+        toStk = self.stkOD[toStk_nme]
+
+              
+        #imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, toStk_nme,  toStk )
+        
+        # MAJOR CALL
+        while frmSlice:
+            newCrd = frmSlice.pop(0)
+            newSts = self.crdOD[newCrd]
+            newStkNme =  newSts.stkNme
+            newSts= Status(newCrd, newSts.fce, toStk_nme)
+            toStk_curHead = toStk.top_item
+            # let the stackMoveMyItems handle stk pops and pushes.
+            frmStk.moveItem(newCrd, toStk, logger)  #NOTE requires Stack not name.
+            
+            movStr = "**** moved {newCrd}-[{newStkNme}] onto [{toStk_nme}] {toStk_curHead}  ****************".format()
+        if not  frmStk.isEmpty:
+            newHead =  frmStk.top_item  ##REFACT??? method?
+            frmStk.crdOD[crd] = Status(newHead,  True,  toStk_nme)
+            
+        #imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
+        
+        if logger:
+            logger.info(movStr )           
+            #logger.debug(imsg)
+            logger.info(self.seeTops())
+        pass
+    
+    def test_move_newState(self):
+        """ improve monitoring of moves.
+        # UNDER TEST: move()
+        >>> from h import *
+        >>> import state, stack
+        >>> ns = state.newState()
+        >>> stsL = []  #Status to populate state
+        >>> movsL = []
+        >>> # EXPECTED GOOD MOVES
+        >>> stsL.append(Status(Crd('S', 1), True, 'T0'))  #
+        >>> movsL.append(Move(Crd('S', 1), 'S'))
+        >>> 
+        >>> ns.populate(stsL)
+        >>> ns.move(movsL[0])
+        
+        """
+    #----------------------------------------------------------------------
     def getHeadsL(self, stk_typeStr=None):
         """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
         """

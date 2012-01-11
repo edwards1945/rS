@@ -41,8 +41,6 @@ class Stack(list):
         except IndexError:
             return  None
     #----------------------------------------------------------------------
-
-    #----------------------------------------------------------------------
     def moveMyItems(self,  item, to_stk, updateItem_function,  logger):
         """ moves one or more items -  in  rS items are cards - to the new stack.
         The updateItem_function() updates the card dictionary with new state in rS.
@@ -62,9 +60,14 @@ class Stack(list):
             if not self.isEmpty:  # uncovered a card, make it faceUP
                 crd = self.top_item
                 updateItem_function(crd, self, logger)
-        
-        
-        
+    #----------------------------------------------------------------------
+    def moveItem(self,  _itm, toStk, logger):
+        """ moves one  -  in  rS items it's a card - to the new stack.
+        Self can be empty.        
+        """
+        if _itm  in self:   # won't index error if empty
+            self.remove(_itm)  
+        toStk.PUSH(_itm)      
 #----------------------------------------------------------------------
 def _top_ndx(lst):
     """

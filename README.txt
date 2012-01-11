@@ -3,7 +3,11 @@
 # MOD 7.7.1
 # 120110 # next is State.move(). assure logging is effective.
 ##  crippled hand_testdocs.py till ready for it. All test now OK.
-#
+## overlaid State.move in newState
+## State.move REFACTed
+## State.move logging improved.
+## Stack.moveMyItems() trimmed
+
 # MOD 7.7 enhanced State
 # 120109
 # introduce namedtuple h.Status to replace newStt
