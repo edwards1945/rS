@@ -1,11 +1,11 @@
-""" state.7.7.1.py 
+""" state.7.7.2.py 
 """
 import random
 from h import *
 import  stack
 import logging
 import logging.config
-###############################################
+#############################################
 class State:
     """ the meld on 11 Stacks and 52 Crds populated - read dealt - is a specific pattern.
     """
@@ -99,6 +99,7 @@ class State:
         
     
     #----------------------------------------------------------------------
+#-------------------------------------------------------------------------
 class newState(State):
     """ move finding and executing to State.
     """
@@ -160,52 +161,18 @@ class newState(State):
             logger.info(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
         pass
     
-    def test_kng_move_newState(self):
+    def test_move_newState(self):
         """ improve monitoring of moves.
-        # UNDER TEST: move()  #NOT TESTING findMoves()
-        >>> # EXPECTED GOOD 
+        # UNDER TEST: move()
+        # NOT TESTING findMoves()
+        # EXPECTED GOOD 
         >>> from h import *
         >>> import state, stack
         >>> logger = logging.getLogger('myI')      
         >>> ##
-        >>> ## kngMove: buried, & new Head is faceUP
-        >>> ns = state.newState()
-        >>> stsL = []  #Status to populate state
-        >>> movsL = []
-        >>> stsL.append(Status(Crd('S',2), False, 'T1'))  #  filler 
-        >>> stsL.append(Status(Crd('S', 4), True, 'T2'))  # filler
-        >>> stsL.append(Status(Crd('S', 6), True, 'T3'))  #  
-        >>> stsL.append(Status(Crd('S', 8), True, 'T4'))  #
-        >>> stsL.append(Status(Crd('S', 10), True, 'T5'))  #
-        >>> stsL.append(Status(Crd('S', 13), True, 'T6'))  #  S13=> T0
-        >>> stsL.append(Status(Crd('S', 12), True, 'T6'))  #
-        >>> movsL.append(Move(Crd('S', 13), 'T0'))
-        >>> ns.populate(stsL)
-        >>> ns.move(movsL[0], logger)  #UNDER TEST
-        >>> ns.stkOD['T6'].head == None
-        True
-        >>> ns.crdOD[Crd('S', 12)].crd == ns.stkOD['T0'].head  # new T2 head
-        True
         >>>
         """
         pass
-    #----------------------------------------------------------------------
-    def getHeadsL(self, stk_typeStr=None):
-        """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
-        """
-        #NOTE: the list return ORDER is reverse that of State.
-        # NOTE: stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
-
-        hdCrd =  lambda stk: stk[-1] if stk else None
-        typ =    stk_typeStr and stk_typeStr[0].lower()
-        if typ ==  't':
-            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  't']
-        elif  typ ==  'f':
-            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  'f']
-        else:
-            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items())]
-        return tl
-
     def findMoves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
@@ -239,7 +206,7 @@ class newState(State):
            self.movesD['sib'] = _movsL
         return len(_movsL) > 0
     
-    def kngMoves(self,  _notEmpty_tblHeadsL):
+    def kngMoves(self, _notEmpty_tblHeadsL):
         """SETS self.kngMovesL &&  RETURNS True if there are moves
         
         - king Crd IsFaceUp, in a tableau, and not its first card.
@@ -282,8 +249,24 @@ class newState(State):
            self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
     
+    #----------------------------------------------------------------------
+    def getHeadsL(self, stk_typeStr=None):
+        """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
+        """
+        # NOTE: the list return ORDER is reverse that of State.
+        # NOTE: stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
+
+        hdCrd =  lambda stk: stk[-1] if stk else None
+        typ =    stk_typeStr and stk_typeStr[0].lower()
+        if typ ==  't':
+            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  't']
+        elif  typ ==  'f':
+            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  'f']
+        else:
+            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items())]
+        return tl
     def seeHeads(self):
-        """ returns formated str of  11 stack heads."""
+        """ RET: formated str of  11 stack heads."""
         ret = 'Top-'
         for top in  self.getTopsL():
             if top[1]:
@@ -291,8 +274,46 @@ class newState(State):
             else:
                 ret +=  "{0}:---,".format(top[0], top[1])
         return ret
+    
             
-        
+#-------------------------------------------------------------------------
+class newFullState(newState):
+    """ shuffled or sequenced rS state.  
+    """    
+    def __init__(self, shuffle=True):
+        newState.__init__(self)
+        #BUILD RUSSIAN SOLITAIRE STATE 
+        # 
+        def build_full(self, shuffle ):
+            """ loads each card Status in crdOD and appends cards to stkOD.
+            
+            """
+            STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
+                                          , 'T1':  1 * [False] + 5 * [True]
+                                          , 'T2': 2 * [False] + 5 * [True]
+                                          , 'T3': 3 * [False] + 5 * [True]
+                                          , 'T4': 4 * [False] + 5 * [True]
+                                          , 'T5': 5 * [False] + 5 * [True]
+                                          , 'T6': 6 * [False] + 5 * [UP]
+                                          ,  'S': [],  'H': [], 'D': [], 'C': []
+                                          }.items(), key=lambda t: t[0])) #{'T0':[True], 'T1':[False, True, True, True, True, True], ,,,}
+            VALUES.reverse()  # TO GET T6 with C-Ace on top.
+            crd52L = [Crd(s, v) for s in  SUITS for  v in  VALUES ]              
+            if shuffle: random.shuffle(crd52L)
+            crdG = (crd for  crd in  crd52L)
+            
+            # ****** now Glue or Move crds to stacks
+            for stk_nme,  fceL in STACK_FACE_DICT.items():
+                # NOTE: the length of each fceL determines the State:loc, fce, crd
+                for fce in  fceL:  #this is the pacer, the sync driver
+                    crd =  crdG.__next__() # want new_crd from crd52L
+                    #stk = self.stkOD[stk_nme]
+                    self.stkOD[stk_nme].PUSH(crd)  # want to stk.PUSH(new_crd)
+                    #new_stt =  newStt(stk_nme, fce, crd)  # build newStt
+                    self.crd2OD[crd] =  newStt(stk_nme, fce, crd)
+                    pass      
+            return  self
+
 class FullState(State):
     """ shuffled or sequenced rS state.  
     """    
@@ -301,7 +322,9 @@ class FullState(State):
         #BUILD RUSSIAN SOLITAIRE STATE 
         # 
         def build_full(self, shuffle ):
-            """ """
+            """ loads each card Status in crdOD and appends cards to stkOD.
+            
+            """
             STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
                                           , 'T1': 1 * [False] + 5 * [True]
                                           , 'T2': 2 * [False] + 5 * [True]
