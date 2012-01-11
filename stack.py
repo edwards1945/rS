@@ -1,4 +1,4 @@
-# stack.7.7.1.py module
+# stack.7.7.2.py module
 # MOD 7.7 enhanced State
 # #  
 

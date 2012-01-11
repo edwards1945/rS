@@ -1,5 +1,8 @@
-""" state.7.7.1.py 
+""" state.7.7.2.py 
 """
+#MOD _7.7.2
+# 120111 - work on multiple state branching in Hand.
+## but first reimplement FullState in newState with fastef full rS deck of cards and stacks.
 # MOD 7.7.1
 # 120111 # newState.move() full implement; simple tests run and in state_testdocs.py. Really improved logging: all in one place in move().
 ## added use of 'hand' instead of 'top' as it is in State: mostly in Stack too.
