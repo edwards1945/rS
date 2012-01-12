@@ -3,6 +3,10 @@
 import random
 from h import *
 import  stack
+import  copy
+#import  io
+import pickle
+
 import logging
 import logging.config
 #############################################
@@ -185,7 +189,7 @@ class State():
 #-------------------------------------------------------------------------
 class FullState(State):
     """ shuffled or sequenced rS state.  
-    """    
+    """
     def __init__(self, shuffle=True):
         State.__init__(self)
         #BUILD RUSSIAN SOLITAIRE STATE 
@@ -206,28 +210,58 @@ class FullState(State):
         [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
         pass
 
-class TestStates(State):
-    """ a series of fixed state.
-    >>> import state, pickle
-    >>> ts = TStates()
-    >>> ts.makeTS1()
-    >>> ts1 = ts.ts1
+class TestStates(FullState):
+    """ a series of fixed states.
     """
-    import state
-    import  io
-    import pickle
+    def __init__(self, stateNme=None):
+        """ a series of fixed states.
+        
+        >>> import state, pickle
+        >>> ##### are test states immutable???
+        >>> ts10 = TestStates('ts10')
+        >>> ### first and existing pickle file.
+        >>> ts10.crdOD[Crd('S', 13)]
+        Status(crd=Crd(suit='S', valu=13), fce=False, stkNme='T4')
+        
+        #>>> ts1.crdOD[Crd('S', 13)].fce
+        #False
+        #>>> sts = ts1.crdOD[Crd('S', 13)]._replace(fce=False)
+        #>>> ts1.crdOD[Crd('S', 13)] = sts
+        #>>> ts1.crdOD[Crd('S', 13)].fce
+        #False
+        #>>> ts1 =ts0.ts1  # second call: ts1 back to original
+        #>>> ts1.crdOD[Crd('S', 13)].fce
+        #True
+        #>>> ### now a non-existing pickle file.
+        #>>> ts = TestStates()
+        #>>> ts2 = ts.ts2
+        #>>> #### test states are immutable !!!
+        #>>>
+        """
+        FullState.__init__(self)
+        self.getTS(stateNme)
+        pass
+
+    def getTS(self,  stateNme):
+        pNme = stateNme + ".pickle"
+        try:
+            with  open(pNme,  'rb') as f:
+                stateNme = pickle.load(f)
+        except IOError:
+            self.makeTS(stateNme)
+            with  open(pNme,  'rb') as f:
+                stateNme = pickle.load(f)
+        return stateNme
     
-    def  makeTS1(self):
-        _ts1 =  FullState()
-        with  open('ts.pickle', 'wb') as f:
-            pickle.dump(_ts1,  f,  pickle.HIGHEST_PROTOCOL)
-       
-    def ts1(self):
-        @property
-        def ts1(self):
-            with  open('ts.pickle',  'rb') as f:
-                _ts1 = pickle.load(f)
-            return _ts1
+    def  makeTS(self,  stateNme):
+        """ creates a pickle file.
+        """
+        pNme = stateNme + ".pickle"
+        ateststate =  copy.deepcopy(FullState())
+        with  open(pNme, 'wb') as f:
+            pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+        f.close()
+           
         
         
     
