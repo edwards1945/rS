@@ -18,9 +18,6 @@ class Hand:
         self.state = mystate
         self._tag =  tag
         # REFACT remove these three aftr state enhances
-        self.fndMovesL =  []
-        self.sibMovesL = []  
-        self.kngMovesL =  []
         
     #----------------------------------------------------------------------
     @property

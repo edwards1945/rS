@@ -188,9 +188,9 @@ import logging.config
         ##True
         ##>>>  # *************  move one to confirm move() works
         ##>>> h.state.move(h.kngMovesL[0])  #UNDER TEST METHOD
-        ##>>> st.stkOD['T3'].top_item  # >>  was buried under king
+        ##>>> st.stkOD['T3'].head  # >>  was buried under king
         ##Crd(suit='C', valu=1)
-        ##>>> st.stkOD['T2'].top_item  # card on top of buried Kng
+        ##>>> st.stkOD['T2'].head  # card on top of buried Kng
         ##Crd(suit='H', valu=6)
         ##>>> del st
         #>>> 
@@ -207,7 +207,7 @@ import logging.config
         #>>> # **** populate a test state.
         #>>> sib_crd = Crd('D', 3)
         #>>> newStt0 = [ newStt('T3', True, Crd('H', 7))]
-        #>>> newStt0.append(newStt('T3', True, Crd('D', 4)))   # T3.top_item
+        #>>> newStt0.append(newStt('T3', True, Crd('D', 4)))   # T3.head
         #>>> newStt0.append(newStt('T6', False, Crd('D', 3)))   # faceDOWN sib violates RULE
         #>>> newStt0.append(newStt('T6', True, Crd('D', 2)))   # 
         #>>> st.populate(newStt0)  #state updated
@@ -231,8 +231,8 @@ import logging.config
         #>>> h.sibMove(st) # OBJECT UNDER TEST
         #True
         #>>> st.move(h.sibMovesL[0])  # OBJECT UNDER TEST
-        #>>> st.stkOD['T6'].top_item  # >>  empty
-        #>>> st.stkOD['T3'].top_item  # sib
+        #>>> st.stkOD['T6'].head  # >>  empty
+        #>>> st.stkOD['T3'].head  # sib
         #Crd(suit='D', valu=2)
         #>>> del st
         #>>>
