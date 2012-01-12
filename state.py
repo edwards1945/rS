@@ -205,6 +205,33 @@ class FullState(State):
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
         [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
         pass
+
+class TestStates(State):
+    """ a series of fixed state.
+    >>> import state, pickle
+    >>> ts = TStates()
+    >>> ts.makeTS1()
+    >>> ts1 = ts.ts1
+    """
+    import state
+    import  io
+    import pickle
+    
+    def  makeTS1(self):
+        _ts1 =  FullState()
+        with  open('ts.pickle', 'wb') as f:
+            pickle.dump(_ts1,  f,  pickle.HIGHEST_PROTOCOL)
+       
+    def ts1(self):
+        @property
+        def ts1(self):
+            with  open('ts.pickle',  'rb') as f:
+                _ts1 = pickle.load(f)
+            return _ts1
+        
+        
+    
+    
        
 if __name__ == "__main__":
     import doctest
