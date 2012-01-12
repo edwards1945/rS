@@ -52,8 +52,9 @@ class Hand:
     
     def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
+        
         RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-    
+
         """        
         if not logger:  logger = logging.getLogger('myW')
         if not state: state = self.state
@@ -138,7 +139,7 @@ if __name__ == "__main__":
     logging.config.fileConfig('myConfig.conf')        
     import doctest
     doctest.testmod(verbose=False)
-    #doctest.testfile("hand_testdocs.py"
+    doctest.testfile("hand_testdocs.py")
     
     
 

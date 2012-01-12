@@ -1,24 +1,33 @@
-#hand.testdocs.7.7.1.py
+#hand.testdocs.7.7.2.py
 #MOD 7.7 enhanced State
 
 import logging
 import logging.config
 
-#class testHand:
-    #def test_1_kngBranching():
-        #""" the begining of maxHands: picking the highest return.
-        #>>> import  state, hand
-        #>>> import logging
-        #>>> import logging.config
-        #>>> from h import *      
-        #>>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        #>>> h = hand.Hand(tag='1')
-        #>>> h.state = state.FullState()  # shuffled
-        #>>> logger = logging.getLogger('myI')
-        #>>> tCntr.clear()
-        #>>> #REFACT hold off till newState >>tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
-        #>>>          
-        #""" 
+class testHand:
+    def test_1_kngBranching():
+        """ the begining of maxHands: picking the highest return.
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> import hand, state
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> hnd = hand.Hand(tag='1')
+        >>> hnd.state = state.FullState()  # shuffled
+        >>> logger = logging.getLogger('myI')
+        >>> tCntr.clear()
+
+        >>> #tCntr += hnd.play_Hand(logger=logger)  #TEST OBJECT
+        asdfghjk
+        >>>          
+        """
+        pass
+        
+if __name__ == "__main__":
+    logging.config.fileConfig('myConfig.conf')            
+    import doctest
+    doctest.testmod(verbose=False)
+
     #def test_0_kngBranching():
         #""" the begining of maxHands: picking the highest return.
         #>>> import  state, hand
@@ -240,8 +249,4 @@ import logging.config
         #pass
     
 
-if __name__ == "__main__":
-    logging.config.fileConfig('myConfig.conf')            
-    import doctest
-    doctest.testmod(verbose=False)
         
