@@ -148,96 +148,96 @@ def test_kngMoves_State(self):
     """
     pass
 
-#def test_sibMoves_State(self):
-    #"""
-    #>>> #(1) confirm sibMovs in findMoves().
-    #>>> from h import *
-    #>>> import state, stack
-    #>>> st = state.State()
-    #>>> #   EXPECTED MOVE DATA: head TO head; buried to head
-    #>>> t_ace = Crd( 'C', 1)
-    #>>> t_sts = Status(t_ace, True, 'T0')  # head to head
-    #>>> t_stsL = []
-    #>>> t_stsL.append(Status(Crd('H', 6), True, 'T1'))  #head ->- head T2
-    #>>> t_stsL.append(Status(Crd('H', 7), True, 'T2')) #h
-    #>>> t_stsL.append(Status(Crd('C', 5), True, 'T3'))  # buried ->- head T4
-    #>>> t_stsL.append(Status(Crd('S', 5), True, 'T3'))
-    #>>> t_stsL.append(Status(Crd('C', 6), True, 'T4'))  #h
-    #>>> #   EXPECTED NO MOVE DATA: fceDOWN: fceDOWN, same tabl, fnd ->- tbl
-    #>>> t_stsL.append(Status(Crd('D', 6), False, 'T5'))  # no move ->- head T6: faceDOWN
-    #>>> t_stsL.append(Status(Crd('D', 7), True, 'T6'))  # h
-    #>>> t_stsL.append(Status(Crd('S', 2), True, 'S'))  # no move ->- head T5: fnd ->- tbl
-    #>>> t_stsL.append(Status(Crd('S', 2), True, 'T0'))  # no move ->- head T0: same tableau
-    #>>> t_stsL.append(Status(Crd('S', 3), True, 'T0'))  # h
-    #>>> st.populate(t_stsL)
-    #>>> #      SETUP COMPLETE
-    #>>> st.findMoves()  #UNDER TEST
-    #True
-    #>>> len( st.movesD['sib'] ) == 2 # 
-    #True
-    #>>> st.movesD['sib'][1]  == Move(crd=Crd(suit='C', valu=5), stkNme='T4')
-    #True
-    #>>> st.movesD['fnd'] == []
-    #True
-    #>>> st.movesD['kng'] == []
-    #True
+def test_sibMoves_State(self):
+    """
+    >>> #(1) confirm sibMovs in findMoves().
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.State()
+    >>> #   EXPECTED MOVE DATA: head TO head; buried to head
+    >>> t_ace = Crd( 'C', 1)
+    >>> t_sts = Status(t_ace, True, 'T0')  # head to head
+    >>> t_stsL = []
+    >>> t_stsL.append(Status(Crd('H', 6), True, 'T1'))  #head ->- head T2
+    >>> t_stsL.append(Status(Crd('H', 7), True, 'T2')) #h
+    >>> t_stsL.append(Status(Crd('C', 5), True, 'T3'))  # buried ->- head T4
+    >>> t_stsL.append(Status(Crd('S', 5), True, 'T3'))
+    >>> t_stsL.append(Status(Crd('C', 6), True, 'T4'))  #h
+    >>> #   EXPECTED NO MOVE DATA: fceDOWN: fceDOWN, same tabl, fnd ->- tbl
+    >>> t_stsL.append(Status(Crd('D', 6), False, 'T5'))  # no move ->- head T6: faceDOWN
+    >>> t_stsL.append(Status(Crd('D', 7), True, 'T6'))  # h
+    >>> t_stsL.append(Status(Crd('S', 2), True, 'S'))  # no move ->- head T5: fnd ->- tbl
+    >>> t_stsL.append(Status(Crd('S', 2), True, 'T0'))  # no move ->- head T0: same tableau
+    >>> t_stsL.append(Status(Crd('S', 3), True, 'T0'))  # h
+    >>> st.populate(t_stsL)
+    >>> #      SETUP COMPLETE
+    >>> st.findMoves()  #UNDER TEST
+    True
+    >>> len( st.movesD['sib'] ) == 2 # 
+    True
+    >>> st.movesD['sib'][1]  == Move(crd=Crd(suit='C', valu=5), stkNme='T4')
+    True
+    >>> st.movesD['fnd'] == []
+    True
+    >>> st.movesD['kng'] == []
+    True
     
-    #"""
-    #pass
+    """
+    pass
 
-#def test_fndMoves_State(self):
-    #"""
-    #>>> #(1) confirm fndMoves in findMoves().
-    #>>> from h import *
-    #>>> import state, stack
-    #>>> st = state.State()
-    #>>> #   EXPECTED MOVE DATA
-    #>>> t_ace = Crd( 'C', 1)
-    #>>> t_sts = Status(t_ace, True, 'T0')  # expect this Ace.
-    #>>> t_stsL = []
-    #>>> t_stsL.append(t_sts)
-    #>>> #   EXPECTED NO MOVE DATA
-    #>>> junk = Move(Crd('TEST', 4), 'TEST')
-    #>>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
-    #>>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
-    #>>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
-    #>>> st.populate(t_stsL)
-    #>>> #      SETUP COMPLETE
-    #>>> st.findMoves()  #UNDER TEST
-    #True
-    #>>> st.movesD['kng']  
-    #[]
-    #>>> st.movesD['sib']  # junk movesD cleared
-    #[]
-    #>>> st.movesD['fnd'] == [Move(crd=Crd(suit='C', valu=1), stkNme='C')]
-    #True
+def test_fndMoves_State(self):
+    """
+    >>> #(1) confirm fndMoves in findMoves().
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.State()
+    >>> #   EXPECTED MOVE DATA
+    >>> t_ace = Crd( 'C', 1)
+    >>> t_sts = Status(t_ace, True, 'T0')  # expect this Ace.
+    >>> t_stsL = []
+    >>> t_stsL.append(t_sts)
+    >>> #   EXPECTED NO MOVE DATA
+    >>> junk = Move(Crd('TEST', 4), 'TEST')
+    >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
+    >>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
+    >>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
+    >>> st.populate(t_stsL)
+    >>> #      SETUP COMPLETE
+    >>> st.findMoves()  #UNDER TEST
+    True
+    >>> st.movesD['kng']  
+    []
+    >>> st.movesD['sib']  # junk movesD cleared
+    []
+    >>> st.movesD['fnd'] == [Move(crd=Crd(suit='C', valu=1), stkNme='C')]
+    True
     
-    #"""
-    #pass
+    """
+    pass
 
-#def test_new_populate_State(self):
-    #"""
-    #>>> # confirm populate works using new namedtuple Status.
-    #>>> from h import *
-    #>>> import state, stack
-    #>>> st = state.State()  # crd2OD & stkOD
-    #>>> # **** first assembled as argument
-    #>>> st.populate([ Status(Crd('D', 6), False, 'T5')])
-    #>>> st.crdOD[Crd('D', 6)] == Status(crd=Crd(suit='D', valu=6), fce=False, stkNme='T5')
-    #True
-    #>>> # **** now multiple status. 
-    #>>> p1 = [Status(Crd('C', 13), False, 'T3')]
-    #>>> p1.append( Status(Crd('C', 12), False, 'T3'))
-    #>>> p1.append( Status(Crd('C', 11), True, 'T3'))
-    #>>> st.populate(p1)
-    #>>> st.crdOD[Crd('C', 13)].fce == False
-    #True
-    #>>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
-    #>>> l1 == [('T3', 3), ('T5', 1)]
-    #True
-    #>>> #SUCCESSFUL POPULATING                
-    #"""
-    #pass
+def test_new_populate_State(self):
+    """
+    >>> # confirm populate works using new namedtuple Status.
+    >>> from h import *
+    >>> import state, stack
+    >>> st = state.State()  # crd2OD & stkOD
+    >>> # **** first assembled as argument
+    >>> st.populate([ Status(Crd('D', 6), False, 'T5')])
+    >>> st.crdOD[Crd('D', 6)] == Status(crd=Crd(suit='D', valu=6), fce=False, stkNme='T5')
+    True
+    >>> # **** now multiple status. 
+    >>> p1 = [Status(Crd('C', 13), False, 'T3')]
+    >>> p1.append( Status(Crd('C', 12), False, 'T3'))
+    >>> p1.append( Status(Crd('C', 11), True, 'T3'))
+    >>> st.populate(p1)
+    >>> st.crdOD[Crd('C', 13)].fce == False
+    True
+    >>> l1 = [(stkNme, len(st.stkOD[stkNme]))  for stkNme in STACKS  if len(st.stkOD[stkNme]) > 0]
+    >>> l1 == [('T3', 3), ('T5', 1)]
+    True
+    >>> #SUCCESSFUL POPULATING                
+    """
+    pass
 
 
     """
