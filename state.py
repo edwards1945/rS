@@ -283,37 +283,38 @@ class newFullState(newState):
     def __init__(self, shuffle=True):
         newState.__init__(self)
         #BUILD RUSSIAN SOLITAIRE STATE 
-        # 
-        def build_full(self, shuffle ):
-            """ loads each card Status in crdOD and appends cards to stkOD.
-            
-            """
-            STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
-                                          , 'T1':  1 * [False] + 5 * [True]
-                                          , 'T2': 2 * [False] + 5 * [True]
-                                          , 'T3': 3 * [False] + 5 * [True]
-                                          , 'T4': 4 * [False] + 5 * [True]
-                                          , 'T5': 5 * [False] + 5 * [True]
-                                          , 'T6': 6 * [False] + 5 * [UP]
-                                          ,  'S': [],  'H': [], 'D': [], 'C': []
-                                          }.items(), key=lambda t: t[0])) #{'T0':[True], 'T1':[False, True, True, True, True, True], ,,,}
-            VALUES.reverse()  # TO GET T6 with C-Ace on top.
-            crd52L = [Crd(s, v) for s in  SUITS for  v in  VALUES ]              
-            if shuffle: random.shuffle(crd52L)
-            crdG = (crd for  crd in  crd52L)
-            
-            # ****** now Glue or Move crds to stacks
-            for stk_nme,  fceL in STACK_FACE_DICT.items():
-                # NOTE: the length of each fceL determines the State:loc, fce, crd
-                for fce in  fceL:  #this is the pacer, the sync driver
-                    crd =  crdG.__next__() # want new_crd from crd52L
-                    #stk = self.stkOD[stk_nme]
-                    self.stkOD[stk_nme].PUSH(crd)  # want to stk.PUSH(new_crd)
-                    #new_stt =  newStt(stk_nme, fce, crd)  # build newStt
-                    self.crd2OD[crd] =  newStt(stk_nme, fce, crd)
-                    pass      
-            return  self
-
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
+        
+        # build crdOD
+        if shuffle: random.shuffle(CARDS52L)
+        crd = CARDS52L
+        fce = FACES52L
+        stk = STAKES52L
+        cfs = list(zip(crd,  fce,  stk))
+        sts = [Status(crd,  fce, stk) for crd,  fce,  stk in  cfs]
+        d = OrderedDict(zip(crd, sts))  # used in stkOD
+        self.crdOD =  d
+        
+        # build stkOD
+        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
+        [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
+        pass
+    
+    def test_newFullState(newState):
+        """
+        # UNDER TEST: newFullState
+        >>> # SETUP
+        >>> from h import *
+        >>> import state, stack
+        >>> logger = logging.getLogger('myI')      
+        >>> ## init
+        >>> nfs = state.newFullState( False)
+        >>> nfs.stkOD['T6'].head == Crd('C', 1)
+        True
+        >>> nfs.crdOD[Crd('H', 12)].fce
+        False
+        >>>
+        """
 class FullState(State):
     """ shuffled or sequenced rS state.  
     """    
