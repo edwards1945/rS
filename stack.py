@@ -18,6 +18,9 @@ class Stack(list):
     def name(self):
         return self._nme
     @property
+    def isFull(self):
+        return  len(self) ==  13
+    @property
     def isEmpty(self):
         return not  len(self) > 0
     #@property

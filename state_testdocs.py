@@ -10,7 +10,7 @@ import  stack,  state
 
 import logging
 import logging.config
-############################################
+########################################
 def test_FullState(State):
     """
     # UNDER TEST: FullState
@@ -30,7 +30,7 @@ def test_FullState(State):
 
 def test_kng_move_State(self):
     """ improve monitoring of moves.
-    # UNDER TEST: move()  #NOT TESTING findMoves()
+    # UNDER TEST: move()  #NOT TESTING find_Moves()
     >>> # EXPECTED GOOD 
     >>> from h import *
     >>> import state, stack
@@ -60,7 +60,7 @@ def test_kng_move_State(self):
 
 def test_fnd_move_State(self):
     """ improve monitoring of moves.
-    # UNDER TEST: move()  #NOT TESTING findMoves()
+    # UNDER TEST: move()  #NOT TESTING find_Moves()
     >>> # EXPECTED GOOD 
     >>> from h import *
     >>> import state, stack
@@ -83,7 +83,7 @@ def test_fnd_move_State(self):
     pass
 def test_sib_move_State(self):
     """ improve monitoring of moves.
-    # UNDER TEST: move()  #NOT TESTING findMoves()
+    # UNDER TEST: move()  #NOT TESTING find_Moves()
     >>> # EXPECTED GOOD 
     >>> from h import *
     >>> import state, stack
@@ -112,7 +112,7 @@ def test_sib_move_State(self):
 
 def test_kngMoves_State(self):
     """
-    >>> #(1) confirm kngMovs in findMoves().
+    >>> #(1) confirm kngMovs in find_Moves().
     >>> from h import *
     >>> import state, stack
     >>> st = state.State()
@@ -134,7 +134,7 @@ def test_kngMoves_State(self):
     >>> t_stsL.append(Status(Crd('H', 4), True, 'T6'))  # h
     >>> st.populate(t_stsL)
     >>> #      SETUP COMPLETE
-    >>> st.findMoves()  #UNDER TEST
+    >>> st.find_Moves()  #UNDER TEST
     True
     >>> len( st.movesD['kng'] ) == 4 # 
     True
@@ -150,7 +150,7 @@ def test_kngMoves_State(self):
 
 def test_sibMoves_State(self):
     """
-    >>> #(1) confirm sibMovs in findMoves().
+    >>> #(1) confirm sibMovs in find_Moves().
     >>> from h import *
     >>> import state, stack
     >>> st = state.State()
@@ -171,7 +171,7 @@ def test_sibMoves_State(self):
     >>> t_stsL.append(Status(Crd('S', 3), True, 'T0'))  # h
     >>> st.populate(t_stsL)
     >>> #      SETUP COMPLETE
-    >>> st.findMoves()  #UNDER TEST
+    >>> st.find_Moves()  #UNDER TEST
     True
     >>> len( st.movesD['sib'] ) == 2 # 
     True
@@ -187,7 +187,7 @@ def test_sibMoves_State(self):
 
 def test_fndMoves_State(self):
     """
-    >>> #(1) confirm fndMoves in findMoves().
+    >>> #(1) confirm fndMoves in find_Moves().
     >>> from h import *
     >>> import state, stack
     >>> st = state.State()
@@ -198,12 +198,12 @@ def test_fndMoves_State(self):
     >>> t_stsL.append(t_sts)
     >>> #   EXPECTED NO MOVE DATA
     >>> junk = Move(Crd('TEST', 4), 'TEST')
-    >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on findMoves() call.
+    >>> st.movesD['sib'].append(junk)   # PRELOAD <dict> to assure it is cleared on find_Moves() call.
     >>> t_stsL.append(Status(Crd('H', 1), True, 'T2'))  # no move: buried
     >>> t_stsL.append(Status(Crd('H', 2), True, 'T2'))
     >>> st.populate(t_stsL)
     >>> #      SETUP COMPLETE
-    >>> st.findMoves()  #UNDER TEST
+    >>> st.find_Moves()  #UNDER TEST
     True
     >>> st.movesD['kng']  
     []

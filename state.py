@@ -4,15 +4,14 @@ import random
 from h import *
 import  stack
 import  copy
-#import  io
+import  io
 import pickle
-
 import logging
 import logging.config
 #############################################
 #-------------------------------------------------------------------------
 class State():
-    """ move finding and executing to State.
+    """ rS State: .move finding base class for various full and test States..
     """
     def __init__(self, shuffle=True):
         self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
@@ -71,19 +70,7 @@ class State():
             logger.info(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
         pass
     
-    def test_State(self):
-        """ improve monitoring of moves.
-        # UNDER TEST: move()
-        # NOT TESTING findMoves()
-        # EXPECTED GOOD 
-        >>> from h import *
-        >>> import state, stack
-        >>> logger = logging.getLogger('myI')      
-        >>> ##
-        >>>
-        """
-        pass
-    def findMoves(self):
+    def find_Moves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
         _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
@@ -160,6 +147,35 @@ class State():
         return len(_movsL) > 0
     
     #----------------------------------------------------------------------
+    @property
+    def hasMoves(self):
+        d =  self.movesD
+        return (len(d['fnd']) + len(d['kng']) + len(d['sib']) ) == 0
+    @property
+    def fndCount(self):
+        """ """
+        d = self.stkOD
+        return (len(d['C']) + len(d['D']) + len(d['H']) + len(d['S']) )         
+    @property
+    def isWin(self):
+        return self.fndCount == 0
+    @property
+    def isStymied(self):
+        return  not  self.hasMoves
+    #----------------------------------------------------------------------
+    def test_State(self):
+        """ improve monitoring of moves.
+        # UNDER TEST: move()
+        # NOT TESTING find_Moves()
+        # EXPECTED GOOD 
+        >>> from h import *
+        >>> import state, stack
+        >>> logger = logging.getLogger('myI')      
+        >>> ##
+        >>>
+        """
+        pass
+    
     def getHeadsL(self, stk_typeStr=None):
         """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
         """
@@ -187,6 +203,63 @@ class State():
     
             
 #-------------------------------------------------------------------------
+class TestStates(State):
+    """ a series of fixed states.
+    """
+    def __init__(self, shuffle=True):
+        """ direct from StateFull which for some reason isn't working. OR ts10.python carries the original state which confuses python."""
+        State.__init__(self)
+        #BUILD RUSSIAN SOLITAIRE STATE 
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
+        
+        # build crdOD
+        if shuffle: random.shuffle(CARDS52L)
+        crd = CARDS52L
+        fce = FACES52L
+        stk = STAKES52L
+        cfs = list(zip(crd,  fce,  stk))
+        sts = [Status(crd,  fce, stk) for crd,  fce,  stk in  cfs]
+        d = OrderedDict(zip(crd, sts))  # used in stkOD
+        self.crdOD =  d
+        
+        # build stkOD
+        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
+        [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
+        pass
+    
+    #@property
+    #def ts10(self):
+         #with  open('ts10.pickle',  'rb') as f:
+             #_ts10 = pickle.load(f)
+         #return _ts10
+     
+    def getTS(self,  stateNme):
+        if stateNme:            
+            pNme = stateNme + ".pickle"
+            try:
+                with  open(pNme,  'rb') as f:
+                    stt = pickle.load(f)
+            except IOError:
+                self.makeTS(stateNme)
+                with  open(pNme,  'rb') as f:
+                    stt = pickle.load(f)
+        return stt
+    
+    def  makeTS(self,  stateNme):
+        """ creates a pickle file.
+        """
+        pNme = stateNme + ".pickle"
+        try:
+            open(pNme,  'rb') 
+            #assert False, "PickleFileExists"
+        except IOError:     
+            ateststate =  copy.deepcopy(TestStates())
+            with  open(pNme, 'wb') as f:
+                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+        pass   
+        
+        
+        
 class FullState(State):
     """ shuffled or sequenced rS state.  
     """
@@ -210,63 +283,37 @@ class FullState(State):
         [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
         pass
 
-class TestStates(FullState):
-    """ a series of fixed states.
-    """
-    def __init__(self, stateNme=None):
-        """ a series of fixed states.
-        
-        >>> import state, pickle
-        >>> ##### are test states immutable???
-        >>> ts10 = TestStates('ts10')
-        >>> ### first and existing pickle file.
-        >>> ts10.crdOD[Crd('S', 13)]
-        Status(crd=Crd(suit='S', valu=13), fce=False, stkNme='T4')
-        
-        #>>> ts1.crdOD[Crd('S', 13)].fce
-        #False
-        #>>> sts = ts1.crdOD[Crd('S', 13)]._replace(fce=False)
-        #>>> ts1.crdOD[Crd('S', 13)] = sts
-        #>>> ts1.crdOD[Crd('S', 13)].fce
-        #False
-        #>>> ts1 =ts0.ts1  # second call: ts1 back to original
-        #>>> ts1.crdOD[Crd('S', 13)].fce
-        #True
-        #>>> ### now a non-existing pickle file.
-        #>>> ts = TestStates()
-        #>>> ts2 = ts.ts2
-        #>>> #### test states are immutable !!!
-        #>>>
-        """
-        FullState.__init__(self)
-        self.getTS(stateNme)
-        pass
 
-    def getTS(self,  stateNme):
-        pNme = stateNme + ".pickle"
-        try:
-            with  open(pNme,  'rb') as f:
-                stateNme = pickle.load(f)
-        except IOError:
-            self.makeTS(stateNme)
-            with  open(pNme,  'rb') as f:
-                stateNme = pickle.load(f)
-        return stateNme
-    
-    def  makeTS(self,  stateNme):
-        """ creates a pickle file.
-        """
-        pNme = stateNme + ".pickle"
-        ateststate =  copy.deepcopy(FullState())
-        with  open(pNme, 'wb') as f:
-            pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
-        f.close()
-           
-        
-        
-    
-    
-       
+def test_pickling(self):
+    """
+    >>> import state, pickle
+    >>> ##### are test states immutable???
+    >>> ### first and existing pickle file.
+    >>> ts = state.TestStates()
+    >>> ts10 = ts.makeTS('ts10')  # falls thru if it exists.
+    >>> ts10 = ts.getTS('ts10')
+    >>> ts10.crdOD[Crd('S', 13)]
+    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T6')
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
+    >>> ts10.crdOD[Crd('S', 13)] = sts
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    False
+    >>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> ### now a non-existing pickle file.
+    >>> ts = TestStates()
+    >>> ts2 = ts.ts2
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'TestStates' object has no attribute 'ts2'
+    >>> #### test states are immutable !!!
+    >>>
+  
+    """
+      
 if __name__ == "__main__":
     import doctest
     logging.config.fileConfig('myConfig.conf') 

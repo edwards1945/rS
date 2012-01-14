@@ -1,6 +1,12 @@
 """ state.7.7.2.py 
 """
 #MOD _7.7.2
+# 120114 - rework  Hand, State, Stack fo State handling moves.
+## add @propery:isFull to Stack; @property:isWin to State
+# 120113 - bypass run or create static TestStates for now; 
+# #get back to Hand and multiple kngHands.
+# 120112 - worked on TestStates to get constant States
+## trouble with makeTS() and getTS()
 # 120111 - work on multiple state branching in Hand.
 ## but first reimplement FullState in newState with fastef full rS deck of cards and stacks.
 ## newFullState done with short test.
@@ -28,4 +34,4 @@
 # override populate() to not force face = True.
 # added another dictionary: movesD
 # reversed tuple output of getTopsL(), now called getHeadsL
-#  add State.findMoves(): move this functionality from hand to here where it belongs.
+#  add State.find_Moves(): move this functionality from hand to here where it belongs.

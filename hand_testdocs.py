@@ -67,7 +67,7 @@ if __name__ == "__main__":
         #>>> h.state = state.FullState(True)  #shuffled
         #>>> logger = logging.getLogger('myI')
         #>>> testSetCntr.clear()
-        #>>> #REFACT testSetCntr = h.play_1_Set(5, logger=logger)  #TEST OBJECT
+        #>>> #REFACT testSetCntr = h.play_Set(5, logger=logger)  #TEST OBJECT
         #>>> testSetCntr['nCnt'] == 5
         #True
         #>>>
