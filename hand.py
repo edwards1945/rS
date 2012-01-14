@@ -61,18 +61,14 @@ class Hand:
         >>> import hand
         
         #>>> hand.test_snippet()        
-        
-        >>> ts = state.TestStates()
+        >>> ts = state.TestStates(False)
         >>> ts.makeTS('ts2')
-        aldfjh
-        >>> ts2 = ts.getTS('ts2')
-        >>> ts2
-        
-        >>> #th = hand.Hand(tag='1')
+        >>> ts.getTS('ts2')
+        >>> th = hand.Hand(mystate=ts, tag='1')
         >>>
         
-        #>>> logI = logging.getLogger('myI')
-        #>>> th.play_Hand(logger=logI)
+        >>> logI = logging.getLogger('myI')
+        >>> th.play_Hand(logger=logI)
             
         """   
     def play_Hand(self,  state=None,  logger=None):

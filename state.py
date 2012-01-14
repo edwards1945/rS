@@ -238,14 +238,14 @@ class TestStates(State):
             pNme = stateNme + ".pickle"
             try:
                 with  open(pNme,  'rb') as f:
-                    stt = pickle.load(f)
+                    self = pickle.load(f)
             except IOError:
                 self.makeTS(stateNme)
                 with  open(pNme,  'rb') as f:
-                    stt = pickle.load(f)
-        return stt
+                    self = pickle.load(f)
+
     
-    def  makeTS(self,  stateNme):
+    def  makeTS(self,  stateNme,  shuffle=True):
         """ creates a pickle file.
         """
         pNme = stateNme + ".pickle"
@@ -253,7 +253,7 @@ class TestStates(State):
             open(pNme,  'rb') 
             #assert False, "PickleFileExists"
         except IOError:     
-            ateststate =  copy.deepcopy(TestStates())
+            ateststate =  copy.deepcopy(self)
             with  open(pNme, 'wb') as f:
                 pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
         pass   
