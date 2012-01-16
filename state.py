@@ -267,24 +267,28 @@ class TestStates(FullState):
                 pass
                 return _ts
             except IOError:
-                self._makeTS(stateNme,  shuffle)
+                #self._makeTS(stateNme,  shuffle)
+                ateststate =  FullState(shuffle)
+                with  open(pNme, 'wb') as f:
+                    pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+                
                 with  open(pNme,  'rb') as f:
                     _ts = pickle.load(f)
                 return _ts
 
                     
-    def  _makeTS(self, stateNme,  shuffle=True):
-        """ creates a pickle file.
-        """
-        pNme = stateNme + ".pickle"
-        try:
-            open(pNme,  'rb') 
-            #fall thru and do nothing if it exists.
-        except IOError:     
-            ateststate =  FullState(shuffle)
-            with  open(pNme, 'wb') as f:
-                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
-        pass   
+    #def  _makeTS(self, stateNme,  shuffle=True):
+        #""" creates a pickle file.
+        #"""
+        #pNme = stateNme + ".pickle"
+        #try:
+            #open(pNme,  'rb') 
+            ##fall thru and do nothing if it exists.
+        #except IOError:     
+            #ateststate =  FullState(shuffle)
+            #with  open(pNme, 'wb') as f:
+                #pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+        #pass   
         
 #----------------------------------------------------------------------
 def getTS( stateNme):
@@ -324,7 +328,7 @@ def test_pickling(self):
     >>> ts = state.TestStates()
     >>> ts10 = ts.getTS('ts10', False)
     >>> ts10.crdOD[Crd('S', 13)]
-    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T6')
+    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T0')
     >>> ts10.crdOD[Crd('S', 13)].fce
     True
     >>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
@@ -335,9 +339,9 @@ def test_pickling(self):
     >>> ts10.crdOD[Crd('S', 13)].fce
     True
     >>> ### now a non-existing pickle file.
-    #>>> ts2 = ts.getTS('unshuffledTS', False)
-    #>>> ts2.stkOD['T0'][0]
-    
+    >>> ts2 = ts.getTS('unshuffledTS', False)
+    >>> ts2.stkOD['T0'][0] == Crd(suit='S', valu=13)
+    True
     >>> #### test states are immutable !!!
     >>>
   
