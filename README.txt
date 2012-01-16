@@ -1,8 +1,22 @@
 """ state.7.7.2.py 
 """
 #MOD _7.7.2
+# 120116 
+##- now have class getTS() method constant states.
+## and a module getTS() function.
+## think I understand pickling a little better. really need makeTS since getTS calls it.
+# 120114 - rework  Hand, State, Stack fo State handling moves.
+## add @propery:isFull to Stack; @property:isWin to State
+# 120113 - bypass run or create static TestStates for now; 
+# #get back to Hand and multiple kngHands.
+# 120112 - worked on TestStates to get constant States
+## trouble with makeTS() and getTS()
 # 120111 - work on multiple state branching in Hand.
 ## but first reimplement FullState in newState with fastef full rS deck of cards and stacks.
+## newFullState done with short test.
+## changed Stack and stack_testdocs attribute get_tops => .head & headsL.
+## emoves all the original class State and not used stuff.
+## some problems with IDE tests. don't work
 # MOD 7.7.1
 # 120111 # newState.move() full implement; simple tests run and in state_testdocs.py. Really improved logging: all in one place in move().
 ## added use of 'hand' instead of 'top' as it is in State: mostly in Stack too.
@@ -24,4 +38,4 @@
 # override populate() to not force face = True.
 # added another dictionary: movesD
 # reversed tuple output of getTopsL(), now called getHeadsL
-#  add State.findMoves(): move this functionality from hand to here where it belongs.
+#  add State.find_Moves(): move this functionality from hand to here where it belongs.

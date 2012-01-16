@@ -4,21 +4,30 @@
 import logging
 import logging.config
 
-#class testHand:
-    #def test_1_kngBranching():
-        #""" the begining of maxHands: picking the highest return.
-        #>>> import  state, hand
-        #>>> import logging
-        #>>> import logging.config
-        #>>> from h import *      
-        #>>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        #>>> h = hand.Hand(tag='1')
-        #>>> h.state = state.FullState()  # shuffled
-        #>>> logger = logging.getLogger('myI')
-        #>>> tCntr.clear()
-        #>>> #REFACT hold off till newState >>tCntr += h.play_Hand(logger=logger)  #TEST OBJECT
-        #>>>          
-        #""" 
+class testHand:
+    def test_1_kngBranching():
+        """ the begining of maxHands: picking the highest return.
+        >>> import logging
+        >>> import logging.config
+        >>> from h import *      
+        >>> import hand, state
+        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        >>> hnd = hand.Hand(tag='1')
+        >>> hnd.state = state.FullState()  # shuffled
+        >>> logger = logging.getLogger('myI')
+        >>> tCntr.clear()
+
+        >>> #tCntr += hnd.play_Hand(logger=logger)  #TEST OBJECT
+        asdfghjk
+        >>>          
+        """
+        pass
+        
+if __name__ == "__main__":
+    logging.config.fileConfig('myConfig.conf')            
+    import doctest
+    doctest.testmod(verbose=False)
+
     #def test_0_kngBranching():
         #""" the begining of maxHands: picking the highest return.
         #>>> import  state, hand
@@ -58,7 +67,7 @@ import logging.config
         #>>> h.state = state.FullState(True)  #shuffled
         #>>> logger = logging.getLogger('myI')
         #>>> testSetCntr.clear()
-        #>>> #REFACT testSetCntr = h.play_1_Set(5, logger=logger)  #TEST OBJECT
+        #>>> #REFACT testSetCntr = h.play_Set(5, logger=logger)  #TEST OBJECT
         #>>> testSetCntr['nCnt'] == 5
         #True
         #>>>
@@ -188,9 +197,9 @@ import logging.config
         ##True
         ##>>>  # *************  move one to confirm move() works
         ##>>> h.state.move(h.kngMovesL[0])  #UNDER TEST METHOD
-        ##>>> st.stkOD['T3'].top_item  # >>  was buried under king
+        ##>>> st.stkOD['T3'].head  # >>  was buried under king
         ##Crd(suit='C', valu=1)
-        ##>>> st.stkOD['T2'].top_item  # card on top of buried Kng
+        ##>>> st.stkOD['T2'].head  # card on top of buried Kng
         ##Crd(suit='H', valu=6)
         ##>>> del st
         #>>> 
@@ -207,7 +216,7 @@ import logging.config
         #>>> # **** populate a test state.
         #>>> sib_crd = Crd('D', 3)
         #>>> newStt0 = [ newStt('T3', True, Crd('H', 7))]
-        #>>> newStt0.append(newStt('T3', True, Crd('D', 4)))   # T3.top_item
+        #>>> newStt0.append(newStt('T3', True, Crd('D', 4)))   # T3.head
         #>>> newStt0.append(newStt('T6', False, Crd('D', 3)))   # faceDOWN sib violates RULE
         #>>> newStt0.append(newStt('T6', True, Crd('D', 2)))   # 
         #>>> st.populate(newStt0)  #state updated
@@ -231,8 +240,8 @@ import logging.config
         #>>> h.sibMove(st) # OBJECT UNDER TEST
         #True
         #>>> st.move(h.sibMovesL[0])  # OBJECT UNDER TEST
-        #>>> st.stkOD['T6'].top_item  # >>  empty
-        #>>> st.stkOD['T3'].top_item  # sib
+        #>>> st.stkOD['T6'].head  # >>  empty
+        #>>> st.stkOD['T3'].head  # sib
         #Crd(suit='D', valu=2)
         #>>> del st
         #>>>
@@ -240,8 +249,4 @@ import logging.config
         #pass
     
 
-if __name__ == "__main__":
-    logging.config.fileConfig('myConfig.conf')            
-    import doctest
-    doctest.testmod(verbose=False)
         

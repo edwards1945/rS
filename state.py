@@ -3,108 +3,18 @@
 import random
 from h import *
 import  stack
+import  copy
+import  os
+import  io
+import pickle
 import logging
 import logging.config
 #############################################
-class State:
-    """ the meld on 11 Stacks and 52 Crds populated - read dealt - is a specific pattern.
-    """
-    def __init__(self):
-        """ populating it's two dicts: 52 named Crds w/o state and 11 named but empty Stacks.)
-        
-         """
-        self.crd2OD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) #MOD 7.5.4
-        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
-        pass
-    #----------------------------------------------------------------------
-    @property
-    def isEmpty(self):
-        return len(self) == 0
-    @property
-    def fndCnt(self):
-        return sum([len(self.stkOD[nme]) for nme in FOUNDATIONS])
-    @property
-    def haveWon(self):
-        return  True if self.fndCnt ==  52 else False
-    def getTopsL(self, stk_typeStr=None):
-        """ RET: <list>  ( stkNme, topCrd) for stk types: FND | TBL or all stacks.
-        """
-        # NOTE: stk_typeStr ONLY uses stk_typeStr[0] against 'f' or 't'
-
-        x =  lambda stk: stk[-1] if stk else None
-        typ =    stk_typeStr and stk_typeStr[0].lower()
-        if typ ==  't':
-            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items()) if nme[0].lower()  ==  't']
-        elif  typ ==  'f':
-            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items()) if nme[0].lower()  ==  'f']
-        else:
-            tl =   [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
-        return tl
-            
-    def seeTops(self):
-        """ returns formated str of top 11 stacks."""
-        #x =  lambda stk: stk[-1] if stk else None
-        #t = [ (nme,  x(stk)) for nme,  stk in  list(self.stkOD.items())]
-        ret = 'Top-'
-        for top in  self.getTops():
-            if top[1]:
-                ret += "{0}:{1.suit}{1.valu}, ".format(top[0], top[1])
-            else:
-                ret +=  "{0}:--,".format(top[0], top[1])
-        return ret
-        
-    def move(self,  mov2, logger=None):  #MOD 7.5.4
-        """ faceUP Crd[s] >TO> StackNme:
-        CALLED from Hand.
- 
-        """
-       #
-       # the call  frm_stk.moveMyItem() handles the <dict> stkOD pop and push
-       # # snd updates the <dict> crd2OD via the passed function: updateItem_function().
-        
-        crd = mov2.crd
-        to_stk_nme =  mov2.stkNme
-        to_stk = self.stkOD[to_stk_nme]
-        to_stk_orig_top_crd = to_stk.top_item
-        frm_stk_nme =  self.crd2OD[crd].stkNme
-        frm_stk = self.stkOD[frm_stk_nme]
-        assert True
-        imsg = "\n<<[{}]-{}\n...[{}]-{}\n>>[{}]-{}".format( frm_stk_nme, frm_stk, frm_stk_nme,  crd, to_stk_nme,  to_stk )
-        
-        def updateItem_function( crd,  to_stk,  logger):
-            """ """
-            self.crd2OD[crd] = newStt(to_stk.name,  True,  crd)
-            if logger:
-                logger.info("**** moved {0}-[...] onto [{1}] ...  ****************".format(crd, to_stk_nme))                        
-                  
-        frm_stk.moveMyItems(crd, to_stk,  updateItem_function,  logger)  # >> crd now switched & newStt updated.
-        
-        imsg += "\n>>[{}]-{}".format(to_stk_nme,  to_stk )
-        if logger:
-            logger.info("**** moved {}-[{}] onto [{}] {}  ****************".format(crd, frm_stk_nme, to_stk_nme, to_stk_orig_top_crd))            
-            logger.debug(imsg)
-            logger.info(self.seeTops())
-        pass    
-    #----------------------------------------------------------------------
-    def populate(self,  newSttL):
-        """populate State using a <list> one or more newStts: newStt(stk_nme, fce, Crd)
-        """
-        for nxt in  newSttL:
-            crd = nxt.crd  
-            stk_nme = nxt.stkNme  
-            self.crd2OD[crd]  =   newStt( stk_nme, True, crd )  # all top cards are true.
-            self.stkOD[stk_nme].append(crd)  # append makes every new card the top MIGHT TRY Stack.moveMyItems()
-            pass
-          
-        
-    
-    #----------------------------------------------------------------------
 #-------------------------------------------------------------------------
-class newState(State):
-    """ move finding and executing to State.
+class State():
+    """ rS State: .move finding base class for various full and test States..
     """
     def __init__(self, shuffle=True):
-        State.__init__(self)
         self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
         self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) 
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
@@ -139,7 +49,7 @@ class newState(State):
         log_before_seeHeadsStr = self.seeHeads()
         log_movStr = ""
         while frmSlice:
-            toStk_curHead = toStk.top_item  # for log
+            toStk_curHead = toStk.head  # for log
             curCrd = frmSlice.pop(0)
             curSts = self.crdOD[curCrd]
             curStkNme =  curSts.stkNme
@@ -150,7 +60,7 @@ class newState(State):
             log_movStr += ("\n" +  "*" *  10 + "**** moved {curCrd}-[{curStkNme}] onto [{toStk_nme}]-{toStk_curHead}" +  "*"  * 10).format( ** locals())
             
         if not  frmStk.isEmpty:
-            curHead =  frmStk.top_item  ##REFACT??? method name ?
+            curHead =  frmStk.head  ##REFACT??? method name ?
             self.crdOD[curHead] = Status(curHead,  True,  toStk_nme)
             
         log_after_seeHeadsStr = self.seeHeads() 
@@ -161,19 +71,7 @@ class newState(State):
             logger.info(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
         pass
     
-    def test_move_newState(self):
-        """ improve monitoring of moves.
-        # UNDER TEST: move()
-        # NOT TESTING findMoves()
-        # EXPECTED GOOD 
-        >>> from h import *
-        >>> import state, stack
-        >>> logger = logging.getLogger('myI')      
-        >>> ##
-        >>>
-        """
-        pass
-    def findMoves(self):
+    def find_Moves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
         _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
@@ -250,10 +148,38 @@ class newState(State):
         return len(_movsL) > 0
     
     #----------------------------------------------------------------------
+    @property
+    def hasMoves(self):
+        d =  self.movesD
+        return (len(d['fnd']) + len(d['kng']) + len(d['sib']) ) == 0
+    @property
+    def fndCount(self):
+        """ """
+        d = self.stkOD
+        return (len(d['C']) + len(d['D']) + len(d['H']) + len(d['S']) )         
+    @property
+    def isWin(self):
+        return self.fndCount == 0
+    @property
+    def isStymied(self):
+        return  not  self.hasMoves
+    def test_State(self):
+        """ improve monitoring of moves.
+        # UNDER TEST: move()
+        # NOT TESTING find_Moves()
+        # EXPECTED GOOD 
+        >>> from h import *
+        >>> import state, stack
+        >>> logger = logging.getLogger('myI')      
+        >>> ##
+        >>>
+        """
+        pass
+    
     def getHeadsL(self, stk_typeStr=None):
         """ RET: <list>  ( topCrd, stkNme ) for stk types: FND | TBL or all stacks.
         """
-        # NOTE: the list return ORDER is reverse that of State.
+        # NOTE: the list return ORDER is reverse that of old State.
         # NOTE: stk_typeStr just uses stk_typeStr[0] against 'f' or 't'
 
         hdCrd =  lambda stk: stk[-1] if stk else None
@@ -268,98 +194,123 @@ class newState(State):
     def seeHeads(self):
         """ RET: formated str of  11 stack heads."""
         ret = 'Top-'
-        for top in  self.getTopsL():
-            if top[1]:
-                ret += "{0}:{1.suit}{1.valu}, ".format(top[0], top[1])
+        for head, stkNme in  self.getHeadsL():
+            if head:
+                ret += "{stkNme}:{head.suit}{head.valu}, ".format(** locals())
             else:
-                ret +=  "{0}:---,".format(top[0], top[1])
+                ret +=  "{stkNme}:---,".format(** locals())
         return ret
     
-            
-#-------------------------------------------------------------------------
-class newFullState(newState):
-    """ shuffled or sequenced rS state.  
-    """    
-    def __init__(self, shuffle=True):
-        newState.__init__(self)
-        #BUILD RUSSIAN SOLITAIRE STATE 
-        # 
-        def build_full(self, shuffle ):
-            """ loads each card Status in crdOD and appends cards to stkOD.
-            
-            """
-            STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
-                                          , 'T1':  1 * [False] + 5 * [True]
-                                          , 'T2': 2 * [False] + 5 * [True]
-                                          , 'T3': 3 * [False] + 5 * [True]
-                                          , 'T4': 4 * [False] + 5 * [True]
-                                          , 'T5': 5 * [False] + 5 * [True]
-                                          , 'T6': 6 * [False] + 5 * [UP]
-                                          ,  'S': [],  'H': [], 'D': [], 'C': []
-                                          }.items(), key=lambda t: t[0])) #{'T0':[True], 'T1':[False, True, True, True, True, True], ,,,}
-            VALUES.reverse()  # TO GET T6 with C-Ace on top.
-            crd52L = [Crd(s, v) for s in  SUITS for  v in  VALUES ]              
-            if shuffle: random.shuffle(crd52L)
-            crdG = (crd for  crd in  crd52L)
-            
-            # ****** now Glue or Move crds to stacks
-            for stk_nme,  fceL in STACK_FACE_DICT.items():
-                # NOTE: the length of each fceL determines the State:loc, fce, crd
-                for fce in  fceL:  #this is the pacer, the sync driver
-                    crd =  crdG.__next__() # want new_crd from crd52L
-                    #stk = self.stkOD[stk_nme]
-                    self.stkOD[stk_nme].PUSH(crd)  # want to stk.PUSH(new_crd)
-                    #new_stt =  newStt(stk_nme, fce, crd)  # build newStt
-                    self.crd2OD[crd] =  newStt(stk_nme, fce, crd)
-                    pass      
-            return  self
 
+#-------------------------------------------------------------------------
 class FullState(State):
     """ shuffled or sequenced rS state.  
-    """    
+    """
+    
     def __init__(self, shuffle=True):
         State.__init__(self)
         #BUILD RUSSIAN SOLITAIRE STATE 
-        # 
-        def build_full(self, shuffle ):
-            """ loads each card Status in crdOD and appends cards to stkOD.
-            
-            """
-            STACK_FACE_DICT = OrderedDict(sorted({'T0':[UP]
-                                          , 'T1': 1 * [False] + 5 * [True]
-                                          , 'T2': 2 * [False] + 5 * [True]
-                                          , 'T3': 3 * [False] + 5 * [True]
-                                          , 'T4': 4 * [False] + 5 * [True]
-                                          , 'T5': 5 * [False] + 5 * [True]
-                                          , 'T6': 6 * [False] + 5 * [UP]
-                                          ,  'S': [],  'H': [], 'D': [], 'C': []
-                                          }.items(), key=lambda t: t[0])) #{'T0':[True], 'T1':[False, True, True, True, True, True], ,,,}
-            VALUES.reverse()  # TO GET T6 with C-Ace on top.
-            crd52L = [Crd(s, v) for s in  SUITS for  v in  VALUES ]              
-            if shuffle: random.shuffle(crd52L)
-            crdG = (crd for  crd in  crd52L)
-            
-            # ****** now Glue or Move crds to stacks
-            for stk_nme,  fceL in STACK_FACE_DICT.items():
-                # NOTE: the length of each fceL determines the State:loc, fce, crd
-                for fce in  fceL:  #this is the pacer, the sync driver
-                    crd =  crdG.__next__() # want new_crd from crd52L
-                    #stk = self.stkOD[stk_nme]
-                    self.stkOD[stk_nme].PUSH(crd)  # want to stk.PUSH(new_crd)
-                    #new_stt =  newStt(stk_nme, fce, crd)  # build newStt
-                    self.crd2OD[crd] =  newStt(stk_nme, fce, crd)
-                    pass      
-            return  self
-    
-        #----------------------------------------------------------------------    
-        build_full(self,  shuffle)
-  
-class FullFoundations(State):
-    """ a WON state.     """
-    def __init__(self):
-        State.__init__(self)
-        self.populate([( newStt(nme, True, Crd(nme, i))) for i in range(1,14) for nme in SUITS])
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
         
+        # build crdOD
+        crd =  copy.copy(CARDS52L)
+        if shuffle: random.shuffle(crd)
+        #crd = CARDS52L
+        fce = FACES52L
+        stk = STAKES52L
+        cfs = list(zip(crd,  fce,  stk))
+        sts = [Status(crd,  fce, stk) for crd,  fce,  stk in  cfs]
+        d = OrderedDict(zip(crd, sts))  # used in stkOD
+        self.crdOD =  d
+        
+        # build stkOD
+        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
+        [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
+        pass
+
+            
+#-------------------------------------------------------------------------
+class TestStates(FullState):
+    """ a series of fixed states.
+    """
+    def __init__(self, shuffle=True):
+        """ direct from StateFull which for some reason isn't working. OR ts10.python carries the original state which confuses python."""
+        FullState.__init__(self, shuffle)
+        ##BUILD RUSSIAN SOLITAIRE STATE 
+    
+    #@property
+    #def ts10(self):
+        #with  open('ts10.pickle',  'rb') as f:
+            #_ts10 = pickle.load(f)
+        #return _ts10
+         
+    def getTS(self, stateNme,  shuffle=True):
+        if stateNme:            
+            pNme = stateNme + ".pickle"
+            try:
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                pass
+                return _ts
+            except IOError:
+                #self._makeTS(stateNme,  shuffle)
+                ateststate =  FullState(shuffle)
+                with  open(pNme, 'wb') as f:
+                    pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                return _ts
+
+#----------------------------------------------------------------------
+def getTS( stateNme,  shuffle=True):
+    if stateNme:            
+        pNme = stateNme + ".pickle"
+        try:
+            with  open(pNme,  'rb') as f:
+                _ts = pickle.load(f)
+            return  _ts
+        except IOError:
+            ateststate =  FullState(shuffle)
+            with  open(pNme,  'wb') as f:
+                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+            with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+            return _ts
+        
+                
+
+    
+
+def test_pickling(self):
+    """
+    >>> import os
+    >>> import state, pickle
+    >>> ##### are test states immutable???
+    >>> ### first and existing pickle file using Class Method getTS()
+    >>> ts = state.TestStates()
+    >>> ts10 = ts.getTS('ts10', False)
+    >>> ts10.crdOD[Crd('S', 13)]
+    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T0')
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
+    >>> ts10.crdOD[Crd('S', 13)] = sts
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    False
+    >>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> ### now a pickle file using module function getTS()
+    >>> ts2 = getTS('TEST', False)
+    >>> ts2.stkOD['T0'][0] == Crd(suit='S', valu=13)
+    True
+    >>> os.remove ('TEST.pickle')
+    
+    >>> #### test states are immutable !!!
+    >>>
+  
+    """
+      
 if __name__ == "__main__":
     import doctest
     logging.config.fileConfig('myConfig.conf') 
