@@ -1,5 +1,9 @@
-""" state.7.7.2.py 
+""" state_7.7.3.py 
 """
+#MOD _7.7.3
+# 120116
+## mod State properties ref moves and foundations.
+## using state.hasMoves property in Hand.play_Hand()
 #MOD _7.7.2
 # 120116 
 ##- now have class getTS() method constant states.

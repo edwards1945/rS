@@ -1,5 +1,5 @@
 #! /usr/bin/env python3.2
-#rS.7.7.2.py
+#rS_7.7.3.py
 
 #120107.10.00  in git created seeHeads and produced state.sttTops() to return a string of formated tops ( or I'm beginning to think of them as heads): T1:C05, T2:--, T3,H13
 

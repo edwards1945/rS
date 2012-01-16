@@ -1,4 +1,4 @@
-""" state.7.7.2.py 
+""" state_7.7.3.py 
 """
 import random
 from h import *
@@ -122,7 +122,7 @@ class State():
                     _mov = Move(_kngCrd,  mt_tblNme)
                     _movsL.append(_mov)                    
         if _movsL:
-           self.movesD['kng'] = _movsL
+            self.movesD['kng'] = _movsL
         return len(_movsL) > 0
     
     def fndMoves(self, _notEmpty_tblHeadsL):
@@ -149,20 +149,23 @@ class State():
     
     #----------------------------------------------------------------------
     @property
-    def hasMoves(self):
-        d =  self.movesD
-        return (len(d['fnd']) + len(d['kng']) + len(d['sib']) ) == 0
-    @property
     def fndCount(self):
         """ """
         d = self.stkOD
-        return (len(d['C']) + len(d['D']) + len(d['H']) + len(d['S']) )         
+        return (len(d['C']) + len(d['D']) + len(d['H']) + len(d['S']) )
     @property
     def isWin(self):
         return self.fndCount == 0
+    
+    def _movCount(self):
+        d =  self.movesD
+        return (len(d['fnd']) + len(d['kng']) + len(d['sib']) )
+    @property
+    def hasMoves(self):
+        return self._movCount() > 0
     @property
     def isStymied(self):
-        return  not  self.hasMoves
+        return  self._movCount() == 0
     def test_State(self):
         """ improve monitoring of moves.
         # UNDER TEST: move()
