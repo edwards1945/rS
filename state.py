@@ -200,20 +200,20 @@ class State():
                 ret +=  "{stkNme}:---,".format(** locals())
         return ret
     
-            
+
 #-------------------------------------------------------------------------
-class TestStates(State):
-    """ a series of fixed states.
+class FullState(State):
+    """ shuffled or sequenced rS state.  
     """
     def __init__(self, shuffle=True):
-        """ direct from StateFull which for some reason isn't working. OR ts10.python carries the original state which confuses python."""
         State.__init__(self)
         #BUILD RUSSIAN SOLITAIRE STATE 
         self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
         
         # build crdOD
-        if shuffle: random.shuffle(CARDS52L)
-        crd = CARDS52L
+        crd =  copy.copy(CARDS52L)
+        if shuffle: random.shuffle(crd)
+        #crd = CARDS52L
         fce = FACES52L
         stk = STAKES52L
         cfs = list(zip(crd,  fce,  stk))
@@ -225,13 +225,67 @@ class TestStates(State):
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
         [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
         pass
+
+            
+#-------------------------------------------------------------------------
+class TestStates(FullState):
+    """ a series of fixed states.
+    """
+    def __init__(self, shuffle=True):
+        """ direct from StateFull which for some reason isn't working. OR ts10.python carries the original state which confuses python."""
+        FullState.__init__(self, shuffle)
+        ##BUILD RUSSIAN SOLITAIRE STATE 
+        #self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
+        
+        ## build crdOD
+        #if shuffle: random.shuffle(CARDS52L)
+        #crd = CARDS52L
+        #fce = FACES52L
+        #stk = STAKES52L
+        #cfs = list(zip(crd,  fce,  stk))
+        #sts = [Status(crd,  fce, stk) for crd,  fce,  stk in  cfs]
+        #d = OrderedDict(zip(crd, sts))  # used in stkOD
+        #self.crdOD =  d
+        
+        ## build stkOD
+        #self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
+        #[self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
+        #pass
     
     #@property
     #def ts10(self):
-         #with  open('ts10.pickle',  'rb') as f:
-             #_ts10 = pickle.load(f)
-         #return _ts10
-     
+        #with  open('ts10.pickle',  'rb') as f:
+            #_ts10 = pickle.load(f)
+        #return _ts10
+         
+    def getTS(self, stateNme,  shuffle=True):
+        if stateNme:            
+            pNme = stateNme + ".pickle"
+            try:
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                pass
+                return _ts
+            except IOError:
+                self._makeTS(stateNme,  shuffle)
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                return _ts
+
+                    
+    def  _makeTS(self, stateNme,  shuffle=True):
+        """ creates a pickle file.
+        """
+        pNme = stateNme + ".pickle"
+        try:
+            open(pNme,  'rb') 
+            #fall thru and do nothing if it exists.
+        except IOError:     
+            ateststate =  FullState(shuffle)
+            with  open(pNme, 'wb') as f:
+                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+        pass   
+        
 #----------------------------------------------------------------------
 def getTS( stateNme):
     if stateNme:            
@@ -261,32 +315,6 @@ def  _makeTS(stateNme,  shuffle=True):
         with  open(pNme, 'wb') as f:
             pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
     pass   
-        
-        
-        
-class FullState(State):
-    """ shuffled or sequenced rS state.  
-    """
-    def __init__(self, shuffle=True):
-        State.__init__(self)
-        #BUILD RUSSIAN SOLITAIRE STATE 
-        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
-        
-        # build crdOD
-        if shuffle: random.shuffle(CARDS52L)
-        crd = CARDS52L
-        fce = FACES52L
-        stk = STAKES52L
-        cfs = list(zip(crd,  fce,  stk))
-        sts = [Status(crd,  fce, stk) for crd,  fce,  stk in  cfs]
-        d = OrderedDict(zip(crd, sts))  # used in stkOD
-        self.crdOD =  d
-        
-        # build stkOD
-        self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS])
-        [self.stkOD[sts.stkNme].append(crd)  for crd,  sts in  d.items()]  # populate stkOD
-        pass
-
 
 def test_pickling(self):
     """
@@ -294,7 +322,7 @@ def test_pickling(self):
     >>> ##### are test states immutable???
     >>> ### first and existing pickle file.
     >>> ts = state.TestStates()
-    >>> ts10 = getTS('ts10')
+    >>> ts10 = ts.getTS('ts10', False)
     >>> ts10.crdOD[Crd('S', 13)]
     Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T6')
     >>> ts10.crdOD[Crd('S', 13)].fce
@@ -307,11 +335,9 @@ def test_pickling(self):
     >>> ts10.crdOD[Crd('S', 13)].fce
     True
     >>> ### now a non-existing pickle file.
-    >>> ts = TestStates()
-    >>> ts2 = ts.ts2
-    Traceback (most recent call last):
-    ...
-    AttributeError: 'TestStates' object has no attribute 'ts2'
+    #>>> ts2 = ts.getTS('unshuffledTS', False)
+    #>>> ts2.stkOD['T0'][0]
+    
     >>> #### test states are immutable !!!
     >>>
   
