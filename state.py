@@ -242,14 +242,14 @@ def getTS( stateNme):
                 p = pickle.load(f)
             return  p
         except IOError:
-            makeTS(stateNme)
+            _makeTS(stateNme)
             with  open(pNme,  'rb') as f:
                 p = pickle.load(f)
             return p
                 
 
     
-def  makeTS(stateNme,  shuffle=True):
+def  _makeTS(stateNme,  shuffle=True):
     """ creates a pickle file.
     """
     pNme = stateNme + ".pickle"

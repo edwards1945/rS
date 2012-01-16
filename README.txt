@@ -1,6 +1,8 @@
 """ state.7.7.2.py 
 """
 #MOD _7.7.2
+# 120116 - State _makeTS and getTS() are module functions.
+## think I understand pickling a little better. really need makeTS since getTS calls it.
 # 120114 - rework  Hand, State, Stack fo State handling moves.
 ## add @propery:isFull to Stack; @property:isWin to State
 # 120113 - bypass run or create static TestStates for now; 
