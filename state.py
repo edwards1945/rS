@@ -162,7 +162,6 @@ class State():
     @property
     def isStymied(self):
         return  not  self.hasMoves
-    #----------------------------------------------------------------------
     def test_State(self):
         """ improve monitoring of moves.
         # UNDER TEST: move()
@@ -233,30 +232,35 @@ class TestStates(State):
              #_ts10 = pickle.load(f)
          #return _ts10
      
-    def getTS(self,  stateNme):
-        if stateNme:            
-            pNme = stateNme + ".pickle"
-            try:
-                with  open(pNme,  'rb') as f:
-                    self = pickle.load(f)
-            except IOError:
-                self.makeTS(stateNme)
-                with  open(pNme,  'rb') as f:
-                    self = pickle.load(f)
+#----------------------------------------------------------------------
+def getTS( stateNme):
+    if stateNme:            
+        pNme = stateNme + ".pickle"
+        p = TestStates()
+        try:
+            with  open(pNme,  'rb') as f:
+                p = pickle.load(f)
+            return  p
+        except IOError:
+            makeTS(stateNme)
+            with  open(pNme,  'rb') as f:
+                p = pickle.load(f)
+            return p
+                
 
     
-    def  makeTS(self,  stateNme,  shuffle=True):
-        """ creates a pickle file.
-        """
-        pNme = stateNme + ".pickle"
-        try:
-            open(pNme,  'rb') 
-            #assert False, "PickleFileExists"
-        except IOError:     
-            ateststate =  copy.deepcopy(self)
-            with  open(pNme, 'wb') as f:
-                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
-        pass   
+def  makeTS(stateNme,  shuffle=True):
+    """ creates a pickle file.
+    """
+    pNme = stateNme + ".pickle"
+    try:
+        open(pNme,  'rb') 
+        #fall thru and do nothing if it exists.
+    except IOError:     
+        ateststate =  TestStates(shuffle)
+        with  open(pNme, 'wb') as f:
+            pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
+    pass   
         
         
         
@@ -290,8 +294,7 @@ def test_pickling(self):
     >>> ##### are test states immutable???
     >>> ### first and existing pickle file.
     >>> ts = state.TestStates()
-    >>> ts10 = ts.makeTS('ts10')  # falls thru if it exists.
-    >>> ts10 = ts.getTS('ts10')
+    >>> ts10 = getTS('ts10')
     >>> ts10.crdOD[Crd('S', 13)]
     Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T6')
     >>> ts10.crdOD[Crd('S', 13)].fce
