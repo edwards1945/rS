@@ -43,13 +43,15 @@ class Hand:
             
         n = nCnt =  setCntr['nCnt']
         f = setCntr['fCnt']
+        fMean =  f / n
         dt = setCntr['msClk']
+        dtMean = dt / n
         w =  setCntr['winCnt']
         winMean = w / n  # mean
         std = calculate_std2(nCnt, winMean)
         setCntr['std'] =  std  # new
-        ret = "  **** {:2} WINS mean/std [{:.1%}/{:1.2}]  in {} HANDS; {} FndCnt @AVG:fnd:{:.1f} & AVG:ms:{:3.1f}.\n".format( w, std, w / n ,  n, f,  f / n,  dt / n )
-        if logger: logger.info(ret)
+        ret = "  **** {:2} WINS mean/std [{:.1%}/{:1.2}]  in {} HANDS; {} FndCnt @AVG:fnd:{:.1f} & AVG:ms:{:3.1f}.\n".format( w, winMean, std,  n, f,  fMean,  dtMean )
+        if logger: logger.warn(ret)
         return  setCntr
     
     def test_play_Hand(self,  state=None,  logger=None):
@@ -62,20 +64,19 @@ class Hand:
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         >>> logW = logging.getLogger('myW')
         >>> logI = logging.getLogger('myI')
+        >>> logI.info("#### now on play_Set ###############")
+        >>> th = hand.Hand('set')
+        >>> tCntr = th.play_Set(5, logW)
         
-        >>> logI.info("#### now add sibMoves() that Stymied")
-        >>> ts2 = state.getTS('ts2')
-        >>> th = hand.Hand(mystate = ts2, tag='1')
-        >>> tCntr = th.play_Hand(logger=logI)
+        #>>> logI.info("#### now add kngMoves() and t3 with 2 king moves ")
+        #>>> ts3 = state.getTS('ts3')
+        #>>> th = hand.Hand(mystate = ts3, tag='3')
+        #>>> tCntr = th.play_Hand(logger=logI)
         >>> 
-        >>> logW.warn( " #### first pure fndMoves() with sequenced TestState.")
-        >>> ts1 = state.getTS('ts1', False)
-        >>> th = hand.Hand(mystate = ts1, tag='1')
-        >>> tCntr = th.play_Hand(logger=logW)
-        >>> tCntr['winCnt'] == 1 and tCntr['fCnt'] == 52
-        True
 
-        """   
+        """
+        pass
+  
     def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         
@@ -105,27 +106,30 @@ class Hand:
                     logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 _state.move(movsL[0], logger)  # arbitary use [0]
                 pass
-                
-                
+                               
             if _state.sibMoves(_state.partial_tbl_HeadsL):  # do one, then look for fndMove
                 mCntr['s'] +=  1
                 movsL =  _state.movesD['sib']
                 if logger:
-                    logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                    logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
                 _state.move(movsL[0], logger)
-                continue  #bypasses kngMove
+                #continue  #bypasses kngMove
                 
-            #if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
-                #mCntr['k'] +=  1                                
-                #movsL = self.kngMovesL
-                #if logger:
-                    #logger.info("--kngMove.{} now sees {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))                    
-                #_state = self._do_best_kngMove(movsL,  logger)
+            if _state.kngMoves(_state.partial_tbl_HeadsL):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
+                mCntr['k'] +=  1                                
+                movsL = _state.movesD['kng']
+                if logger:
+                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
+                    for m in movsL: msg +=  "\n{}".format(m)
+                    logger.info(msg)                    
+                _state.move(movsL[0],  logger)
 
             ##refresh and try again:
             if _state.isWin or  _state.isStymied:
                 break
-            if stop['i'] >=  10:
+            if stop['i'] >=  75:
+                if logger:
+                    logger.warn('\nEXCEEDED STOP COUNT OF 75\n')
                 break
             pass 
         _has_mov = _state.find_Moves()
@@ -136,7 +140,7 @@ class Hand:
         hCntr['nCnt'] = 1
         
         if logger:
-            msg_hand = "  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *********".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
+            msg_hand = "  ***** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ****".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
             logger.warn(msg_hand)
             logger.info(_state.seeHeads())
         return hCntr

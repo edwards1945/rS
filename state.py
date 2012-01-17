@@ -58,7 +58,7 @@ class State():
             # let the stackMoveMyItems handle stk pops and pushes.
             frmStk.moveItem(curCrd, toStk, logger)  #NOTE requires Stack not name.
             
-            log_movStr += ("\n" +  "*" *  10 + "**** moved {curCrd}-[{curStkNme}] onto [{toStk_nme}]-{toStk_curHead}" +  "*"  * 10).format( ** locals())
+            log_movStr += ("\n" +  "*" *  10 + "**** moved {curCrd}-[{curStkNme}] onto [{toStk_nme}]-{toStk_curHead}" +  "*"  * 0).format( ** locals())
             
         if not  frmStk.isEmpty:
             curHead =  frmStk.head  ##REFACT??? method name ?
@@ -67,9 +67,9 @@ class State():
         log_after_seeHeadsStr = self.seeHeads() 
         
         if logger:
-            logger.info(log_before_seeHeadsStr)
-            logger.info(log_movStr )           
-            logger.info(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
+            logger.debug(log_before_seeHeadsStr)
+            logger.debug(log_movStr )           
+            logger.debug(log_after_seeHeadsStr + "\n")  #REFACT: may not want ending \n when I get to Hands & Sets
         pass
     
     def find_Moves(self):
@@ -146,7 +146,7 @@ class State():
                     and tblHead.suit == fndNme: 
                         _movsL.append(Move(tblHead,  fndNme))
         if _movsL:
-           self.movesD['fnd'] = _movsL
+            self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
     
     #----------------------------------------------------------------------

@@ -177,8 +177,6 @@ def test_sibMoves_State(self):
     True
     >>> st.movesD['sib'][1]  == Move(crd=Crd(suit='C', valu=5), stkNme='T4')
     True
-    >>> st.movesD['fnd'] == []
-    True
     >>> st.movesD['kng'] == []
     True
     

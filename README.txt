@@ -1,7 +1,14 @@
 """ state_7.7.3.py 
 """
 #MOD _7.7.3
+# 120117
+## Hand.play_Set() is working with corrected logging displays
+## Hand.play_Hand() is working with improved logging
+## State.move() improved logging.
 # 120116
+## changed logging: + easier to change; - ??
+## sibMoves() looks ok.
+## added stop counter while testing to prevent infinite loop in play_Hand while loop.
 ## mod State properties ref moves and foundations.
 ## using state.hasMoves property in Hand.play_Hand()
 #MOD _7.7.2

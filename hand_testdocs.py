@@ -4,6 +4,31 @@
 import logging
 import logging.config
 
+def test_play_Hand(self,  state=None,  logger=None):
+    """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+    >>> from h import *
+    >>> import logging
+    >>> import pickle
+    >>> import state
+    >>> import hand
+    >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
+    
+    >>> logW = logging.getLogger('myW')
+    >>> logI = logging.getLogger('myI')
+    >>> logI.info("#### now add sibMoves() that Stymied")
+    >>> ts2 = state.getTS('ts2')  # stymies
+    >>> th = hand.Hand(mystate = ts2, tag='1')
+    >>> tCntr = th.play_Hand(logger=logW)
+    >>> 
+    >>> logW.warn( " #### first pure fndMoves() with sequenced TestState.")
+    >>> ts1 = state.getTS('ts1', False)
+    >>> th = hand.Hand(mystate = ts1, tag='1')
+    >>> tCntr = th.play_Hand(logger=logW)
+    >>> tCntr['winCnt'] == 1 and tCntr['fCnt'] == 52
+    True
+
+    """
+    pass
 class testHand:
     def test_1_kngBranching():
         """ the begining of maxHands: picking the highest return.
