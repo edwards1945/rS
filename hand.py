@@ -60,11 +60,21 @@ class Hand:
         >>> import state
         >>> import hand
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
+        >>> logW = logging.getLogger('myW')
+        >>> logI = logging.getLogger('myI')
+        
+        >>> logI.info("#### now add sibMoves() that Stymied")
+        >>> ts2 = state.getTS('ts2')
+        >>> th = hand.Hand(mystate = ts2, tag='1')
+        >>> tCntr = th.play_Hand(logger=logI)
+        >>> 
+        >>> logW.warn( " #### first pure fndMoves() with sequenced TestState.")
         >>> ts1 = state.getTS('ts1', False)
         >>> th = hand.Hand(mystate = ts1, tag='1')
-        >>> logI = logging.getLogger('myW')
-        >>> tCntr = th.play_Hand(logger=logI)       
-            
+        >>> tCntr = th.play_Hand(logger=logW)
+        >>> tCntr['winCnt'] == 1 and tCntr['fCnt'] == 52
+        True
+
         """   
     def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
@@ -83,9 +93,11 @@ class Hand:
                 logger.info(_state.seeHeads())
         # NOTE: don't bother; force on pass and use indivual _state.xxxMoves() >> _state.find_Moves()
         _has_mov =  True
+        stop =  Counter(i=1)
         while _has_mov:
             if logger:
                 logger.info(_state.seeHeads())
+            stop['i'] +=  1
             while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
                 mCntr['f'] += 1
                 movsL =  _state.movesD['fnd']
@@ -95,13 +107,13 @@ class Hand:
                 pass
                 
                 
-            #if self.sibMove(state,  logger):  # do one, then look for fndMove
-                #mCntr['s'] +=  1
-                #movsL =  self.sibMovesL
-                #if logger:
-                    #logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                #_state.move(self.sibMovesL[0], logger)
-                #continue  #bypasses kngMove
+            if _state.sibMoves(_state.partial_tbl_HeadsL):  # do one, then look for fndMove
+                mCntr['s'] +=  1
+                movsL =  _state.movesD['sib']
+                if logger:
+                    logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                _state.move(movsL[0], logger)
+                continue  #bypasses kngMove
                 
             #if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
                 #mCntr['k'] +=  1                                
@@ -111,7 +123,9 @@ class Hand:
                 #_state = self._do_best_kngMove(movsL,  logger)
 
             ##refresh and try again:
-            if _state.isWin:
+            if _state.isWin or  _state.isStymied:
+                break
+            if stop['i'] >=  10:
                 break
             pass 
         _has_mov = _state.find_Moves()
