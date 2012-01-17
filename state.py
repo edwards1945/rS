@@ -39,7 +39,8 @@ class State():
         frmCrd = a_Move.crd
         frmSts =  self.crdOD[frmCrd]
         assert  frmSts.fce , " Move ERROR: face is DOWN in Status{}".format(frmSts)
-        frmStk = self.stkOD[frmSts.stkNme]
+        frmStk_nme = frmSts.stkNme
+        frmStk = self.stkOD[frmStk_nme]
         frmSlice = frmStk[frmStk.index(frmCrd):]
 
         toStk_nme =  a_Move.stkNme
@@ -61,7 +62,7 @@ class State():
             
         if not  frmStk.isEmpty:
             curHead =  frmStk.head  ##REFACT??? method name ?
-            self.crdOD[curHead] = Status(curHead,  True,  toStk_nme)
+            self.crdOD[curHead] = Status(curHead,  True,  frmStk_nme)
             
         log_after_seeHeadsStr = self.seeHeads() 
         
@@ -135,6 +136,7 @@ class State():
         _notEmpty_fndHeadsL =  [ (head, nme)  for head, nme in self.getHeadsL('FND') if head]
         _movsL = []
         del self.movesD['fnd'] [:]  
+
         for  tblHead, tblNme in _notEmpty_tblHeadsL:
             if tblHead.valu ==  1:  # Ace
                 _movsL.append( Move(tblHead, tblHead.suit) )      
@@ -142,7 +144,7 @@ class State():
                 for  fndHead, fndNme in _notEmpty_fndHeadsL:
                     if tblHead.valu == fndHead.valu + 1 \
                     and tblHead.suit == fndNme: 
-                        _movsL.append(Move(fndHead,  tblNme))
+                        _movsL.append(Move(tblHead,  fndNme))
         if _movsL:
            self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
@@ -155,7 +157,7 @@ class State():
         return (len(d['C']) + len(d['D']) + len(d['H']) + len(d['S']) )
     @property
     def isWin(self):
-        return self.fndCount == 0
+        return self.fndCount == 52
     
     def _movCount(self):
         d =  self.movesD
@@ -164,8 +166,23 @@ class State():
     def hasMoves(self):
         return self._movCount() > 0
     @property
+    def has_fndMove(self):
+        return len(self.movesD['fnd'])
+    @property
+    def has_kngMove(self):
+        return len(self.movesD['kng'])
+    @property
+    def has_sibMove(self):
+        return len(self.movesD['sib'])
+    @property
     def isStymied(self):
         return  self._movCount() == 0
+    @property
+    def partial_tbl_HeadsL(self):
+        """ used in finding xxxMoves()"""
+        return  [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
+    #----------------------------------------------------------------------
+    
     def test_State(self):
         """ improve monitoring of moves.
         # UNDER TEST: move()
@@ -190,7 +207,7 @@ class State():
         if typ ==  't':
             tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  't']
         elif  typ ==  'f':
-            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  ==  'f']
+            tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items()) if stkNme[0].lower()  !=  't']
         else:
             tl =   [ (hdCrd(stk),  stkNme) for stkNme,  stk in  list(self.stkOD.items())]
         return tl
