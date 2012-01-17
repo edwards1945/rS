@@ -1,6 +1,6 @@
-""" state_7.7.3.py 
+""" state_7.7.4.py 
 """
-#MOD _7.7.3
+#MOD _7.7.4
 # 120117
 ## hand module test() working; about same results.
 ## Hand.play_Set() is working with corrected logging displays
