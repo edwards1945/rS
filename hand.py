@@ -62,7 +62,7 @@ class Hand:
         >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
         >>> ts1 = state.getTS('ts1', False)
         >>> th = hand.Hand(mystate = ts1, tag='1')
-        >>> logI = logging.getLogger('myI')
+        >>> logI = logging.getLogger('myW')
         >>> tCntr = th.play_Hand(logger=logI)       
             
         """   
@@ -73,28 +73,34 @@ class Hand:
         """        
         if not logger:  logger = logging.getLogger('myW')
         if not state:
-            state = self.state
+            _state = self.state
         
         hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
-        msg_heads_before =  state.seeHeads()
-        while state.hasMoves:
+        
+        if logger:
+                logger.info(_state.seeHeads())
+        # NOTE: don't bother; force on pass and use indivual _state.xxxMoves() >> _state.find_Moves()
+        _has_mov =  True
+        while _has_mov:
             if logger:
-                logger.info(self.state.seeHeads())
-            #while self.fndMove(state,  logger):  #do a whole seq if possible.
-                #mCntr['f'] += 1
-                #movsL =  self.fndMovesL
-                #if logger:
-                    #logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                #self.state.move(self.fndMovesL[0], logger)
+                logger.info(_state.seeHeads())
+            while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
+                mCntr['f'] += 1
+                movsL =  _state.movesD['fnd']
+                if logger:
+                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                _state.move(movsL[0], logger)  # arbitary use [0]
+                pass
+                
                 
             #if self.sibMove(state,  logger):  # do one, then look for fndMove
                 #mCntr['s'] +=  1
                 #movsL =  self.sibMovesL
                 #if logger:
                     #logger.info("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                #self.state.move(self.sibMovesL[0], logger)
+                #_state.move(self.sibMovesL[0], logger)
                 #continue  #bypasses kngMove
                 
             #if self.kngMove(state,  logger):  #do at least one, maybe spawn a play_1_hand; then look for fndMove
@@ -102,26 +108,23 @@ class Hand:
                 #movsL = self.kngMovesL
                 #if logger:
                     #logger.info("--kngMove.{} now sees {} kngMoves:{}...".format(self.tag, len(movsL), movsL[:1]))                    
-                #self.state = self._do_best_kngMove(movsL,  logger)
+                #_state = self._do_best_kngMove(movsL,  logger)
 
             ##refresh and try again:
-            if self.state.isWin:
+            if _state.isWin:
                 break
-            pass # don't need now>> still_has_Movs = state.hasMoves
+            pass 
+        _has_mov = _state.find_Moves()
             
         hCntr['msClk'] = (clock() - startClk) *  1000
-        hCntr['winCnt'] = 1 if state.isWin else 0
-        #assert  mCntr['f'] ==  state.fndCnt
-        hCntr['fCnt'] = state.fndCount
+        hCntr['winCnt'] = 1 if _state.isWin else 0
+        hCntr['fCnt'] = _state.fndCount
         hCntr['nCnt'] = 1
         
         if logger:
-            msg_hand = "  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) ***************".format(  dict( hCntr) ,  dict(mCntr),  state.fndCount,  sum(mCntr.values()),  self.tag)
-            
-            msg_heads_after= state.seeHeads()
-            logger.info(msg_heads_before)
+            msg_hand = "  **** Hand.{4} finished:(f,n,w,ms)-({2:>2}, {0[nCnt]}, {0[winCnt]}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3}) *********".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
             logger.warn(msg_hand)
-            logger.info(msg_heads_after)
+            logger.info(_state.seeHeads())
         return hCntr
 
     #----------------------------------------------------------------------
