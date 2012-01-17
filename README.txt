@@ -2,6 +2,7 @@
 """
 #MOD _7.7.3
 # 120117
+## hand module test() working; about same results.
 ## Hand.play_Set() is working with corrected logging displays
 ## Hand.play_Hand() is working with improved logging
 ## State.move() improved logging.

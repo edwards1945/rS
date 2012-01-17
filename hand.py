@@ -54,29 +54,6 @@ class Hand:
         if logger: logger.warn(ret)
         return  setCntr
     
-    def test_play_Hand(self,  state=None,  logger=None):
-        """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        
-        >>> import logging
-        >>> import pickle
-        >>> import state
-        >>> import hand
-        >>> tCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0, std=0)
-        >>> logW = logging.getLogger('myW')
-        >>> logI = logging.getLogger('myI')
-        >>> logI.info("#### now on play_Set ###############")
-        >>> th = hand.Hand('set')
-        >>> tCntr = th.play_Set(5, logW)
-        
-        #>>> logI.info("#### now add kngMoves() and t3 with 2 king moves ")
-        #>>> ts3 = state.getTS('ts3')
-        #>>> th = hand.Hand(mystate = ts3, tag='3')
-        #>>> tCntr = th.play_Hand(logger=logI)
-        >>> 
-
-        """
-        pass
-  
     def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         
@@ -163,18 +140,21 @@ def test_snippet():
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.
     PRINTS summary stats.
+    
+    >>> x = hand.test()
     """    
-    s =  state.State()
+    s =  state.FullState()
     h =  Hand(s)
     
-    setCnt = 50
-    gmeCnt = 20
+    setCnt = 20
+    gmeCnt = 50
     
     tstCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
     f =  open('testPrintout.txt', mode='a')
     
+    logE = logging.getLogger('root')
     for i in range(gmeCnt):
-        tstCntr += h.play_Set(setCnt)
+        tstCntr += h.play_Set(setCnt,  logger=logE)
         
     n = tstCntr['nCnt']
     msg = ( "Test - {: .1%}/{:.1%} - {} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games/{} Hands.\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['winCnt'], tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
