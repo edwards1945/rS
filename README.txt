@@ -1,4 +1,4 @@
-""" state_7.7.4.py 
+""" state_7.7.5.py 
 """
 #MOD _7.7.4
 # 120118
@@ -48,7 +48,7 @@
 ## State.move logging improved.
 ## Stack.moveMyItems() trimmed
 
-# MOD 7.7 enhanced State
+
 # 120109
 # introduce namedtuple h.Status to replace newStt
 # introduced new namedtuple h.Move(Crd, fce, StkNme) :NEW ORDER.
