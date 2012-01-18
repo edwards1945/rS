@@ -1,6 +1,8 @@
 """ state_7.7.4.py 
 """
 #MOD _7.7.4
+# 120118
+## modife State.getTS() to accept folder name.
 ## developing Hand.branch_kngMoves() method.
 ## add State.pickleMyState() method to pickle and return current state
 ## changed Hand.fndMoves() to while / continue

@@ -96,6 +96,7 @@ class Hand:
                 mCntr['k'] +=  1                                
                 movsL = _state.movesD['kng']
                 if len(movsL) > 1:
+                    #_state.move(movsL[0],  logger)               
                     self.branch_kngMove(movsL,  logger)
                 else:
                     _state.move(movsL[0],  logger)
@@ -132,7 +133,7 @@ class Hand:
         for mov in movsL:
             if logger:
                 _tag = "{self.tag}.{i}  ".format( ** locals())
-                logger.warn("BASE" + _tag +  self.state.seeHeads())
+                logger.warn("BASE " + _tag +  self.state.seeHeads())
                 
             self.state.move(mov,  logger) 
             _tag = "{self.tag}.{i}".format( ** locals())
@@ -155,10 +156,17 @@ class Hand:
         >>> logW = logging.getLogger('myW')
         >>> logI = logging.getLogger('myI')
         >>> logI.info("#### now add kngMoves()  ")
-        >>> logI.info("#### ts4 State has ?? king moves  AND ??!")
-        >>> ts4 = state.getTS('ts4')
-        >>> th = hand.Hand(mystate = ts4, tag='ts4')
-        >>> tCntr = th.play_Hand(logger=logW)
+        
+        
+        #>>> logI.info("#### ts4 State has ?? king moves  AND ??!")
+        #>>> th = hand.Hand(tag='ts4')
+        #>>> ts4 = th.state.getTS('ts4','ts4')
+        #>>> tCntr = th.play_Hand(logger=logW)
+        
+        #>>> logI.info("#### ts5 State has ?? king moves  AND ??!")
+        #>>> ts5 = state.getTS('ts5', 'ts5')
+        #>>> th = hand.Hand(mystate = ts5, tag='ts5')
+        #>>> tCntr = th.play_Hand(logger=logW)
         
         #>>> logI.info("#### ts3 State has 1 king moves  AND wins!")
         #>>> ts3 = state.getTS('ts3')

@@ -148,25 +148,6 @@ class State():
         if _movsL:
             self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
-    
-    def getTS(self, stateNme,  shuffle=True):
-        """ retreives existing pickled state OR creates new one."""
-        if stateNme:            
-            pNme = "./dat/" + stateNme + ".pickle"
-            try:
-                with  open(pNme,  'rb') as f:
-                    _ts = pickle.load(f)
-                pass
-                return _ts
-            except IOError:
-                #self._makeTS(stateNme,  shuffle)
-                ateststate =  FullState(shuffle)
-                with  open(pNme, 'wb') as f:
-                    pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
-                with  open(pNme,  'rb') as f:
-                    _ts = pickle.load(f)
-                return _ts
-        #----------------------------------------------------------------------
     def pickleMyState(self, stateNme,  ):
         """ creates a deepcopy of self; names, pickles and RETURNS it."""
         pNme = stateNme + ".pickle"
@@ -209,7 +190,24 @@ class State():
         """ used in finding xxxMoves()"""
         return  [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
     #----------------------------------------------------------------------
-    
+    def getTS(self, file,  folder=None,  shuffle=True):
+        """ retreives existing pickled state OR creates new one."""
+        folder =  "./{folder}/" if folder else ""           
+        pNme = "{folder}{file!s}.pickle".format( ** locals())
+        try:
+            with  open(pNme,  'rb') as f:
+                _ts = pickle.load(f)
+            pass
+            return _ts
+        except IOError:
+            #self._makeTS(file,  shuffle)
+            ateststate =  FullState(shuffle)
+            with  open(pNme, 'wb') as f:
+                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
+            with  open(pNme,  'rb') as f:
+                _ts = pickle.load(f)
+            return _ts
+        #----------------------------------------------------------------------
     def test_State(self):
         """ improve monitoring of moves.
         # UNDER TEST: move()
@@ -292,22 +290,24 @@ class TestStates(FullState):
         #return _ts10
          
 #----------------------------------------------------------------------
-def getTS( stateNme,  shuffle=True):
-    if stateNme:            
-        pNme = stateNme + ".pickle"
-        try:
-            with  open(pNme,  'rb') as f:
-                _ts = pickle.load(f)
-            return  _ts
-        except IOError:
-            ateststate =  FullState(shuffle)
-            with  open(pNme,  'wb') as f:
-                pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)
-            with  open(pNme,  'rb') as f:
-                    _ts = pickle.load(f)
-            return _ts
-        
-                
+def getTS(file,  folder=None,  shuffle=True):
+    """ retreives existing pickled state OR creates new one."""
+    folder =  "./{folder}/" if folder else ""           
+    pNme = "{folder}{file!s}.pickle".format( ** locals())
+    try:
+        with  open(pNme,  'rb') as f:
+            _ts = pickle.load(f)
+        pass
+        return _ts
+    except IOError:
+        #self._makeTS(file,  shuffle)
+        ateststate =  FullState(shuffle)
+        with  open(pNme, 'wb') as f:
+            pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
+        with  open(pNme,  'rb') as f:
+            _ts = pickle.load(f)
+        return _ts
+    #----------------------------------------------------------------------
 
     
 
@@ -318,23 +318,24 @@ def test_pickling(self):
     >>> ##### are test states immutable???
     >>> ### first and existing pickle file using Class Method getTS()
     >>> ts = state.TestStates()
-    >>> ts10 = ts.getTS('ts10', False)
-    >>> ts10.crdOD[Crd('S', 13)]
-    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T0')
-    >>> ts10.crdOD[Crd('S', 13)].fce
-    True
-    >>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
-    >>> ts10.crdOD[Crd('S', 13)] = sts
-    >>> ts10.crdOD[Crd('S', 13)].fce
-    False
-    >>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
-    >>> ts10.crdOD[Crd('S', 13)].fce
-    True
-    >>> ### now a pickle file using module function getTS()
-    >>> ts2 = getTS('TEST', False)
-    >>> ts2.stkOD['T0'][0] == Crd(suit='S', valu=13)
-    True
-    >>> os.remove ('TEST.pickle')
+    
+    #>>> ts10 = ts.getTS('ts10', False)
+    #>>> ts10.crdOD[Crd('S', 13)]
+    #Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T0')
+    #>>> ts10.crdOD[Crd('S', 13)].fce
+    #True
+    #>>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
+    #>>> ts10.crdOD[Crd('S', 13)] = sts
+    #>>> ts10.crdOD[Crd('S', 13)].fce
+    #False
+    #>>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
+    #>>> ts10.crdOD[Crd('S', 13)].fce
+    #True
+    #>>> ### now a pickle file using module function getTS()
+    #>>> ts2 = getTS('TEST', False)
+    #>>> ts2.stkOD['T0'][0] == Crd(suit='S', valu=13)
+    #True
+    #>>> os.remove ('TEST.pickle')
     
     >>> #### test states are immutable !!!
     >>>
