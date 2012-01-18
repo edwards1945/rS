@@ -1,6 +1,10 @@
 """ state_7.7.4.py 
 """
 #MOD _7.7.4
+## developing Hand.branch_kngMoves() method.
+## add State.pickleMyState() method to pickle and return current state
+## changed Hand.fndMoves() to while / continue
+#MOD _7.7.3
 # 120117
 ## hand module test() working; about same results.
 ## Hand.play_Set() is working with corrected logging displays

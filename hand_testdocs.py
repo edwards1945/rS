@@ -3,9 +3,11 @@
 
 import logging
 import logging.config
-def test_play_Hand(self,  state=None,  logger=None):
+
+
+def test_play_Set(self,  state=None,  logger=None):
     """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-    
+    >>> from h import *    
     >>> import logging
     >>> import pickle
     >>> import state
@@ -16,17 +18,9 @@ def test_play_Hand(self,  state=None,  logger=None):
     >>> logI.info("#### now on play_Set ###############")
     >>> th = hand.Hand('set')
     >>> tCntr = th.play_Set(5, logW)
-    
-    >>> logI.info("#### now add kngMoves() and t3 with 2 king moves ")
-    >>> ts3 = state.getTS('ts3')
-    >>> th = hand.Hand(mystate = ts3, tag='3')
-    >>> tCntr = th.play_Hand(logger=logI)
-    >>> 
-
+    >>> #
     """
     pass
-
-
 
 def test_play_Hand(self,  state=None,  logger=None):
     """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)

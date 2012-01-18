@@ -149,6 +149,33 @@ class State():
             self.movesD['fnd'] = _movsL
         return len(_movsL) > 0
     
+    def getTS(self, stateNme,  shuffle=True):
+        """ retreives existing pickled state OR creates new one."""
+        if stateNme:            
+            pNme = "./dat/" + stateNme + ".pickle"
+            try:
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                pass
+                return _ts
+            except IOError:
+                #self._makeTS(stateNme,  shuffle)
+                ateststate =  FullState(shuffle)
+                with  open(pNme, 'wb') as f:
+                    pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
+                with  open(pNme,  'rb') as f:
+                    _ts = pickle.load(f)
+                return _ts
+        #----------------------------------------------------------------------
+    def pickleMyState(self, stateNme,  ):
+        """ creates a deepcopy of self; names, pickles and RETURNS it."""
+        pNme = stateNme + ".pickle"
+        with  open(pNme, 'wb') as f:
+            pickle.dump(self,  f,  pickle.HIGHEST_PROTOCOL) 
+        with  open(pNme,  'rb') as f:
+            _ts = pickle.load(f)
+        return _ts
+    
     #----------------------------------------------------------------------
     @property
     def fndCount(self):
@@ -264,23 +291,6 @@ class TestStates(FullState):
             #_ts10 = pickle.load(f)
         #return _ts10
          
-    def getTS(self, stateNme,  shuffle=True):
-        if stateNme:            
-            pNme = stateNme + ".pickle"
-            try:
-                with  open(pNme,  'rb') as f:
-                    _ts = pickle.load(f)
-                pass
-                return _ts
-            except IOError:
-                #self._makeTS(stateNme,  shuffle)
-                ateststate =  FullState(shuffle)
-                with  open(pNme, 'wb') as f:
-                    pickle.dump(ateststate,  f,  pickle.HIGHEST_PROTOCOL)                
-                with  open(pNme,  'rb') as f:
-                    _ts = pickle.load(f)
-                return _ts
-
 #----------------------------------------------------------------------
 def getTS( stateNme,  shuffle=True):
     if stateNme:            

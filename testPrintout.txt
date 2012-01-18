@@ -46,3 +46,10 @@ Test -  2.5%/0.4% - 10 WINS:AVG: 3.8 FndMovs in 6.8 ms  for 20 Games/20 Hands.
 Test -  2.2%/0.4% - 9 WINS:AVG: 3.8 FndMovs in 7.1 ms  for 20 Games/20 Hands.
 Test -  2.7%/0.5% - 27 WINS:AVG: 3.9 FndMovs in 6.9 ms  for 50 Games/20 Hands.
 Test -  2.8%/0.5% - 28 WINS:AVG: 3.8 FndMovs in 23.2ms  for 50 Games/20 Hands.
+Test -  3.1%/0.6% - 31 WINS:AVG: 4.1 FndMovs in 24.6ms  for 50 Games/20 Hands.
+Test -  2.7%/0.5% - 27 WINS:AVG: 3.7 FndMovs in 6.9 ms  for 50 Games/20 Hands.
+_7.7.4 added while /  continue to fndMoves()
+Test -  4.2%/0.7% - 42 WINS:AVG: 4.6 FndMovs in 7.2 ms  for 50 Games/20 Hands.
+Test -  3.3%/0.6% - 33 WINS:AVG: 4.3 FndMovs in 7.2 ms  for 50 Games/20 Hands.
+Test -  2.5%/0.5% - 25 WINS:AVG: 4.0 FndMovs in 6.9 ms  for 50 Games/20 Hands.
+Test -  3.8%/0.7% - 38 WINS:AVG: 4.6 FndMovs in 7.2 ms  for 50 Games/20 Hands.
