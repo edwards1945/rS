@@ -319,23 +319,21 @@ def test_pickling(self):
     >>> ### first and existing pickle file using Class Method getTS()
     >>> ts = state.TestStates()
     
-    #>>> ts10 = ts.getTS('ts10', False)
-    #>>> ts10.crdOD[Crd('S', 13)]
-    #Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T0')
-    #>>> ts10.crdOD[Crd('S', 13)].fce
-    #True
-    #>>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
-    #>>> ts10.crdOD[Crd('S', 13)] = sts
-    #>>> ts10.crdOD[Crd('S', 13)].fce
-    #False
-    #>>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
-    #>>> ts10.crdOD[Crd('S', 13)].fce
-    #True
-    #>>> ### now a pickle file using module function getTS()
-    #>>> ts2 = getTS('TEST', False)
-    #>>> ts2.stkOD['T0'][0] == Crd(suit='S', valu=13)
-    #True
-    #>>> os.remove ('TEST.pickle')
+    >>> ts10 = ts.getTS('ts10', False)
+    >>> ts10.crdOD[Crd('S', 13)]
+    Status(crd=Crd(suit='S', valu=13), fce=True, stkNme='T3')
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> sts = ts10.crdOD[Crd('S', 13)]._replace(fce=False)
+    >>> ts10.crdOD[Crd('S', 13)] = sts
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    False
+    >>> ts10 =ts.getTS('ts10')  # second call: ts10 back to original
+    >>> ts10.crdOD[Crd('S', 13)].fce
+    True
+    >>> ### now a pickle file using module function getTS()
+    >>> ts2 = getTS('TEST', False)
+    >>> os.remove ('TEST.pickle')
     
     >>> #### test states are immutable !!!
     >>>
