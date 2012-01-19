@@ -68,13 +68,13 @@ class Hand:
         startClk =  clock()
         
         if logger:
-                logger.info(_state.seeHeads())
-        # NOTE: don't bother; force on pass and use indivual _state.xxxMoves() >> _state.find_Moves()
-        _has_mov =  True
+            _top =  _state.seeHeads()
+            logger.warn('Beg:{0}-{1}'.format( self.tag, _top ))
         stop =  Counter(i=1)
+        _has_mov =  True
         while _has_mov:
-            if logger:
-                logger.info(_state.seeHeads())
+            #if logger:
+                #logger.info(_state.seeHeads())
             stop['i'] +=  1
             while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
                 mCntr['f'] += 1
@@ -84,7 +84,7 @@ class Hand:
                 _state.move(movsL[0], logger)  # arbitary use [0]
                 continue
                                
-            if _state.sibMoves(_state.partial_tbl_HeadsL):  # do one, then look for fndMove
+            if _state.sibMoves(_state.partial_tbl_HeadsL):  # do 1, then look other movs
                 mCntr['s'] +=  1
                 movsL =  _state.movesD['sib']
                 if logger:
@@ -95,22 +95,31 @@ class Hand:
             if _state.kngMoves(_state.partial_tbl_HeadsL):  #maybe branch and play all Hands; 
                 mCntr['k'] +=  1                                
                 movsL = _state.movesD['kng']
-                if len(movsL) > 1:
-                    #_state.move(movsL[0],  logger)               
-                    self.branch_kngMove(movsL,  logger)
-                else:
-                    _state.move(movsL[0],  logger)
                 if logger:
                     msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
                     for m in movsL:
                         msg +=  "\n{}".format(m)
                     logger.warn(msg)
+                    if len(movsL) > 1:
+                        logger.warn('End:{0}-{1}'.format( self.tag, _top))        
+                    
+                
+                #if len(movsL) > 1:
+                    #_state.move(movsL[0],  logger)               
+                    # and now leave this hand for good.
+                self.branch_kngMove(_state, movsL,  logger)
+                break  # the while _has_mov: loop.
+                #else:
+                    #_state.move(movsL[0],  logger)
             #end while _has_mov: loop
+            
             if _state.isWin or  _state.isStymied:
-                break
-            if stop['i'] >=  75:  # TESTING RESTRAINT ONLY
+                break  # the while _has_mov: loop.
+            
+            stopMax =  10
+            if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
                 if logger:
-                    logger.warn('\nEXCEEDED STOP COUNT OF 75\n')
+                    logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
                 break
             pass # TESTING
         _has_mov = _state.find_Moves()
@@ -121,30 +130,30 @@ class Hand:
         hCntr['nCnt'] = 1
         
         if logger:
-            msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})\n".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
-            
-            logger.warn(_state.seeHeads())
-            logger.warn(msg_hand)
+            msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
+            _top =  _state.seeHeads()
+            logger.warn('End:{0}-{1}'.format( self.tag, _top))
+            logger.warn(msg_hand+ "\n")
         return hCntr
-    #----------------------------------------------------------------------
-    def branch_kngMove(self,  movsL,  logger=None):
+#----------------------------------------------------------------------
+    def branch_kngMove(self,  _state, movsL,  logger=None):
         """ play all permutations of king move list: movsL"""
+        _top = _state.seeHeads()
         i = 0
         for mov in movsL:
-            if logger:
-                _tag = "{self.tag}.{i}  ".format( ** locals())
-                logger.warn("BASE " + _tag +  self.state.seeHeads())
-                
-            self.state.move(mov,  logger) 
+            _base_state = copy.deepcopy(_state)
+            _base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+            _tag = "{self.tag}.{i}  ".format( ** locals())
+            i += 1            
+            if logger:  # 
+                logger.warn("b@" + _tag +
+                            _base_state.seeHeads() + "\n")
+            _base_state.move(mov,  logger) 
             _tag = "{self.tag}.{i}".format( ** locals())
-            _state =  self.state.getTS(_tag)  #existing data.
-            #_state = self.state.pickleMyState(self.tag)
-            _h = hand.Hand(_state,  _tag)  #REFACT do I need to pickle???
-            _h.play_Hand(logger=logger)
-            i += 1
-            
+            _h = hand.Hand(_base_state,  _tag)  
+            _base_cntr = _h.play_Hand(logger=logger)
         
-    #----------------------------------------------------------------------
+        
     def test_play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         >>> from h import *       
@@ -158,15 +167,15 @@ class Hand:
         >>> logI.info("#### now add kngMoves()  ")
         
         
-        #>>> logI.info("#### ts4 State has ?? king moves  AND ??!")
-        #>>> th = hand.Hand(tag='ts4')
-        #>>> ts4 = th.state.getTS('ts4','ts4')
-        #>>> tCntr = th.play_Hand(logger=logW)
+        >>> logI.info("#### ts4 State has ?? king moves  AND ??!")
+        >>> ts4 = state.getTS(file='ts4')
+        >>> th = hand.Hand(ts4, tag='ts4')
+        >>> tCntr = th.play_Hand(logger=logW)
         
-        #>>> logI.info("#### ts5 State has ?? king moves  AND ??!")
-        #>>> ts5 = state.getTS('ts5', 'ts5')
+        #>>> logI.info("#### ts5 State has 4 king moves  AND 4 Stymies!")
+        #>>> ts5 = state.getTS(file='ts5', folder='ts5')
         #>>> th = hand.Hand(mystate = ts5, tag='ts5')
-        #>>> tCntr = th.play_Hand(logger=logW)
+        #>>> tCntr = th.play_Hand(logger=logI)
         
         #>>> logI.info("#### ts3 State has 1 king moves  AND wins!")
         #>>> ts3 = state.getTS('ts3')
@@ -175,6 +184,7 @@ class Hand:
         #>>> #    
         """
         pass
+    #----------------------------------------------------------------------
 def test_snippet():
     """ """
     ts =  state.TestStates(False)

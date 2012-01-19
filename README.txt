@@ -1,5 +1,7 @@
 """ state_7.7.5.py 
 """
+#MOD _7.7.5
+## working on logging to figure out what kingmoves() is doing.
 #MOD _7.7.4
 # 120118
 ## modife State.getTS() to accept folder name.

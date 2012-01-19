@@ -292,7 +292,7 @@ class TestStates(FullState):
 #----------------------------------------------------------------------
 def getTS(file,  folder=None,  shuffle=True):
     """ retreives existing pickled state OR creates new one."""
-    folder =  "./{folder}/" if folder else ""           
+    folder =  "./{folder}/".format( **locals()) if folder else ""           
     pNme = "{folder}{file!s}.pickle".format( ** locals())
     try:
         with  open(pNme,  'rb') as f:
