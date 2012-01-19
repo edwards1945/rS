@@ -1,8 +1,11 @@
-""" state_7.7.5.py 
+""" state_7.7.6.py 
 """
-#MOD _7.7.5
+# MOD 7.7.6 - moving bulk of play_Hand() to state.
+# 120119
+## move move decision making to state. With hopes to ease king branching.
+#MOD 7.7.5
 ## working on logging to figure out what kingmoves() is doing.
-#MOD _7.7.4
+#MOD 7.7.4
 # 120118
 ## modife State.getTS() to accept folder name.
 ## developing Hand.branch_kngMoves() method.

@@ -1,4 +1,4 @@
-#hand_7.7.5
+#hand_7.7.6
 #MOD 7.7 enhanced State
 
 from h import *
@@ -19,6 +19,9 @@ class Hand:
         logger = logging.getLogger('myW') #  myD, myI OR myW 
         self.state = mystate
         self._tag =  tag
+        self.hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        mCntr = Counter(f=0,  k=0,  s=0)
+        
         # REFACT remove these three aftr state enhances
         
     #----------------------------------------------------------------------
@@ -63,7 +66,7 @@ class Hand:
         if not state:
             _state = self.state
         
-        hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        self.hCntr.clear()  # = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
         mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
         
@@ -124,17 +127,17 @@ class Hand:
             pass # TESTING
         _has_mov = _state.find_Moves()
             
-        hCntr['msClk'] = (clock() - startClk) *  1000
-        hCntr['winCnt'] = 1 if _state.isWin else 0
-        hCntr['fCnt'] = _state.fndCount
-        hCntr['nCnt'] = 1
+        self.hCntr['msClk'] = (clock() - startClk) *  1000
+        self.hCntr['winCnt'] = 1 if _state.isWin else 0
+        self.hCntr['fCnt'] = _state.fndCount
+        self.hCntr['nCnt'] = 1
         
         if logger:
-            msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})".format(  dict( hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
+            msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})".format(  dict( self.hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
             _top =  _state.seeHeads()
             logger.warn('End:{0}-{1}'.format( self.tag, _top))
             logger.warn(msg_hand+ "\n")
-        return hCntr
+        return self.hCntr
 #----------------------------------------------------------------------
     def branch_kngMove(self,  _state, movsL,  logger=None):
         """ play all permutations of king move list: movsL"""

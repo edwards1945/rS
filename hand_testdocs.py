@@ -1,4 +1,4 @@
-#hand.testdocs_7.7.5.py
+#hand.testdocs_7.7.6.py
 #MOD 7.7 enhanced State
 
 import logging
