@@ -60,73 +60,79 @@ class Hand:
     def play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.
         
-        RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        RETURNS hCntr(  winCnt=0, nCnt=0, fCnt=0, msClk=0)
         """        
         if not logger:  logger = logging.getLogger('myW')
         if not state:
             _state = self.state
         
         self.hCntr.clear()  # = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        mCntr = Counter(f=0,  k=0,  s=0)
         startClk =  clock()
         
-        if logger:
-            _top =  _state.seeHeads()
-            logger.warn('Beg:{0}-{1}'.format( self.tag, _top ))
-        stop =  Counter(i=1)
-        _has_mov =  True
-        while _has_mov:
-            #if logger:
-                #logger.info(_state.seeHeads())
-            stop['i'] +=  1
-            while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
-                mCntr['f'] += 1
-                movsL =  _state.movesD['fnd']
-                if logger:
-                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
-                _state.move(movsL[0], logger)  # arbitary use [0]
-                continue
+        self.state.select_Moves()
+        
+        # BEGIN selectMoves()
+        
+        #mCntr = Counter(f=0,  k=0,  s=0)
+        #startClk =  clock()
+        #stop =  Counter(i=1)
+             
+        #if logger:
+            #_top =  _state.seeHeads()
+            #logger.warn('Beg:{0}-{1}'.format( self.tag, _top ))
+            
+        #_has_mov =  True
+        #while _has_mov:
+            #stop['i'] +=  1
+            #while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
+                #mCntr['f'] += 1
+                #movsL =  _state.movesD['fnd']
+                #if logger:
+                    #logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                #_state.move(movsL[0], logger)  # arbitary use [0]
+                #continue
                                
-            if _state.sibMoves(_state.partial_tbl_HeadsL):  # do 1, then look other movs
-                mCntr['s'] +=  1
-                movsL =  _state.movesD['sib']
-                if logger:
-                    logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
-                _state.move(movsL[0], logger)
-                #continue  #bypasses kngMove
+            #if _state.sibMoves(_state.partial_tbl_HeadsL):  # do 1, then look other movs
+                #mCntr['s'] +=  1
+                #movsL =  _state.movesD['sib']
+                #if logger:
+                    #logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
+                #_state.move(movsL[0], logger)
+                ##continue  #bypasses kngMove
                 
-            if _state.kngMoves(_state.partial_tbl_HeadsL):  #maybe branch and play all Hands; 
-                mCntr['k'] +=  1                                
-                movsL = _state.movesD['kng']
-                if logger:
-                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
-                    for m in movsL:
-                        msg +=  "\n{}".format(m)
-                    logger.warn(msg)
-                    if len(movsL) > 1:
-                        logger.warn('End:{0}-{1}'.format( self.tag, _top))        
+            #if _state.kngMoves(_state.partial_tbl_HeadsL):  #maybe branch and play all Hands; 
+                #mCntr['k'] +=  1                                
+                #movsL = _state.movesD['kng']
+                #if logger:
+                    #msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
+                    #for m in movsL:
+                        #msg +=  "\n{}".format(m)
+                    #logger.warn(msg)
+                    #if len(movsL) > 1:
+                        #logger.warn('End:{0}-{1}'.format( self.tag, _top))        
                     
                 
-                #if len(movsL) > 1:
-                    #_state.move(movsL[0],  logger)               
-                    # and now leave this hand for good.
-                self.branch_kngMove(_state, movsL,  logger)
-                break  # the while _has_mov: loop.
-                #else:
-                    #_state.move(movsL[0],  logger)
-            #end while _has_mov: loop
+                ##if len(movsL) > 1:
+                    ##_state.move(movsL[0],  logger)               
+                    ## and now leave this hand for good.
+                #self.branch_kngMove(_state, movsL,  logger)
+                #break  # the while _has_mov: loop.
+                ##else:
+                    ##_state.move(movsL[0],  logger)
+            ##end while _has_mov: loop
             
-            if _state.isWin or  _state.isStymied:
-                break  # the while _has_mov: loop.
+            #if _state.isWin or  _state.isStymied:
+                #break  # the while _has_mov: loop.
             
-            stopMax =  10
-            if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
-                if logger:
-                    logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
-                break
-            pass # TESTING
-        _has_mov = _state.find_Moves()
-            
+            #stopMax =  10
+            #if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
+                #if logger:
+                    #logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
+                #break
+            #pass # TESTING
+        #_has_mov = _state.find_Moves()
+        
+        #WRAPUP     
         self.hCntr['msClk'] = (clock() - startClk) *  1000
         self.hCntr['winCnt'] = 1 if _state.isWin else 0
         self.hCntr['fCnt'] = _state.fndCount
@@ -139,23 +145,6 @@ class Hand:
             logger.warn(msg_hand+ "\n")
         return self.hCntr
 #----------------------------------------------------------------------
-    def branch_kngMove(self,  _state, movsL,  logger=None):
-        """ play all permutations of king move list: movsL"""
-        _top = _state.seeHeads()
-        i = 0
-        for mov in movsL:
-            _base_state = copy.deepcopy(_state)
-            _base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-            _tag = "{self.tag}.{i}  ".format( ** locals())
-            i += 1            
-            if logger:  # 
-                logger.warn("b@" + _tag +
-                            _base_state.seeHeads() + "\n")
-            _base_state.move(mov,  logger) 
-            _tag = "{self.tag}.{i}".format( ** locals())
-            _h = hand.Hand(_base_state,  _tag)  
-            _base_cntr = _h.play_Hand(logger=logger)
-        
         
     def test_play_Hand(self,  state=None,  logger=None):
         """ EXECUTES foundation, king and sibling Moves until no more moves: stymied or Won.  RETURNS hCntr(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)

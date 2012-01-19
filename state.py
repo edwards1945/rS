@@ -12,7 +12,7 @@ import logging.config
 #############################################
 #-------------------------------------------------------------------------
 class State():
-    """ rS State: .move finding base class for various full and test States..
+    """ rS State: .move activities base class for various full and test States..
     """
     def __init__(self, shuffle=True):
         self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
@@ -81,6 +81,87 @@ class State():
         hasMoves = self.sibMoves(_notEmpty_tblHeadsL)  or hasMoves
         return hasMoves
     
+    #----------------------------------------------------------------------
+    def select_Moves(self,  logger=None):
+        """ chooses and executes moves.  The strategy is included in whiles and loops.
+        """
+        # INIT 
+        mCntr = Counter(f=0,  k=0,  s=0)
+        stop =  Counter(i=1)
+        
+        _top =  self.seeHeads()
+        if logger:
+            logger.warn('Beg:{0}-{1}'.format( self.tag, _top ))
+            
+        _has_mov =  True  # for sure one pass
+        while _has_mov:
+            stop['i'] +=  1  #TESTING Cntr
+            while self.fndMoves(self.partial_tbl_HeadsL):  #do a whole seq if possible.
+                mCntr['f'] += 1
+                movsL =  self.movesD['fnd']
+                if logger:
+                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                self.move(movsL[0], logger)  # arbitary use [0]
+                continue
+                               
+            if self.sibMoves(self.partial_tbl_HeadsL):  # do 1, then look other movs
+                mCntr['s'] +=  1
+                movsL =  self.movesD['sib']
+                if logger:
+                    logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
+                self.move(movsL[0], logger)
+                #continue  #bypasses kngMove
+                
+            if self.kngMoves(self.partial_tbl_HeadsL):  #maybe branch and play all Hands; 
+                mCntr['k'] +=  1                                
+                movsL = self.movesD['kng']
+                if logger:
+                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
+                    for m in movsL:
+                        msg +=  "\n{}".format(m)
+                    logger.warn(msg)
+                    if len(movsL) > 1:
+                        logger.warn('End:{0}-{1}'.format( self.tag, _top))        
+                    
+                
+                #if len(movsL) > 1:
+                    #self.move(movsL[0],  logger)               
+                    # and now leave this hand for good.
+                self.branch_kngMove(_state, movsL,  logger)
+                break  # the while _has_mov: loop.
+                #else:
+                    #self.move(movsL[0],  logger)
+            #end while _has_mov: loop
+            
+            if self.isWin or  self.isStymied:
+                break  # the while _has_mov: loop.
+            
+            stopMax =  10
+            if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
+                if logger:
+                    logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
+                break
+            pass # TESTING
+        _has_mov = self.find_Moves()
+
+    def branch_kngMove(self,  _state, movsL,  logger=None):
+        """ play all permutations of king move list: movsL"""
+        _top = self.seeHeads()
+        i = 0
+        for mov in movsL:
+            _base_state = copy.deepcopy(_state)
+            _base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+            _tag = "{self.tag}.{i}  ".format( ** locals())
+            i += 1            
+            if logger:  # 
+                logger.warn("b@" + _tag +
+                            _baseself.seeHeads() + "\n")
+            _baseself.move(mov,  logger) 
+            _tag = "{self.tag}.{i}".format( ** locals())
+            _h = hand.Hand(_base_state,  _tag)  
+            _base_cntr = _h.play_Hand(logger=logger)
+        
+
     def sibMoves(self, _notEmpty_tblHeadsL):
         """SETS self.sibMovesL &&  RETURNS True if there are moves.
         
