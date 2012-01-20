@@ -15,7 +15,7 @@ class State():
     """ rS State: .move activities base class for various full and test States..
     """
     def __init__(self, shuffle=True):
-        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  # NEW 7.7
+        self.movesD = {'fnd': list(), 'kng': list(),  'sib': list()}  
         self.crdOD = OrderedDict([(Crd(s, v), None) for s in  SUITS for  v in  VALUES ] ) 
         self.stkOD =  OrderedDict( [(nme, stack.Stack(nme)) for nme in  STACKS]) 
 
@@ -75,32 +75,32 @@ class State():
     def find_Moves(self):
         """ rebuilds fnd.., kng..., sibMoves. RET: at least one move.
         """
-        _notEmpty_tblHeadsL = [ (head, nme)  for head, nme in self.getHeadsL('TBL') if head]
+        _notEmpty_tblHeadsL = self.partial_tbl_HeadsL
+        # NOTE: one call vs 4: maybe better
         hasMoves = self.fndMoves(_notEmpty_tblHeadsL) 
         hasMoves = self.kngMoves(_notEmpty_tblHeadsL)  or hasMoves
         hasMoves = self.sibMoves(_notEmpty_tblHeadsL)  or hasMoves
-        return hasMoves
-    
+        return hasMoves 
     #----------------------------------------------------------------------
-    def select_Moves(self,  logger=None):
+    def select_Moves(self,  _hand, logger=None):
         """ chooses and executes moves.  The strategy is included in whiles and loops.
         """
         # INIT 
         mCntr = Counter(f=0,  k=0,  s=0)
         stop =  Counter(i=1)
-        
         _top =  self.seeHeads()
         if logger:
-            logger.warn('Beg:{0}-{1}'.format( self.tag, _top ))
+            logger.info('Beg:{0}-{1}'.format( _hand.tag, _top ))
             
         _has_mov =  True  # for sure one pass
+        # MAIN
         while _has_mov:
             stop['i'] +=  1  #TESTING Cntr
             while self.fndMoves(self.partial_tbl_HeadsL):  #do a whole seq if possible.
                 mCntr['f'] += 1
                 movsL =  self.movesD['fnd']
                 if logger:
-                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(_hand.tag, len(movsL), movsL[:2]))
                 self.move(movsL[0], logger)  # arbitary use [0]
                 continue
                                
@@ -108,61 +108,74 @@ class State():
                 mCntr['s'] +=  1
                 movsL =  self.movesD['sib']
                 if logger:
-                    logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
+                    logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(_hand.tag, len(movsL), movsL[:1]))
                 self.move(movsL[0], logger)
                 #continue  #bypasses kngMove
                 
-            if self.kngMoves(self.partial_tbl_HeadsL):  #maybe branch and play all Hands; 
+            if self.kngMoves(self.partial_tbl_HeadsL):  ###one for sure; maybe branch and play all Hands; 
                 mCntr['k'] +=  1                                
                 movsL = self.movesD['kng']
                 if logger:
-                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
+                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  _hand.tag,  len(movsL))
                     for m in movsL:
                         msg +=  "\n{}".format(m)
                     logger.warn(msg)
-                    if len(movsL) > 1:
-                        logger.warn('End:{0}-{1}'.format( self.tag, _top))        
-                    
-                
-                #if len(movsL) > 1:
-                    #self.move(movsL[0],  logger)               
-                    # and now leave this hand for good.
-                self.branch_kngMove(_state, movsL,  logger)
-                break  # the while _has_mov: loop.
-                #else:
-                    #self.move(movsL[0],  logger)
+                                   
+                self.branch_kngMove(_hand, movsL,  logger)
+                break  # the while _has_mov: loop. could fall thru but this is more obvious.
             #end while _has_mov: loop
             
+            # EXIT 
             if self.isWin or  self.isStymied:
+                if logger:
+                    _top =  self.seeHeads()                   
+                    logger.info('End:{0}-{1}'.format( _hand.tag, _top))  
                 break  # the while _has_mov: loop.
-            
-            stopMax =  10
+            #TESTING EXIT
+            stopMax =  20
             if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
                 if logger:
                     logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
                 break
-            pass # TESTING
+            # FOR DEBUG
+            pass 
         _has_mov = self.find_Moves()
 
-    def branch_kngMove(self,  _state, movsL,  logger=None):
-        """ play all permutations of king move list: movsL"""
-        _top = self.seeHeads()
-        i = 0
-        for mov in movsL:
-            _base_state = copy.deepcopy(_state)
-            _base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-            _tag = "{self.tag}.{i}  ".format( ** locals())
+    def branch_kngMove(self,  _hand, movsL,  logger=None):
+        """ play all permutations of king move list: movsL.
+        expect at least one mov.
+        """
+        #
+        i = 1
+        _base_heads = self.seeHeads()
+        _base_state = copy.deepcopy(self)
+        _base_tag = _hand.tag
+        #_base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)  #CHANGE TO ATTRIBUTE
+        #_base_cntr = self.cntr
+        # 
+        #if logger: 
+            #logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _base_heads ))
+        #self.move(movsL[0], logger)
+        #_new_cntr = _hand.play_Hand(self, logger=logger)
+        # fall thru if other moves.
+        for mov in movsL[:-1]:
+            # there are more moves
             i += 1            
-            if logger:  # 
-                logger.warn("b@" + _tag +
-                            _baseself.seeHeads() + "\n")
-            _baseself.move(mov,  logger) 
-            _tag = "{self.tag}.{i}".format( ** locals())
-            _h = hand.Hand(_base_state,  _tag)  
-            _base_cntr = _h.play_Hand(logger=logger)
-        
-
-    def sibMoves(self, _notEmpty_tblHeadsL):
+            _new_tag = "{_base_tag}.{i}  ".format( ** locals())
+            _new_state =  copy.deepcopy(_base_state)  
+            _new_state.move(mov,  logger)
+            _new_state_heads = _new_state.seeHeads()
+            _hand.tag = "{_hand.tag}.{i}".format( ** locals())
+            _hand.tag = _new_tag  #TESTING
+            if logger: 
+                logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _new_state_heads ))
+            _new_cntr = _hand.play_Hand(_new_state, logger=logger)
+            pass
+        # move and pass back to original state
+        #self.tag = "{_hand.tag}.{i}".format( ** locals())
+        _base_state.move(movsL[-1], logger)
+        pass
+    def sibMoves(self, partial_tbl_HeadsL):
         """SETS self.sibMovesL &&  RETURNS True if there are moves.
         
         - faceUP, buried or not, sib_crd in tableau
@@ -171,7 +184,7 @@ class State():
         """
         _movsL = []
         del self.movesD['sib'] [:]  
-        for   tbl_headCrd, tbl_stkNme in  _notEmpty_tblHeadsL:
+        for   tbl_headCrd, tbl_stkNme in  partial_tbl_HeadsL:
             if tbl_headCrd.valu > 1:    #not Ace head card         
                 _sibCrd =  Crd(tbl_headCrd.suit,  tbl_headCrd.valu - 1)  
                 _sibSts =  self.crdOD[_sibCrd]
@@ -186,7 +199,7 @@ class State():
            self.movesD['sib'] = _movsL
         return len(_movsL) > 0
     
-    def kngMoves(self, _notEmpty_tblHeadsL):
+    def kngMoves(self, partial_tbl_HeadsL):
         """SETS self.kngMovesL &&  RETURNS True if there are moves
         
         - king Crd IsFaceUp, in a tableau, and not its first card.
@@ -199,7 +212,7 @@ class State():
                 _kngSts = self.crdOD[_kngCrd]
                 if _kngSts \
                 and _kngSts.fce \
-                and _kngSts.stkNme in [(stkNme) for crd, stkNme in _notEmpty_tblHeadsL]\
+                and _kngSts.stkNme in [(stkNme) for crd, stkNme in partial_tbl_HeadsL]\
                 and self.stkOD[_kngSts.stkNme].index(_kngCrd) > 0:
                     _mov = Move(_kngCrd,  mt_tblNme)
                     _movsL.append(_mov)                    
@@ -207,7 +220,7 @@ class State():
             self.movesD['kng'] = _movsL
         return len(_movsL) > 0
     
-    def fndMoves(self, _notEmpty_tblHeadsL):
+    def fndMoves(self, partial_tbl_HeadsL):
         """SETS movesD['fnd']  and RET True if there were moves.
                
             -  head_crd in notEmpty tableau
@@ -218,7 +231,7 @@ class State():
         _movsL = []
         del self.movesD['fnd'] [:]  
 
-        for  tblHead, tblNme in _notEmpty_tblHeadsL:
+        for  tblHead, tblNme in partial_tbl_HeadsL:
             if tblHead.valu ==  1:  # Ace
                 _movsL.append( Move(tblHead, tblHead.suit) )      
             else:
