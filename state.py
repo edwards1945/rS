@@ -141,40 +141,40 @@ class State():
             pass 
         _has_mov = self.find_Moves()
 
-    def branch_kngMove(self,  _hand, movsL,  logger=None):
-        """ play all permutations of king move list: movsL.
-        expect at least one mov.
-        """
-        #
-        i = 1
-        _base_heads = self.seeHeads()
-        _base_state = copy.deepcopy(self)
-        _base_tag = _hand.tag
-        #_base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)  #CHANGE TO ATTRIBUTE
-        #_base_cntr = self.cntr
-        # 
-        #if logger: 
-            #logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _base_heads ))
-        #self.move(movsL[0], logger)
-        #_new_cntr = _hand.play_Hand(self, logger=logger)
-        # fall thru if other moves.
-        for mov in movsL[:-1]:
-            # there are more moves
-            i += 1            
-            _new_tag = "{_base_tag}.{i}  ".format( ** locals())
-            _new_state =  copy.deepcopy(_base_state)  
-            _new_state.move(mov,  logger)
-            _new_state_heads = _new_state.seeHeads()
-            _hand.tag = "{_hand.tag}.{i}".format( ** locals())
-            _hand.tag = _new_tag  #TESTING
-            if logger: 
-                logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _new_state_heads ))
-            _new_cntr = _hand.play_Hand(_new_state, logger=logger)
-            pass
-        # move and pass back to original state
-        #self.tag = "{_hand.tag}.{i}".format( ** locals())
-        _base_state.move(movsL[-1], logger)
-        pass
+    #def branch_kngMove(self,  _hand, movsL,  logger=None):
+        #""" play all permutations of king move list: movsL.
+        #expect at least one mov.
+        #"""
+        ##
+        #i = 1
+        #_base_heads = self.seeHeads()
+        #_base_state = copy.deepcopy(self)
+        #_base_tag = _hand.tag
+        ##_base_cntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)  #CHANGE TO ATTRIBUTE
+        ##_base_cntr = self.cntr
+        ## 
+        ##if logger: 
+            ##logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _base_heads ))
+        ##self.move(movsL[0], logger)
+        ##_new_cntr = _hand.play_Hand(self, logger=logger)
+        ## fall thru if other moves.
+        #for mov in movsL[:-1]:
+            ## there are more moves
+            #i += 1            
+            #_new_tag = "{_base_tag}.{i}  ".format( ** locals())
+            #_new_state =  copy.deepcopy(_base_state)  
+            #_new_state.move(mov,  logger)  # MAIN OP
+            #_new_state_heads = _new_state.seeHeads()
+            #_hand.tag = "{_hand.tag}.{i}".format( ** locals())
+            #_hand.tag = _new_tag  #TESTING
+            #if logger: 
+                #logger.warn("\n===newbeg@{}:{}".format( _hand.tag,      _new_state_heads ))
+            ##_new_cntr = _hand.play_Hand(_new_state, logger=logger)
+            #pass
+        ## move and pass back to original state
+        ##self.tag = "{_hand.tag}.{i}".format( ** locals())
+        #_base_state.move(movsL[-1], logger)
+        #pass
     def sibMoves(self, partial_tbl_HeadsL):
         """SETS self.sibMovesL &&  RETURNS True if there are moves.
         
