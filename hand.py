@@ -19,7 +19,7 @@ class Hand:
         self.state = mystate
         self._tag =  tag
         self.hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
-        mCntr = Counter(f=0,  k=0,  s=0)
+        self.mCntr = Counter(f=0,  k=0,  s=0)
         
         # REFACT remove these three aftr state enhances
         
@@ -69,7 +69,7 @@ class Hand:
         startClk =  clock()
         if logger:            
             _top =  _state.seeHeads()
-            logger.warn('Beg:{0}:{1}'.format( self.tag, _top))
+            logger.info('Beg:{0}:{1}'.format( self.tag, _top))
         
         self.select_Moves(_state,  logger)
         
@@ -78,16 +78,14 @@ class Hand:
         win = self.hCntr['winCnt'] = 1 if _state.isWin else 0
         fnd = self.hCntr['fCnt'] = _state.fndCount
         n = self.hCntr['nCnt'] = 1
-        tag = self.tag
         
-        if logger:
-            msg_hand = "  **** Hand.{tag} finished:(w,n,f,ms)-({win}, {n:>2}, {fnd:2}, {clk:3.2f})".format(  ** locals())
+        if logger:  # Hand & Movs
             _top =  _state.seeHeads()
-
-            #msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})".format(  dict( self.hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
+            msg_hand = "  **** Hand.{self.tag} finished:(w,n,f,ms)-({win}, {n:>2}, {fnd:2}, {clk:3.2f})".format(  ** locals())
+            msg_movs = ": Movs:{0}".format( dict(self.mCntr))
             #_top =  _state.seeHeads()
-            logger.warn('End:{0}:{1}'.format( self.tag, _top))
-            logger.warn(msg_hand+ "\n")
+            logger.info('End:{0}:{1}'.format( self.tag, _top))
+            logger.info(msg_hand+ msg_movs + "\n")
         return self.hCntr
 #----------------------------------------------------------------------
         
@@ -95,26 +93,26 @@ class Hand:
         """ chooses and executes moves.  The strategy is included in whiles and loops.
         """
         # INIT 
-        mCntr = Counter(f=0,  k=0,  s=0)
+        #mCntr = Counter(f=0,  k=0,  s=0)
         stop =  Counter(i=1)
         _top =  _state.seeHeads()
         if logger:
-            logger.info('Beg:{0}:{1}'.format( self.tag, _top ))
+            logger.debug('Beg:{0}:{1}'.format( self.tag, _top ))
             
         _has_mov =  True  # for sure one pass
         # MAIN
         while _has_mov:
             stop['i'] +=  1  #TESTING Cntr
             while _state.fndMoves(_state.partial_tbl_HeadsL):  #do a whole seq if possible.
-                mCntr['f'] += 1
+                self.mCntr['f'] += 1
                 movsL =  _state.movesD['fnd']
                 if logger:
-                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
+                    logger.debug("--fndMove.{} now sees {} fndMoves:{}...".format(self.tag, len(movsL), movsL[:2]))
                 _state.move(movsL[0], logger)  # arbitary use [0]
                 continue
                                
             if _state.sibMoves(_state.partial_tbl_HeadsL):  # do 1, then look other movs
-                mCntr['s'] +=  1
+                self.mCntr['s'] +=  1
                 movsL =  _state.movesD['sib']
                 if logger:
                     logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(self.tag, len(movsL), movsL[:1]))
@@ -122,13 +120,13 @@ class Hand:
                 #continue  #bypasses kngMove
                 
             if _state.kngMoves(_state.partial_tbl_HeadsL):  ###one for sure; maybe branch and play all Hands; 
-                mCntr['k'] +=  1                                
+                self.mCntr['k'] +=  1                                
                 movsL = _state.movesD['kng']
                 if logger:
                     msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
                     for m in movsL:
                         msg +=  "\n.................................{}".format(m)
-                    logger.warn(msg)
+                    logger.info(msg)
                     
                 # TESTING _state.move(movsL[0], logger)
                 self.branch_kngMove(_state, movsL,  logger)
@@ -139,7 +137,7 @@ class Hand:
             if _state.isWin or  _state.isStymied:
                 if logger:
                     _top =  _state.seeHeads()                   
-                    logger.info('End:{0}:{1}'.format( self.tag, _top))  
+                    logger.debug('End:{0}:{1}'.format( self.tag, _top))  
                 break  # the while _has_mov: loop.
             #TESTING EXIT
             stopMax =  20
@@ -164,7 +162,7 @@ class Hand:
             _new_state_heads = _new_state.seeHeads()
             # create Hand
             if logger: 
-                logger.warn("\n==============newbeg@{_new_state_tag}:{_new_state_heads}".format( **locals()))            
+                logger.info("\n===========newbeg@{_new_state_tag}:{_new_state_heads}".format( **locals()))            
             _new_hand = hand.Hand(_new_state, _new_state_tag)
             _new_hand.play_Hand(logger=logger)
             
@@ -177,7 +175,7 @@ class Hand:
         self_heads = _state.seeHeads()
         
         if logger: 
-                logger.warn("\n==============newbeg@{self.tag}:{self_heads}".format( **locals()))
+                logger.info("\n===========newbeg@{self.tag}:{self_heads}".format( **locals()))
        
         pass
     
@@ -221,7 +219,7 @@ def test_snippet():
     # ONE HAND:
     t1.state =  t1.state.getTS('t_3kng')
     t1.tag = 't3'  #NOTE local name still t1; tag only changed.
-    t1.play_Hand(logger=logW)
+    t1.play_Hand(logger=logI)
     ## change tag and state
     #t1.tag = 't2'  #NOTE local name still t1; tag only changed.
     #t1.state =  t1.state.getTS('t_1fnd_sibs')
