@@ -1,5 +1,4 @@
-#hand.testdocs_7.7.6.py
-#MOD 7.7 enhanced State
+#hand.testdocs_7.7.5.py
 
 import logging
 import logging.config
@@ -34,12 +33,12 @@ def test_play_Hand(self,  state=None,  logger=None):
     >>> logW = logging.getLogger('myW')
     >>> logI = logging.getLogger('myI')
     >>> logI.info("#### now add sibMoves() that Stymied")
-    >>> ts2 = state.getTS('ts2')  # stymies
+    >>> ts2 = state.getTS('t_sibOnly')  # stymies
     >>> th = hand.Hand(mystate = ts2, tag='1')
     >>> tCntr = th.play_Hand(logger=logW)
     >>> 
     >>> logW.warn( " #### first pure fndMoves() with sequenced TestState.")
-    >>> ts1 = state.getTS('ts1', False)
+    >>> ts1 = state.getTS('t_52fnd', False)
     >>> th = hand.Hand(mystate = ts1, tag='1')
     >>> tCntr = th.play_Hand(logger=logW)
     >>> tCntr['winCnt'] == 1 and tCntr['fCnt'] == 52

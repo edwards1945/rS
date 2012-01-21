@@ -1,5 +1,9 @@
-""" state_7.7.6.py 
+""" state_7.7.5.py 
 """
+# MOD 7.7.5
+# 1120121
+## now need move count passed thru to branches.
+## worked out hand branching for kngMoves()
 # MOD 7.7.6 - moving bulk of play_Hand() to state.
 # 120119
 ## move move decision making to state. With hopes to ease king branching.

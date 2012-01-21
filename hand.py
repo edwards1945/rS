@@ -1,5 +1,4 @@
-#hand_7.7.6
-#MOD 7.7 enhanced State
+#hand_7.7.5
 
 from h import *
 from  time import  clock  
@@ -70,7 +69,7 @@ class Hand:
         startClk =  clock()
         if logger:            
             _top =  _state.seeHeads()
-            logger.warn('Beg:{0}-{1}'.format( self.tag, _top))
+            logger.warn('Beg:{0}:{1}'.format( self.tag, _top))
         
         self.select_Moves(_state,  logger)
         
@@ -87,7 +86,7 @@ class Hand:
 
             #msg_hand = "  **** Hand.{4} finished:(w,n,f,ms)-({0[winCnt]}, {0[nCnt]}, {2:>2}, {0[msClk]:3.2f}): Moves(N,f,k,s)-({3}, {1[f]:2}, {1[k]:2}, {1[s]:3})".format(  dict( self.hCntr) ,  dict(mCntr),  _state.fndCount,  sum(mCntr.values()),  self.tag)
             #_top =  _state.seeHeads()
-            logger.warn('End:{0}-{1}'.format( self.tag, _top))
+            logger.warn('End:{0}:{1}'.format( self.tag, _top))
             logger.warn(msg_hand+ "\n")
         return self.hCntr
 #----------------------------------------------------------------------
@@ -100,7 +99,7 @@ class Hand:
         stop =  Counter(i=1)
         _top =  _state.seeHeads()
         if logger:
-            logger.info('Beg:{0}-{1}'.format( self.tag, _top ))
+            logger.info('Beg:{0}:{1}'.format( self.tag, _top ))
             
         _has_mov =  True  # for sure one pass
         # MAIN
@@ -140,7 +139,7 @@ class Hand:
             if _state.isWin or  _state.isStymied:
                 if logger:
                     _top =  _state.seeHeads()                   
-                    logger.info('End:{0}-{1}'.format( self.tag, _top))  
+                    logger.info('End:{0}:{1}'.format( self.tag, _top))  
                 break  # the while _has_mov: loop.
             #TESTING EXIT
             stopMax =  20
@@ -153,32 +152,33 @@ class Hand:
         _has_mov = _state.find_Moves()
         
     def branch_kngMove(self, _state, movsL,  logger=None):
-        """ play all permutations of king move list: movsL.
+        """ play all permutations of king moves list: movsL.
         expect at least one mov.
         """
         #
-        i = 1
-        _base_heads = _state.seeHeads()
-        _base_state = copy.deepcopy(_state)
-        _base_tag = self.tag
-
-        for mov in movsL[:-1]:
-            # there are more than one move;
-            # change this hands state and make move
-            i += 1            
-            _new_tag = "{_base_tag}.{i}  ".format( ** locals())
-            _new_state =  copy.deepcopy(_base_state)  
+        i = len(movsL) - 1
+        for mov in movsL[:-1]:#  more than one move;
+            _new_state =  copy.deepcopy(_state)  
+            _new_state_tag = "{self.tag}.{i}".format( ** locals())
             _new_state.move(mov,  logger)  # MAIN OP
             _new_state_heads = _new_state.seeHeads()
-            self.state = _new_state  # MAIN OP
-            self.tag = "{self.tag}.{i}".format( ** locals())
-            self.tag = _new_tag  #TESTING
+            # create Hand
             if logger: 
-                logger.warn("\n===newbeg@{}:{}".format( self.tag,      _new_state_heads ))
+                logger.warn("\n==============newbeg@{_new_state_tag}:{_new_state_heads}".format( **locals()))            
+            _new_hand = hand.Hand(_new_state, _new_state_tag)
+            _new_hand.play_Hand(logger=logger)
+            
+            i -= 1            
             pass
         # move and pass back to original state
-        #self.tag = "{_hand.tag}.{i}".format( ** locals())
-        _base_state.move(movsL[-1], logger)
+        
+        self.tag = "{self.tag}".format( ** locals())
+        _state.move(movsL[-1], logger)  # MAIN OP
+        self_heads = _state.seeHeads()
+        
+        if logger: 
+                logger.warn("\n==============newbeg@{self.tag}:{self_heads}".format( **locals()))
+       
         pass
     
     def test_play_Hand(self,  state=None,  logger=None):

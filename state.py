@@ -1,4 +1,4 @@
-""" state_7.7.6.py 
+""" state_7.7.5.py 
 """
 import random
 from h import *
@@ -90,7 +90,7 @@ class State():
         #stop =  Counter(i=1)
         #_top =  self.seeHeads()
         #if logger:
-            #logger.info('Beg:{0}-{1}'.format( _hand.tag, _top ))
+            #logger.info('Beg:{0}:{1}'.format( _hand.tag, _top ))
             
         #_has_mov =  True  # for sure one pass
         ## MAIN
@@ -129,7 +129,7 @@ class State():
             #if self.isWin or  self.isStymied:
                 #if logger:
                     #_top =  self.seeHeads()                   
-                    #logger.info('End:{0}-{1}'.format( _hand.tag, _top))  
+                    #logger.info('End:{0}:{1}'.format( _hand.tag, _top))  
                 #break  # the while _has_mov: loop.
             ##TESTING EXIT
             #stopMax =  20
@@ -332,12 +332,12 @@ class State():
         return tl
     def seeHeads(self):
         """ RET: formated str of  11 stack heads."""
-        ret = 'Top-'
+        ret = '^'
         for head, stkNme in  self.getHeadsL():
             if head:
-                ret += "{stkNme}:{head.suit}{head.valu}, ".format(** locals())
+                ret += "{stkNme}:{head.suit}{head.valu:2}, ".format(** locals())
             else:
-                ret +=  "{stkNme}:---,".format(** locals())
+                ret +=  "{stkNme}:--, ".format(** locals())
         return ret
     
 
