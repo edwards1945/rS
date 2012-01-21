@@ -128,7 +128,7 @@ class Hand:
                 if logger:
                     msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  self.tag,  len(movsL))
                     for m in movsL:
-                        msg +=  "\nxxxxxxxxxxxx {}".format(m)
+                        msg +=  "\n.................................{}".format(m)
                     logger.warn(msg)
                     
                 # TESTING _state.move(movsL[0], logger)
@@ -152,7 +152,7 @@ class Hand:
             pass 
         _has_mov = _state.find_Moves()
         
-    def branch_kngMove(self,  _state, movsL,  logger=None):
+    def branch_kngMove(self, _state, movsL,  logger=None):
         """ play all permutations of king move list: movsL.
         expect at least one mov.
         """
@@ -163,14 +163,16 @@ class Hand:
         _base_tag = self.tag
 
         for mov in movsL[:-1]:
-            # there are more than one moves
+            # there are more than one move;
+            # change this hands state and make move
             i += 1            
             _new_tag = "{_base_tag}.{i}  ".format( ** locals())
             _new_state =  copy.deepcopy(_base_state)  
             _new_state.move(mov,  logger)  # MAIN OP
             _new_state_heads = _new_state.seeHeads()
-            _hand.tag = "{_hand.tag}.{i}".format( ** locals())
-            _hand.tag = _new_tag  #TESTING
+            self.state = _new_state  # MAIN OP
+            self.tag = "{self.tag}.{i}".format( ** locals())
+            self.tag = _new_tag  #TESTING
             if logger: 
                 logger.warn("\n===newbeg@{}:{}".format( self.tag,      _new_state_heads ))
             pass
@@ -219,14 +221,14 @@ def test_snippet():
     # ONE HAND:
     t1.state =  t1.state.getTS('t_3kng')
     t1.tag = 't3'  #NOTE local name still t1; tag only changed.
-    t1.play_Hand(logger=logD)
-    # change tag and state
-    t1.tag = 't2'  #NOTE local name still t1; tag only changed.
-    t1.state =  t1.state.getTS('t_1fnd_sibs')
     t1.play_Hand(logger=logW)
-    t1.state =  t1.state.getTS('t_52fnd')
-    t1.tag = 't1'  #NOTE local name still t1; tag only changed.
-    t1.play_Hand(logger=logW)
+    ## change tag and state
+    #t1.tag = 't2'  #NOTE local name still t1; tag only changed.
+    #t1.state =  t1.state.getTS('t_1fnd_sibs')
+    #t1.play_Hand(logger=logW)
+    #t1.state =  t1.state.getTS('t_52fnd')
+    #t1.tag = 't1'  #NOTE local name still t1; tag only changed.
+    #t1.play_Hand(logger=logW)
     
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.

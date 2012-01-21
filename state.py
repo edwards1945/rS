@@ -82,64 +82,64 @@ class State():
         hasMoves = self.sibMoves(_notEmpty_tblHeadsL)  or hasMoves
         return hasMoves 
     #----------------------------------------------------------------------
-    def select_Moves(self,  _hand, logger=None):
-        """ chooses and executes moves.  The strategy is included in whiles and loops.
-        """
-        # INIT 
-        mCntr = Counter(f=0,  k=0,  s=0)
-        stop =  Counter(i=1)
-        _top =  self.seeHeads()
-        if logger:
-            logger.info('Beg:{0}-{1}'.format( _hand.tag, _top ))
+    #def select_Moves(self,  _hand, logger=None):
+        #""" chooses and executes moves.  The strategy is included in whiles and loops.
+        #"""
+        ## INIT 
+        #mCntr = Counter(f=0,  k=0,  s=0)
+        #stop =  Counter(i=1)
+        #_top =  self.seeHeads()
+        #if logger:
+            #logger.info('Beg:{0}-{1}'.format( _hand.tag, _top ))
             
-        _has_mov =  True  # for sure one pass
-        # MAIN
-        while _has_mov:
-            stop['i'] +=  1  #TESTING Cntr
-            while self.fndMoves(self.partial_tbl_HeadsL):  #do a whole seq if possible.
-                mCntr['f'] += 1
-                movsL =  self.movesD['fnd']
-                if logger:
-                    logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(_hand.tag, len(movsL), movsL[:2]))
-                self.move(movsL[0], logger)  # arbitary use [0]
-                continue
+        #_has_mov =  True  # for sure one pass
+        ## MAIN
+        #while _has_mov:
+            #stop['i'] +=  1  #TESTING Cntr
+            #while self.fndMoves(self.partial_tbl_HeadsL):  #do a whole seq if possible.
+                #mCntr['f'] += 1
+                #movsL =  self.movesD['fnd']
+                #if logger:
+                    #logger.info("--fndMove.{} now sees {} fndMoves:{}...".format(_hand.tag, len(movsL), movsL[:2]))
+                #self.move(movsL[0], logger)  # arbitary use [0]
+                #continue
                                
-            if self.sibMoves(self.partial_tbl_HeadsL):  # do 1, then look other movs
-                mCntr['s'] +=  1
-                movsL =  self.movesD['sib']
-                if logger:
-                    logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(_hand.tag, len(movsL), movsL[:1]))
-                self.move(movsL[0], logger)
-                #continue  #bypasses kngMove
+            #if self.sibMoves(self.partial_tbl_HeadsL):  # do 1, then look other movs
+                #mCntr['s'] +=  1
+                #movsL =  self.movesD['sib']
+                #if logger:
+                    #logger.debug("--sibMove.{} now sees {} sibMoves:{}...".format(_hand.tag, len(movsL), movsL[:1]))
+                #self.move(movsL[0], logger)
+                ##continue  #bypasses kngMove
                 
-            if self.kngMoves(self.partial_tbl_HeadsL):  ###one for sure; maybe branch and play all Hands; 
-                mCntr['k'] +=  1                                
-                movsL = self.movesD['kng']
-                if logger:
-                    msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  _hand.tag,  len(movsL))
-                    for m in movsL:
-                        msg +=  "\n{}".format(m)
-                    logger.warn(msg)
+            #if self.kngMoves(self.partial_tbl_HeadsL):  ###one for sure; maybe branch and play all Hands; 
+                #mCntr['k'] +=  1                                
+                #movsL = self.movesD['kng']
+                #if logger:
+                    #msg = "==== kngMove.{0} now sees {1} kngMoves:".format(  _hand.tag,  len(movsL))
+                    #for m in movsL:
+                        #msg +=  "\n{}".format(m)
+                    #logger.warn(msg)
                                    
-                self.branch_kngMove(_hand, movsL,  logger)
-                break  # the while _has_mov: loop. could fall thru but this is more obvious.
-            #end while _has_mov: loop
+                #self.branch_kngMove(_hand, movsL,  logger)
+                #break  # the while _has_mov: loop. could fall thru but this is more obvious.
+            ##end while _has_mov: loop
             
-            # EXIT 
-            if self.isWin or  self.isStymied:
-                if logger:
-                    _top =  self.seeHeads()                   
-                    logger.info('End:{0}-{1}'.format( _hand.tag, _top))  
-                break  # the while _has_mov: loop.
-            #TESTING EXIT
-            stopMax =  20
-            if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
-                if logger:
-                    logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
-                break
-            # FOR DEBUG
-            pass 
-        _has_mov = self.find_Moves()
+            ## EXIT 
+            #if self.isWin or  self.isStymied:
+                #if logger:
+                    #_top =  self.seeHeads()                   
+                    #logger.info('End:{0}-{1}'.format( _hand.tag, _top))  
+                #break  # the while _has_mov: loop.
+            ##TESTING EXIT
+            #stopMax =  20
+            #if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
+                #if logger:
+                    #logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
+                #break
+            ## FOR DEBUG
+            #pass 
+        #_has_mov = self.find_Moves()
 
     #def branch_kngMove(self,  _hand, movsL,  logger=None):
         #""" play all permutations of king move list: movsL.
