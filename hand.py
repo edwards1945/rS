@@ -153,29 +153,40 @@ class Hand:
         """ play all permutations of king moves list: movsL.
         expect at least one mov.
         """
-        #
-        i = len(movsL) - 1
-        for mov in movsL[:-1]:#  more than one move;
+        i = len(movsL)
+        accum_mCntr = Counter(f=0,  k=0,  s=0)
+        accum_hCntr = Counter( fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
+        for mov in movsL:#  more than one move;
             _new_state =  copy.deepcopy(_state)  
-            _new_state_tag = "{self.tag}.{i}".format( ** locals())
             _new_state.move(mov,  logger)  # MAIN OP
             _new_state_heads = _new_state.seeHeads()
             # create Hand
+            _new_hand_tag = "{self.tag}.{i}".format( ** locals())
             if logger: 
-                logger.info("\n===========newbeg@{_new_state_tag}:{_new_state_heads}".format( **locals()))            
-            _new_hand = hand.Hand(_new_state, _new_state_tag)
+                logger.info("\n===========newbeg@{_new_hand_tag}:{_new_state_heads}".format( **locals()))
+            #              
+            _new_hand = hand.Hand(_new_state, _new_hand_tag)
+            # pickup existing moves
+            _new_hand.mCntr =  copy.copy(self.mCntr) 
+            _new_hand.hCntr =  copy.copy(self.hCntr) 
             _new_hand.play_Hand(logger=logger)
+            # _hand finished
+            #self.hCntr += _new_hand.hCntr
+            accum_mCntr += _new_hand.mCntr
+            accum_hCntr += _new_hand.hCntr
             
             i -= 1            
             pass
-        # move and pass back to original state
         
-        self.tag = "{self.tag}".format( ** locals())
-        _state.move(movsL[-1], logger)  # MAIN OP
-        self_heads = _state.seeHeads()
+        ## move last mov and return to original hand.
+        self.mCntr = accum_mCntr
+        self.hCntr = accum_hCntr
+        #self.tag = "{self.tag}".format( ** locals())
+        ##_state.move(movsL[-1], logger)  # MAIN OP
+        #self_heads = _state.seeHeads()
         
-        if logger: 
-                logger.info("\n===========newbeg@{self.tag}:{self_heads}".format( **locals()))
+        #if logger: 
+                #logger.info("\n===========newbeg@{self.tag}:{self_heads}".format( **locals()))
        
         pass
     
