@@ -52,6 +52,7 @@ class Hand:
         winMean = w / n  # mean
         std = calculate_std2(nCnt, winMean)
         setCntr['std'] =  std  # new
+        
         ret = "  **** {:2} WINS mean/std [{:.1%}/{:1.2}]  in {} HANDS; {} FndCnt @AVG:fnd:{:.1f} & AVG:ms:{:3.1f}.\n".format( w, winMean, std,  n, f,  fMean,  dtMean )
         if logger: logger.warn(ret)
         return  setCntr
@@ -74,10 +75,14 @@ class Hand:
         self.select_Moves(_state,  logger)
         
         #WRAPUP     
-        clk = self.hCntr['msClk'] = (clock() - startClk) *  1000
-        win = self.hCntr['winCnt'] = 1 if _state.isWin else 0
-        fnd = self.hCntr['fCnt'] = _state.fndCount
-        n = self.hCntr['nCnt'] = 1
+        self.hCntr['msClk'] += (clock() - startClk) *  1000
+        self.hCntr['winCnt'] += 1 if _state.isWin else 0
+        self.hCntr['fCnt'] += _state.fndCount
+        self.hCntr['nCnt'] += 1
+        clk = self.hCntr['msClk'] 
+        win = self.hCntr['winCnt'] 
+        fnd = self.hCntr['fCnt']
+        n = self.hCntr['nCnt'] 
         
         if logger:  # Hand & Movs
             _top =  _state.seeHeads()
@@ -140,10 +145,10 @@ class Hand:
                     logger.debug('End:{0}:{1}'.format( self.tag, _top))  
                 break  # the while _has_mov: loop.
             #TESTING EXIT
-            stopMax =  20
+            stopMax =  40
             if stop['i'] >=  stopMax:  # TESTING RESTRAINT ONLY
                 if logger:
-                    logger.warn('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
+                    logger.error('\nEXCEEDED STOP COUNT OF {0}\n'.format(stopMax))
                 break
             # FOR DEBUG
             pass 
@@ -167,8 +172,8 @@ class Hand:
             #              
             _new_hand = hand.Hand(_new_state, _new_hand_tag)
             # pickup existing moves
-            _new_hand.mCntr =  copy.copy(self.mCntr) 
-            _new_hand.hCntr =  copy.copy(self.hCntr) 
+            #_new_hand.mCntr =  copy.copy(self.mCntr) 
+            #_new_hand.hCntr =  copy.copy(self.hCntr) 
             _new_hand.play_Hand(logger=logger)
             # _hand finished
             #self.hCntr += _new_hand.hCntr
@@ -231,13 +236,13 @@ def test_snippet():
     t1.state =  t1.state.getTS('t_3kng')
     t1.tag = 't3'  #NOTE local name still t1; tag only changed.
     t1.play_Hand(logger=logI)
-    ## change tag and state
-    #t1.tag = 't2'  #NOTE local name still t1; tag only changed.
-    #t1.state =  t1.state.getTS('t_1fnd_sibs')
-    #t1.play_Hand(logger=logW)
-    #t1.state =  t1.state.getTS('t_52fnd')
-    #t1.tag = 't1'  #NOTE local name still t1; tag only changed.
-    #t1.play_Hand(logger=logW)
+    # change tag and state
+    t1.tag = 't2'  #NOTE local name still t1; tag only changed.
+    t1.state =  t1.state.getTS('t_1fnd_sibs')
+    t1.play_Hand(logger=logI)
+    t1.state =  t1.state.getTS('t_52fnd')
+    t1.tag = 't1'  #NOTE local name still t1; tag only changed.
+    t1.play_Hand(logger=logI)
     
 def test():
     """ Test: PLAYS n Sets of m Hands & prints stats.
@@ -247,18 +252,20 @@ def test():
     s =  state.FullState()
     h =  Hand(s)
     
-    setCnt = 20
-    gmeCnt = 50
+    setCnt = 9
+    gmeCnt = 11
     
     tstCntr = Counter(fCnt=0,  nCnt=0,  winCnt=0, msClk=0)
     f =  open('testPrintout.txt', mode='a')
     
+    logW = logging.getLogger('myW')
+    logI = logging.getLogger('myI')
     logE = logging.getLogger('root')
     for i in range(gmeCnt):
         tstCntr += h.play_Set(setCnt,  logger=logE)
         
     n = tstCntr['nCnt']
-    msg = ( "Test - {: .1%}/{:.1%} - {} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms  for {} Games/{} Hands.\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['winCnt'], tstCntr['fCnt']/n, tstCntr['msClk'] /n,  gmeCnt, setCnt ))
+    msg = ( "Test {: .1%}/{:.1%} - {} WINS:AVG: {:<.1f} FndMovs in {:<4.1f}ms. [{} hns/{}Gms/{}Sts]\n".format(tstCntr['winCnt']/n, tstCntr['std'] / n, tstCntr['winCnt'], tstCntr['fCnt']/n, tstCntr['msClk'] /n,  n, gmeCnt, setCnt ))
     
     print(msg)
     f.write(msg)
@@ -273,7 +280,8 @@ if __name__ == "__main__":
     import doctest
     #doctest.testmod(verbose=False)
     #doctest.testfile("hand_testdocs.py")
-    test_snippet()
+    #test_snippet()
+    test()
     
     
 
